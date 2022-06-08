@@ -1,0 +1,18 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "EditorConfig.EditorConfig",
+    "msjsdiag.debugger-for-chrome",
+    "dkundel.vscode-new-file",
+    "aaron-bond.better-comments",
+    "wix.vscode-import-cost",
+    "shd101wyy.markdown-preview-enhanced",
+    "equinusocio.vsc-material-theme-icons",
+    "esbenp.prettier-vscode",
+    "2gua.rainbow-brackets",
+    "formulahendry.auto-rename-tag",
+    "VisualStudioExptTeam.vscodeintellicode",
+    "oderwat.indent-rainbow",
+    "alefragnani.Bookmarks"
+  ]
+}
