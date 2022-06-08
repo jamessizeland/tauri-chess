@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { SketchPicker, Color } from 'react-color';
+import { SketchPicker, Color, RGBColor } from 'react-color';
+import { invoke } from '@tauri-apps/api/tauri';
 
 function App() {
   const [color, setColor] = useState<Color>('#1fa9f4');
@@ -11,6 +12,8 @@ function App() {
         color={color}
         onChange={(color, event) => {
           setColor(color.hex);
+          console.log(color.hex);
+          invoke('generate_gradient', color.rgb);
         }}
       />
     </div>
