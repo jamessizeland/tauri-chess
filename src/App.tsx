@@ -13,7 +13,11 @@ function App() {
         onChange={(color, event) => {
           setColor(color.hex);
           console.log(color.hex);
-          invoke('generate_gradient', color.rgb);
+          invoke('generate_gradient', {
+            r: color.rgb.r,
+            g: color.rgb.g,
+            b: color.rgb.b,
+          });
         }}
       />
     </div>
