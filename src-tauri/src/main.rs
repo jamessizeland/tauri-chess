@@ -13,7 +13,7 @@ fn main() {
 }
 
 #[tauri::command]
-fn generate_gradient(r: u8, g: u8, b: u8) -> Vec<Vec<(u8)>> {
+fn generate_gradient(r: u8, g: u8, b: u8) -> Vec<Vec<u8>> {
     println!("invokes {} {} {}", r, g, b);
     let my_rgb = Srgb::new(r as f32 / 255.0, g as f32 / 255.0, b as f32 / 255.0);
     let my_lch = Lch::from_color(my_rgb.into_linear());
