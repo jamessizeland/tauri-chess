@@ -4,6 +4,7 @@ import { invoke } from '@tauri-apps/api/tauri';
 
 function App() {
   const [color, setColor] = useState<Color>('#1fa9f4');
+  const [gradient, setGradient] = useState([]);
 
   return (
     <div>
@@ -17,9 +18,17 @@ function App() {
             r: color.rgb.r,
             g: color.rgb.g,
             b: color.rgb.b,
+          }).then((grad) => {
+            console.log(grad);
+            setGradient(grad);
           });
         }}
       />
+      {gradient.map((color) => (
+        <div>
+          rgb({color[0]}, {color[1]}, {color[2]})
+        </div>
+      ))}
     </div>
   );
 }
