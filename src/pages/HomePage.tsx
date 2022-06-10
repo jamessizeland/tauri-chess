@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Chessboard, { Position } from 'chessboardjsx';
+import Chessboard, { Position, Piece } from 'chessboardjsx';
 import { notify } from 'services/notifications';
 import { invoke } from '@tauri-apps/api/tauri';
 
@@ -26,9 +26,13 @@ const HomePage = (): JSX.Element => {
           width={400}
           position={position}
           sparePieces
-          onDrop={(square) => invoke<Position>('drop_square', square)}
-          onMouseOverSquare={(square) => invoke('hover_square', square)}
-          onMouseOutSquare={(square) => invoke('unhover_square', square)}
+          onDrop={(state) => invoke<Position>('drop_square', state)}
+          onMouseOverSquare={(square) =>
+            invoke('hover_square', { square: square })
+          }
+          onMouseOutSquare={(square) =>
+            invoke('unhover_square', { square: square })
+          }
           boardStyle={{
             borderRadius: '5px',
             boxShadow: `0 5px 15px rgba(0,0,0,0.5)`,
