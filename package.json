@@ -1,7 +1,7 @@
 {
   "name": "chess-tauri",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "author": {
     "name": "James Sizeland"
   },
@@ -16,6 +16,7 @@
     "@headlessui/react": "^1.6.4",
     "@reach/portal": "^0.17.0",
     "@tauri-apps/api": "^1.0.0-rc.6",
+    "chessboardjsx": "^2.4.7",
     "clsx": "^1.1.1",
     "dayjs": "^1.11.3",
     "debounce": "^1.2.1",
