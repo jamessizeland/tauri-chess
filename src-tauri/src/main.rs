@@ -3,13 +3,34 @@
     windows_subsystem = "windows"
 )]
 
+use app::chess;
 use palette::{FromColor, Gradient, Lch, Srgb};
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![generate_gradient])
+        .invoke_handler(tauri::generate_handler![
+            generate_gradient,
+            hover_square,
+            unhover_square,
+            drop_square,
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+#[tauri::command]
+fn hover_square(square: &str) {
+    dbg!(square);
+}
+
+#[tauri::command]
+fn unhover_square(square: &str) {
+    dbg!(square);
+}
+
+#[tauri::command]
+fn drop_square(source_square: &str, target_square: &str, piece: &str) {
+    dbg!(source_square, target_square, piece);
 }
 
 #[tauri::command]
