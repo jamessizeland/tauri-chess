@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import Chessboard, { Position } from 'chessboardjsx';
 import { notify } from 'services/notifications';
+import { invoke } from '@tauri-apps/api/tauri';
 
 // https://chessboardjsx.com/
 
 const HomePage = (): JSX.Element => {
   const [position, setPosition] = useState<Position | 'start'>('start');
+  const [pieceSquare, setPieceSquare] = useState('');
+  const [square, setSquare] = useState('');
+  const [history, setHistory] = useState<string[]>([]);
 
   useEffect(() => {
     // set a new board up when we go to this page
@@ -22,9 +26,9 @@ const HomePage = (): JSX.Element => {
           width={400}
           position={position}
           sparePieces
-          // onDrop={}
-          // onMouseOverSquare={}
-          // onMouseOutSquare={}
+          onDrop={(square) => invoke<Position>('drop_square', square)}
+          onMouseOverSquare={(square) => invoke('hover_square', square)}
+          onMouseOutSquare={(square) => invoke('unhover_square', square)}
           boardStyle={{
             borderRadius: '5px',
             boxShadow: `0 5px 15px rgba(0,0,0,0.5)`,
