@@ -57,7 +57,7 @@
       {
         "fullscreen": false,
         "height": 600,
-        "resizable": true,
+        "resizable": false,
         "title": "Chess",
         "width": 800
       }
