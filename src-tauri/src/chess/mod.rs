@@ -2,6 +2,18 @@ mod pieces;
 
 /// Logic for the chess board actions
 pub mod board {
+    use super::pieces::Piece;
+
+    /// game state 8x8 board
+    static mut GAME: [[Piece; 8]; 8] = [[Piece::None; 8]; 8];
+
+    /// game move history, stored as FEN strings
+    static mut HISTORY: Vec<&str> = Vec::new();
+
+    /// game score stored relative to white
+    static mut SCORE: i32 = 0;
+
+    // <Vec<Vec<Piece>>>
     #[tauri::command]
     /// Initialize a new game by sending a starting set of coords
     pub fn new_game() {
