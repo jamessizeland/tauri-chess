@@ -93,7 +93,7 @@ const HomePage = (): JSX.Element => {
   const [square, setSquare] = useState(''); // currently clicked square
   const [history, setHistory] = useState<string[]>([]);
   const [squareStyles, setSquareStyles] = useState();
-  let hoveredSquare: Square | undefined = undefined;
+  let hoveredSquare: Square | undefined;
 
   useEffect(() => {
     // set a new board up when we go to this page
