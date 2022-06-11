@@ -1,10 +1,18 @@
 #[tauri::command]
+/// Initialize a new game by sending a starting set of coords
+pub fn new_game() {
+    println!("new game!");
+}
+
+#[tauri::command]
 /// Highlight available moves for the piece occupying this square
-pub fn hover_square(square: &str) -> &str {
+pub fn hover_square(square: &str) -> Vec<&str> {
     let sq_vec: Vec<char> = square.chars().collect();
     // dbg!(&square);
     dbg!(&sq_vec);
-    square
+    let mut highlights = Vec::new();
+    highlights.push(square);
+    highlights
 }
 
 #[tauri::command]

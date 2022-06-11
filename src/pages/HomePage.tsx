@@ -78,10 +78,21 @@ const parseBoardState = (boardArray: BoardStateArray) => {
   return start;
 };
 
+const highlightSquares = (squares: Square[]) => {
+  // turn this array of squares into an object with cssProperties defined
+  const props = squares.reduce<any>((result, item, index) => {
+    result[item] = { backgroundColor: 'yellow' };
+    return result;
+  }, {});
+  console.log(props);
+  return props;
+};
+
 const HomePage = (): JSX.Element => {
   const [position, setPosition] = useState<Position | 'start'>(start);
   const [square, setSquare] = useState(''); // currently clicked square
   const [history, setHistory] = useState<string[]>([]);
+  const [squareStyles, setSquareStyles] = useState();
   let hoveredSquare: Square | undefined = undefined;
 
   useEffect(() => {
@@ -106,8 +117,11 @@ const HomePage = (): JSX.Element => {
           onMouseOverSquare={(square) => {
             // stop unnecessary repeats of this function call
             if (square !== hoveredSquare) {
-              invoke<Square>('hover_square', { square: square }).then((sq) =>
-                console.log(sq),
+              invoke<Square[]>('hover_square', { square: square }).then(
+                (sq) => {
+                  console.log(sq);
+                  setSquareStyles(highlightSquares(sq));
+                },
               );
             }
             hoveredSquare = square;
@@ -119,7 +133,7 @@ const HomePage = (): JSX.Element => {
             borderRadius: '5px',
             boxShadow: `0 5px 15px rgba(0,0,0,0.5)`,
           }}
-          // squareStyles={}
+          squareStyles={squareStyles}
           // dropSquareStyle={}
           // onDragOverSquare={}
           // onSquareClick={}
