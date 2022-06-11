@@ -537,6 +537,11 @@
     "@tauri-apps/cli-win32-ia32-msvc" "1.0.0-rc.13"
     "@tauri-apps/cli-win32-x64-msvc" "1.0.0-rc.13"
 
+"@types/chess.js@^0.13.1":
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/@types/chess.js/-/chess.js-0.13.1.tgz#dda08630957a87375fbadbee1ad3484b8316e1ab"
+  integrity sha512-g5+1ClE0exhD+U7LCcclzBons3d/7ensY61pIoPIdh1VGWMrfMjW0RlI3AYZOXjvc+9Y4KM6lfDiBhXhb7FZag==
+
 "@types/debounce@^1.2.1":
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/@types/debounce/-/debounce-1.2.1.tgz#79b65710bc8b6d44094d286aecf38e44f9627852"
@@ -946,6 +951,11 @@ chalk@^4.0.0:
   dependencies:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
+
+chess.js@^0.13.2:
+  version "0.13.2"
+  resolved "https://registry.yarnpkg.com/chess.js/-/chess.js-0.13.2.tgz#a917667a5bc79c5de325fe7da8c479e3959b30fd"
+  integrity sha512-MVr9IfU1ZhyPMAW4BfwsgeSyB9sliREiWhpimNDZN0Q6JMmb9W0drGlUvemqheqkVGa+/FgypLv/FexUBLBTow==
 
 chessboardjsx@^2.4.7:
   version "2.4.7"
