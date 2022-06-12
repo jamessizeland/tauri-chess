@@ -1,12 +1,14 @@
 //! Chess pieces logic
 
-#[derive(Clone, Copy)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub enum Color {
     Black,
     White,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub enum Piece {
     None,
     Pawn(Color),
