@@ -20,39 +20,39 @@ pub mod board {
     pub fn new_game(state: tauri::State<PieceLocation>) -> BoardState {
         // Lock the counter(Mutex) to get the current value
         let mut game = state.0.lock().expect("game state access error");
-        game[0][0] = Piece::Rook(Color::White);
+        game[0][0] = Piece::Rook(Color::White, true);
         game[1][0] = Piece::Bishop(Color::White);
         game[2][0] = Piece::Knight(Color::White);
         game[3][0] = Piece::Queen(Color::White);
-        game[4][0] = Piece::King(Color::White);
+        game[4][0] = Piece::King(Color::White, true, false, false);
         game[5][0] = Piece::Knight(Color::White);
         game[6][0] = Piece::Bishop(Color::White);
-        game[7][0] = Piece::Rook(Color::White);
-        game[0][1] = Piece::Pawn(Color::White);
-        game[1][1] = Piece::Pawn(Color::White);
-        game[2][1] = Piece::Pawn(Color::White);
-        game[3][1] = Piece::Pawn(Color::White);
-        game[4][1] = Piece::Pawn(Color::White);
-        game[5][1] = Piece::Pawn(Color::White);
-        game[6][1] = Piece::Pawn(Color::White);
-        game[7][1] = Piece::Pawn(Color::White);
+        game[7][0] = Piece::Rook(Color::White, true);
+        game[0][1] = Piece::Pawn(Color::White, true);
+        game[1][1] = Piece::Pawn(Color::White, true);
+        game[2][1] = Piece::Pawn(Color::White, true);
+        game[3][1] = Piece::Pawn(Color::White, true);
+        game[4][1] = Piece::Pawn(Color::White, true);
+        game[5][1] = Piece::Pawn(Color::White, true);
+        game[6][1] = Piece::Pawn(Color::White, true);
+        game[7][1] = Piece::Pawn(Color::White, true);
         // ---
-        game[0][7] = Piece::Rook(Color::Black);
+        game[0][7] = Piece::Rook(Color::Black, true);
         game[1][7] = Piece::Bishop(Color::Black);
         game[2][7] = Piece::Knight(Color::Black);
         game[3][7] = Piece::Queen(Color::Black);
-        game[4][7] = Piece::King(Color::Black);
+        game[4][7] = Piece::King(Color::Black, true, false, false);
         game[5][7] = Piece::Knight(Color::Black);
         game[6][7] = Piece::Bishop(Color::Black);
-        game[7][7] = Piece::Rook(Color::Black);
-        game[0][6] = Piece::Pawn(Color::Black);
-        game[1][6] = Piece::Pawn(Color::Black);
-        game[2][6] = Piece::Pawn(Color::Black);
-        game[3][6] = Piece::Pawn(Color::Black);
-        game[4][6] = Piece::Pawn(Color::Black);
-        game[5][6] = Piece::Pawn(Color::Black);
-        game[6][6] = Piece::Pawn(Color::Black);
-        game[7][6] = Piece::Pawn(Color::Black);
+        game[7][7] = Piece::Rook(Color::Black, true);
+        game[0][6] = Piece::Pawn(Color::Black, true);
+        game[1][6] = Piece::Pawn(Color::Black, true);
+        game[2][6] = Piece::Pawn(Color::Black, true);
+        game[3][6] = Piece::Pawn(Color::Black, true);
+        game[4][6] = Piece::Pawn(Color::Black, true);
+        game[5][6] = Piece::Pawn(Color::Black, true);
+        game[6][6] = Piece::Pawn(Color::Black, true);
+        game[7][6] = Piece::Pawn(Color::Black, true);
         *game // return dereferenced game state to frontend
     }
 
