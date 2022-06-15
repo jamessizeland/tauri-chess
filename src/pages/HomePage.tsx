@@ -16,7 +16,9 @@ const HomePage = (): JSX.Element => {
   const [square, setSquare] = useState(''); // currently clicked square
   const [history, setHistory] = useState<string[]>([]);
   const [squareStyles, setSquareStyles] = useState();
-  let hoveredSquare: Square | undefined;
+  const [hoveredSquare, setHoveredSquare] = useState<Square | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
     // ask if we want to start a new game
@@ -36,14 +38,11 @@ const HomePage = (): JSX.Element => {
           onMouseOverSquare={(square) => {
             // stop unnecessary repeats of this function call
             if (square !== hoveredSquare) {
-              invoke<Square[]>('hover_square', { square: square }).then(
-                (sq) => {
-                  console.log(sq);
-                  setSquareStyles(highlightSquares(sq));
-                },
+              invoke<Square[]>('hover_square', { square: square }).then((sq) =>
+                setSquareStyles(highlightSquares(sq)),
               );
             }
-            hoveredSquare = square;
+            setHoveredSquare(square);
           }}
           onMouseOutSquare={(square) =>
             invoke('unhover_square', { square: square })
