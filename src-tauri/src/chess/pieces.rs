@@ -18,6 +18,11 @@ pub enum Piece {
     Knight(Color),
     Rook(Color),
 }
+impl Default for Piece {
+    fn default() -> Self {
+        Piece::None
+    }
+}
 
 // #[derive(Debug)] // include this line right before your struct definition
 // pub struct Piece {

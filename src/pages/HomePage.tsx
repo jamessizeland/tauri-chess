@@ -4,6 +4,7 @@ import { Square } from 'chess.js';
 import { notify } from 'services/notifications';
 import { invoke } from '@tauri-apps/api/tauri';
 import { match } from 'assert';
+import { Button } from 'components/Elements';
 
 // https://chessboardjsx.com/
 
@@ -118,6 +119,15 @@ const HomePage = (): JSX.Element => {
           // onSquareRightClick={}
         />
       </div>
+      <Button
+        onClick={() =>
+          invoke<BoardStateArray>('get_state').then((gameState) =>
+            console.log(gameState),
+          )
+        }
+      >
+        Get State
+      </Button>
     </div>
   );
 };

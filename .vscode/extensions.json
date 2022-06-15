@@ -13,6 +13,8 @@
     "formulahendry.auto-rename-tag",
     "VisualStudioExptTeam.vscodeintellicode",
     "oderwat.indent-rainbow",
-    "alefragnani.Bookmarks"
+    "alefragnani.Bookmarks",
+    "tamasfe.even-better-toml",
+    "rust-lang.rust-analyzer"
   ]
 }
