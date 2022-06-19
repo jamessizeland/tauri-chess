@@ -28,7 +28,13 @@ const parseBoardState = (boardArray: BoardStateArray) => {
     return `${colRef[row]}${col + 1}` as Square;
   };
   const rustToPiece = (pieceObj: RustPiece) => {
-    const color = Object.values(pieceObj)[0] === 'Black' ? 'b' : 'w';
+    let color: 'w' | 'b' = 'w';
+    // this is required because some pieces only have one property
+    if (!Array.isArray(Object.values(pieceObj)[0])) {
+      color = Object.values(pieceObj)[0] === 'Black' ? 'b' : 'w';
+    } else {
+      color = Object.values(pieceObj)[0][0] === 'Black' ? 'b' : 'w';
+    }
     switch (Object.keys(pieceObj)[0] as PieceType) {
       case 'Queen':
         return `${color}Q` as Piece;
