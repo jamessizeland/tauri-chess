@@ -68,12 +68,15 @@ type PositionStyles = {
 type BoardStateArray = string[][];
 type Color = 'White' | 'Black';
 type PieceType = 'Queen' | 'King' | 'Bishop' | 'Knight' | 'Rook' | 'Pawn';
+type FirstMove = boolean;
+type Check = boolean;
+type CheckMate = boolean;
 type RustPiece =
-  | { [key in 'Queen']: Color }
-  | { [key in 'King']: [Color, boolean, boolean, boolean] } // first move, check, checkmate?
-  | { [key in 'Bishop']: Color }
-  | { [key in 'Knight']: Color }
-  | { [key in 'Rook']: [Color, boolean] } // first move?
-  | { [key in 'Pawn']: [Color, boolean] }; // first move?
+  | { [key in 'Queen']: [Color, FirstMove] }
+  | { [key in 'King']: [Color, FirstMove, Check, CheckMate] }
+  | { [key in 'Bishop']: [Color, FirstMove] }
+  | { [key in 'Knight']: [Color, FirstMove] }
+  | { [key in 'Rook']: [Color, FirstMove] }
+  | { [key in 'Pawn']: [Color, FirstMove] };
 
 export type { BoardStateArray, Color, PieceType, PositionStyles, RustPiece };

@@ -19,9 +19,9 @@ pub enum Piece {
     None,
     Pawn(Color, FirstMove),
     King(Color, FirstMove, Check, CheckMate),
-    Queen(Color),
-    Bishop(Color),
-    Knight(Color),
+    Queen(Color, FirstMove),
+    Bishop(Color, FirstMove),
+    Knight(Color, FirstMove),
     Rook(Color, FirstMove),
 }
 impl Default for Piece {
@@ -78,9 +78,9 @@ impl GetMoves for Piece {
                 }
             }
             Piece::King(color, first_move, check, check_mate) => todo!(),
-            Piece::Queen(color) => todo!(),
-            Piece::Bishop(color) => todo!(),
-            Piece::Knight(color) => todo!(),
+            Piece::Queen(color, first_move) => todo!(),
+            Piece::Bishop(color, first_move) => todo!(),
+            Piece::Knight(color, first_move) => todo!(),
             Piece::Rook(color, first_move) => todo!(),
         }
     }

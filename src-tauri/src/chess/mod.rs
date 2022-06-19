@@ -22,12 +22,12 @@ pub mod board {
         let mut game = state.0.lock().expect("state access error");
         // set up white pieces
         game[0][0] = Piece::Rook(Color::White, true);
-        game[1][0] = Piece::Bishop(Color::White);
-        game[2][0] = Piece::Knight(Color::White);
-        game[3][0] = Piece::Queen(Color::White);
+        game[1][0] = Piece::Bishop(Color::White, true);
+        game[2][0] = Piece::Knight(Color::White, true);
+        game[3][0] = Piece::Queen(Color::White, true);
         game[4][0] = Piece::King(Color::White, true, false, false);
-        game[5][0] = Piece::Knight(Color::White);
-        game[6][0] = Piece::Bishop(Color::White);
+        game[5][0] = Piece::Knight(Color::White, true);
+        game[6][0] = Piece::Bishop(Color::White, true);
         game[7][0] = Piece::Rook(Color::White, true);
         game[0][1] = Piece::Pawn(Color::White, true);
         game[1][1] = Piece::Pawn(Color::White, true);
@@ -39,12 +39,12 @@ pub mod board {
         game[7][1] = Piece::Pawn(Color::White, true);
         // set up black pieces
         game[0][7] = Piece::Rook(Color::Black, true);
-        game[1][7] = Piece::Bishop(Color::Black);
-        game[2][7] = Piece::Knight(Color::Black);
-        game[3][7] = Piece::Queen(Color::Black);
+        game[1][7] = Piece::Bishop(Color::Black, true);
+        game[2][7] = Piece::Knight(Color::Black, true);
+        game[3][7] = Piece::Queen(Color::Black, true);
         game[4][7] = Piece::King(Color::Black, true, false, false);
-        game[5][7] = Piece::Knight(Color::Black);
-        game[6][7] = Piece::Bishop(Color::Black);
+        game[5][7] = Piece::Knight(Color::Black, true);
+        game[6][7] = Piece::Bishop(Color::Black, true);
         game[7][7] = Piece::Rook(Color::Black, true);
         game[0][6] = Piece::Pawn(Color::Black, true);
         game[1][6] = Piece::Pawn(Color::Black, true);
