@@ -3,6 +3,12 @@ import Chessboard, { Position, Piece } from 'chessboardjsx';
 import { Square } from 'chess.js';
 import { notify } from 'services/notifications';
 import { invoke } from '@tauri-apps/api/tauri';
+import type {
+  BoardStateArray,
+  RustPiece,
+  PieceType,
+  PositionStyles,
+} from './types';
 import {
   Modal,
   ModalBody,
@@ -12,17 +18,6 @@ import {
 } from 'components/Elements/';
 
 // https://chessboardjsx.com/
-
-type BoardStateArray = string[][];
-type Color = 'White' | 'Black';
-type PieceType = 'Queen' | 'King' | 'Bishop' | 'Knight' | 'Rook' | 'Pawn';
-type RustPiece =
-  | { [key in 'Queen']: Color }
-  | { [key in 'King']: Color }
-  | { [key in 'Bishop']: Color }
-  | { [key in 'Knight']: Color }
-  | { [key in 'Rook']: Color }
-  | { [key in 'Pawn']: Color };
 
 const parseBoardState = (boardArray: BoardStateArray) => {
   // get 8x8 array of strings
@@ -62,10 +57,10 @@ const parseBoardState = (boardArray: BoardStateArray) => {
   return state;
 };
 
-const highlightSquares = (squares: Square[]) => {
+const highlightSquares = (squares: Square[]): PositionStyles => {
   // turn this array of squares into an object with cssProperties defined
-  const props = squares.reduce<any>((result, item, index) => {
-    result[item] = { backgroundColor: 'yellow' };
+  const props = squares.reduce<PositionStyles>((result, item, index) => {
+    result[item] = { backgroundColor: 'yellow', borderRadius: '50%' };
     return result;
   }, {});
   console.log(props);
@@ -112,5 +107,3 @@ const startNewGame = (setPosition: (positions: Position) => void) => {
 // };
 
 export { parseBoardState, highlightSquares, startNewGame };
-
-export type { BoardStateArray, Color, PieceType, RustPiece };

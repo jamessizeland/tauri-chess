@@ -1,4 +1,4 @@
-pub mod pieces;
+mod pieces;
 
 /// Logic for the chess board actions
 pub mod board {
@@ -10,7 +10,7 @@ pub mod board {
     /// game move history, stored as FEN strings
     // pub struct History(Vec<i32>);
     /// game score stored relative to white
-    pub struct Score(Mutex<i32>);
+    pub struct Score(pub Mutex<i32>);
 
     /// game state 8x8 board
     pub struct PieceLocation(pub Mutex<BoardState>);
@@ -19,7 +19,8 @@ pub mod board {
     /// Initialize a new game by sending a starting set of coords
     pub fn new_game(state: tauri::State<PieceLocation>) -> BoardState {
         // Lock the counter(Mutex) to get the current value
-        let mut game = state.0.lock().expect("game state access error");
+        let mut game = state.0.lock().expect("state access error");
+        // set up white pieces
         game[0][0] = Piece::Rook(Color::White, true);
         game[1][0] = Piece::Bishop(Color::White);
         game[2][0] = Piece::Knight(Color::White);
@@ -36,7 +37,7 @@ pub mod board {
         game[5][1] = Piece::Pawn(Color::White, true);
         game[6][1] = Piece::Pawn(Color::White, true);
         game[7][1] = Piece::Pawn(Color::White, true);
-        // ---
+        // set up black pieces
         game[0][7] = Piece::Rook(Color::Black, true);
         game[1][7] = Piece::Bishop(Color::Black);
         game[2][7] = Piece::Knight(Color::Black);
@@ -61,6 +62,11 @@ pub mod board {
         let game = state.0.lock().expect("game state access error");
         *game
     }
+    #[tauri::command]
+    pub fn get_score(state: tauri::State<Score>) -> i32 {
+        let score = state.0.lock().expect("score state access error");
+        *score
+    }
 
     #[tauri::command]
     /// Highlight available moves for the piece occupying this square
@@ -75,7 +81,9 @@ pub mod board {
 
     #[tauri::command]
     /// Remove any highlighting for square just left
-    pub fn unhover_square(square: &str) {}
+    pub fn unhover_square(square: &str) -> bool {
+        true
+    }
 
     #[tauri::command]
     /// Perform the boardstate change associated with a chess piece being moved

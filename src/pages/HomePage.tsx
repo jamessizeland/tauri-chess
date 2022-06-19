@@ -4,18 +4,18 @@ import { Square } from 'chess.js';
 import { notify } from 'services/notifications';
 import { invoke } from '@tauri-apps/api/tauri';
 import { Button } from 'components/Elements';
-import {
-  highlightSquares,
+import { highlightSquares, startNewGame } from 'components/Features/chess';
+import type {
   BoardStateArray,
-  startNewGame,
-} from 'components/Features/chess';
+  PositionStyles,
+} from 'components/Features/chess/types';
 import { checkEnv } from 'utils';
 
 const HomePage = (): JSX.Element => {
   const [position, setPosition] = useState<Position | 'start'>('start');
   const [square, setSquare] = useState(''); // currently clicked square
   const [history, setHistory] = useState<string[]>([]);
-  const [squareStyles, setSquareStyles] = useState();
+  const [squareStyles, setSquareStyles] = useState<PositionStyles>();
   const [hoveredSquare, setHoveredSquare] = useState<Square | undefined>(
     undefined,
   );
@@ -44,9 +44,15 @@ const HomePage = (): JSX.Element => {
             }
             setHoveredSquare(square);
           }}
-          onMouseOutSquare={(square) =>
-            invoke('unhover_square', { square: square })
-          }
+          onMouseOutSquare={(square) => {
+            // this doesn't work as expected yet...
+            if (square !== hoveredSquare) {
+              invoke('unhover_square', { square: square }).then(() =>
+                setSquareStyles(highlightSquares([])),
+              );
+              setHoveredSquare(undefined);
+            }
+          }}
           boardStyle={{
             borderRadius: '5px',
             boxShadow: `0 5px 15px rgba(0,0,0,0.5)`,

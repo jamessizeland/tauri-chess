@@ -3,17 +3,19 @@
     windows_subsystem = "windows"
 )]
 
-use app::chess::board::*;
+mod chess;
 
 fn main() {
     tauri::Builder::default()
-        .manage(PieceLocation(Default::default()))
+        .manage(chess::board::PieceLocation(Default::default()))
+        .manage(chess::board::Score(Default::default()))
         .invoke_handler(tauri::generate_handler![
-            new_game,
-            get_state,
-            hover_square,
-            unhover_square,
-            drop_square,
+            chess::board::new_game,
+            chess::board::get_state,
+            chess::board::get_score,
+            chess::board::hover_square,
+            chess::board::unhover_square,
+            chess::board::drop_square,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
