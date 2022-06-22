@@ -3,7 +3,7 @@ mod pieces;
 /// Logic for the chess board actions
 pub mod board {
     use super::pieces::{Color, Piece};
-    use std::sync::Mutex; // mutual exclusion wrapper
+    use std::{default, sync::Mutex}; // mutual exclusion wrapper
 
     pub type BoardState = [[Piece; 8]; 8];
 
@@ -14,6 +14,21 @@ pub mod board {
 
     /// game state 8x8 board
     pub struct PieceLocation(pub Mutex<BoardState>);
+
+    /// Convert letters a-h to a row index from a standard chessboard
+    fn letter_to_row(letter: char) -> u32 {
+        match letter {
+            'a' => 0,
+            'b' => 1,
+            'c' => 2,
+            'd' => 3,
+            'e' => 4,
+            'f' => 5,
+            'g' => 6,
+            'h' => 7,
+            _ => panic!(),
+        }
+    }
 
     #[tauri::command]
     /// Initialize a new game by sending a starting set of coords
@@ -59,21 +74,25 @@ pub mod board {
 
     #[tauri::command]
     pub fn get_state(state: tauri::State<PieceLocation>) -> BoardState {
-        let game = state.0.lock().expect("game state access error");
+        let game = state.0.lock().expect("game state access");
         *game
     }
     #[tauri::command]
     pub fn get_score(state: tauri::State<Score>) -> i32 {
-        let score = state.0.lock().expect("score state access error");
+        let score = state.0.lock().expect("score state access");
         *score
     }
 
     #[tauri::command]
     /// Highlight available moves for the piece occupying this square
-    pub fn hover_square(square: &str) -> Vec<&str> {
+    pub fn hover_square<'a>(square: &'a str, state: tauri::State<PieceLocation>) -> Vec<&'a str> {
         let sq_vec: Vec<char> = square.chars().collect();
-        // dbg!(&square);
-        dbg!(&sq_vec);
+        let coord = (
+            letter_to_row(sq_vec[0]),
+            sq_vec[1].to_digit(10).unwrap() - 1,
+        );
+        dbg!(&coord, &square);
+
         let mut highlights = Vec::new();
         highlights.push(square);
         highlights

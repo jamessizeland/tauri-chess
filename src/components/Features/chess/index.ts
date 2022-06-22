@@ -1,5 +1,5 @@
 import react from 'React';
-import Chessboard, { Position, Piece } from 'chessboardjsx';
+import { Position, Piece } from 'chessboardjsx';
 import { Square } from 'chess.js';
 import { notify } from 'services/notifications';
 import { invoke } from '@tauri-apps/api/tauri';
@@ -9,13 +9,6 @@ import type {
   PieceType,
   PositionStyles,
 } from './types';
-import {
-  Modal,
-  ModalBody,
-  ModalHeader,
-  ModalFooter,
-  Button,
-} from 'components/Elements/';
 
 // https://chessboardjsx.com/
 
@@ -28,13 +21,8 @@ const parseBoardState = (boardArray: BoardStateArray) => {
     return `${colRef[row]}${col + 1}` as Square;
   };
   const rustToPiece = (pieceObj: RustPiece) => {
-    let color: 'w' | 'b' = 'w';
-    // this is required because some pieces only have one property
-    if (!Array.isArray(Object.values(pieceObj)[0])) {
-      color = Object.values(pieceObj)[0] === 'Black' ? 'b' : 'w';
-    } else {
-      color = Object.values(pieceObj)[0][0] === 'Black' ? 'b' : 'w';
-    }
+    let color: 'w' | 'b' =
+      Object.values(pieceObj)[0][0] === 'Black' ? 'b' : 'w';
     switch (Object.keys(pieceObj)[0] as PieceType) {
       case 'Queen':
         return `${color}Q` as Piece;
@@ -79,37 +67,5 @@ const startNewGame = (setPosition: (positions: Position) => void) => {
     setPosition(parseBoardState(board));
   });
 };
-
-//? need to figure out how to do a new context for this
-// const NewGamePopup = (): JSX.Element => {
-//   const { open, toggle } = useToggle();
-//   return (
-//     <div className="mb-8">
-//       <h2 className="mb-3 mt-12 text-gray-600 text-lg font-bold md:text-2xl">
-//         With animation
-//       </h2>
-//       <Button onClick={toggle} color="primary">
-//         Click to open me
-//       </Button>
-//       <Modal
-//         isOpen={open}
-//         toggle={toggle}
-//         animate={true}
-//         closeOnClickOutside={false}
-//       >
-//         <ModalHeader>Chess</ModalHeader>
-//         <ModalBody>Start New Game?</ModalBody>
-//         <ModalFooter>
-//           <Button onClick={toggle} color="danger" className="mr-1">
-//             Close
-//           </Button>
-//           <Button onClick={toggle} color="primary">
-//             Confirm
-//           </Button>
-//         </ModalFooter>
-//       </Modal>
-//     </div>
-//   );
-// };
 
 export { parseBoardState, highlightSquares, startNewGame };

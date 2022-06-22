@@ -2,7 +2,6 @@
   "recommendations": [
     "dbaeumer.vscode-eslint",
     "EditorConfig.EditorConfig",
-    "msjsdiag.debugger-for-chrome",
     "dkundel.vscode-new-file",
     "aaron-bond.better-comments",
     "wix.vscode-import-cost",
