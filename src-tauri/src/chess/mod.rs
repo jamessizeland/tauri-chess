@@ -16,7 +16,7 @@ pub mod board {
     pub struct PieceLocation(pub Mutex<BoardState>);
 
     /// Convert letters a-h to a row index from a standard chessboard
-    fn letter_to_row(letter: char) -> u32 {
+    fn letter_to_row(letter: char) -> usize {
         match letter {
             'a' => 0,
             'b' => 1,
@@ -87,9 +87,9 @@ pub mod board {
     /// Highlight available moves for the piece occupying this square
     pub fn hover_square<'a>(square: &'a str, state: tauri::State<PieceLocation>) -> Vec<&'a str> {
         let sq_vec: Vec<char> = square.chars().collect();
-        let coord = (
+        let coord: (usize, usize) = (
             letter_to_row(sq_vec[0]),
-            sq_vec[1].to_digit(10).unwrap() - 1,
+            (sq_vec[1].to_digit(10).unwrap() - 1) as usize,
         );
         dbg!(&coord, &square);
 

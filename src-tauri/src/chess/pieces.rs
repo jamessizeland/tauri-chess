@@ -14,7 +14,7 @@ pub type FirstMove = bool;
 pub type Check = bool;
 pub type CheckMate = bool;
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq)]
 pub enum Piece {
     None,
     Pawn(Color, FirstMove),
@@ -29,20 +29,20 @@ impl Default for Piece {
         Piece::None
     }
 }
-#[repr(u8)]
-pub enum Row {
-    A,
-    B,
-    C,
-    D,
-    E,
-    F,
-    G,
-    H,
-}
+// #[repr(usize)]
+// pub enum Row {
+//     A,
+//     B,
+//     C,
+//     D,
+//     E,
+//     F,
+//     G,
+//     H,
+// }
 
 /// Square reference in row and column
-type Square = (Row, u8);
+type Square = (usize, usize);
 type IsAttack = bool;
 type MoveList = Vec<(Square, IsAttack)>;
 
@@ -57,25 +57,36 @@ pub trait GetMoves {
 
 impl GetMoves for Piece {
     fn get_moves(&self, square: Square, board_state: BoardState) -> MoveList {
-        // what type of piece am I?
+        let mut moves: MoveList = Vec::new(); // start with empty movelist
         match &self {
+            // what type of piece am I?
             Piece::None => {
-                let mut moves: MoveList = Vec::new();
-                moves.push((square, false));
+                // moves.push((square, false));
                 moves
             }
-            // for each actual piece we need to work out what moves it could do on an empty board
-            // then remove moves that are blocked by other pieces
+            // for each actual piece we need to work out what moves it could do on an empty board, then remove moves that are blocked by other pieces
             Piece::Pawn(color, first_move) => {
-                let mut move_array: Vec<(i8, i8)> = Vec::new();
-                move_array.push((0, 1));
-                if *first_move {
-                    move_array.push((0, 2));
-                };
+                // fill an array of possible move vectors
+                // move_array.push(vec![(0, 1)]);
+                // if *first_move {
+
+                //     move_array[0].push((0, 2));
+                // };
+                //* 3. potential attacks
                 match color {
+                    Color::White => {
+                        //* 1. move forward one
+                        if board_state[square.0][square.1 + 1] == Piece::None {
+                            moves.push(((square.0, square.1 + 1), false));
+                            //* 2. move forward two if first move
+                            if board_state[square.0][square.1 + 2] == Piece::None && *first_move {
+                                moves.push(((square.0, square.1 + 2), false));
+                            }
+                        }
+                    }
                     Color::Black => todo!(),
-                    Color::White => todo!(),
                 }
+                moves
             }
             Piece::King(color, first_move, check, check_mate) => todo!(),
             Piece::Queen(color, first_move) => todo!(),
@@ -85,3 +96,5 @@ impl GetMoves for Piece {
         }
     }
 }
+/// Check if a potential move square for my piece is occupied by a friend or foe
+fn check_square_occupant(square: &Square, my_piece: &Piece) {}

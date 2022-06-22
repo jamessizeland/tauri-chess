@@ -63,7 +63,7 @@ const highlightSquares = (squares: Square[]): PositionStyles => {
 
 const startNewGame = (setPosition: (positions: Position) => void) => {
   invoke<BoardStateArray>('new_game').then((board) => {
-    notify('starting new game');
+    notify('starting new game', 'new_game');
     setPosition(parseBoardState(board));
   });
 };
