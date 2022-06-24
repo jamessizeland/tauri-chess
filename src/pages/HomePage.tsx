@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Chessboard, { Position } from 'chessboardjsx';
 import { Square } from 'chess.js';
-import { notify } from 'services/notifications';
+// import { notify } from 'services/notifications';
 import { invoke } from '@tauri-apps/api/tauri';
 import { Button } from 'components/Elements';
 import { highlightSquares, startNewGame } from 'components/Features/chess';
 import type {
   BoardStateArray,
+  MoveList,
   PositionStyles,
 } from 'components/Features/chess/types';
 import { checkEnv } from 'utils';
@@ -38,7 +39,7 @@ const HomePage = (): JSX.Element => {
           onMouseOverSquare={(square) => {
             // stop unnecessary repeats of this function call
             if (square !== hoveredSquare) {
-              invoke<Square[]>('hover_square', { square: square }).then((sq) =>
+              invoke<MoveList>('hover_square', { square: square }).then((sq) =>
                 setSquareStyles(highlightSquares(sq)),
               );
             }

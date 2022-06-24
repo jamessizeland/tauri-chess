@@ -1,9 +1,10 @@
+mod moves;
 mod pieces;
 
 /// Logic for the chess board actions
 pub mod board {
-    use super::pieces::{Color, Piece};
-    use std::{default, sync::Mutex}; // mutual exclusion wrapper
+    use super::pieces::{Color, GetState, MoveList, Piece, Square};
+    use std::sync::Mutex; // mutual exclusion wrapper
 
     pub type BoardState = [[Piece; 8]; 8];
 
@@ -29,6 +30,20 @@ pub mod board {
             _ => panic!(),
         }
     }
+
+    // fn row_to_letter(row: usize) -> char {
+    //     match row {
+    //         0 => 'a',
+    //         1 => 'b',
+    //         2 => 'c',
+    //         3 => 'd',
+    //         4 => 'e',
+    //         5 => 'f',
+    //         6 => 'g',
+    //         7 => 'h',
+    //         _ => panic!(),
+    //     }
+    // }
 
     #[tauri::command]
     /// Initialize a new game by sending a starting set of coords
@@ -69,6 +84,11 @@ pub mod board {
         game[5][6] = Piece::Pawn(Color::Black, true);
         game[6][6] = Piece::Pawn(Color::Black, true);
         game[7][6] = Piece::Pawn(Color::Black, true);
+        // debug
+        game[1][2] = Piece::Pawn(Color::Black, true);
+        game[3][2] = Piece::Pawn(Color::Black, true);
+        game[1][5] = Piece::Pawn(Color::White, true);
+        game[3][5] = Piece::Pawn(Color::White, true);
         *game // return dereferenced game state to frontend
     }
 
@@ -85,22 +105,23 @@ pub mod board {
 
     #[tauri::command]
     /// Highlight available moves for the piece occupying this square
-    pub fn hover_square<'a>(square: &'a str, state: tauri::State<PieceLocation>) -> Vec<&'a str> {
+    pub fn hover_square<'a>(square: &'a str, state: tauri::State<PieceLocation>) -> MoveList {
+        let game = state.0.lock().expect("game state access");
         let sq_vec: Vec<char> = square.chars().collect();
-        let coord: (usize, usize) = (
+        let coord: Square = (
             letter_to_row(sq_vec[0]),
             (sq_vec[1].to_digit(10).unwrap() - 1) as usize,
         );
         dbg!(&coord, &square);
-
-        let mut highlights = Vec::new();
-        highlights.push(square);
-        highlights
+        game[coord.0][coord.1].get_moves(coord, *game)
+        // let mut highlights = Vec::new();
+        // highlights.push(square);
+        // highlights
     }
 
     #[tauri::command]
     /// Remove any highlighting for square just left
-    pub fn unhover_square(square: &str) -> bool {
+    pub fn unhover_square(_square: &str) -> bool {
         true
     }
 

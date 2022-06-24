@@ -79,4 +79,13 @@ type RustPiece =
   | { [key in 'Rook']: [Color, FirstMove] }
   | { [key in 'Pawn']: [Color, FirstMove] };
 
-export type { BoardStateArray, Color, PieceType, PositionStyles, RustPiece };
+type MoveList = [[number, number], boolean][];
+
+export type {
+  BoardStateArray,
+  Color,
+  PieceType,
+  PositionStyles,
+  RustPiece,
+  MoveList,
+};

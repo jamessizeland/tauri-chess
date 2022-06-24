@@ -1,8 +1,8 @@
 //! Chess pieces logic
 
+use super::moves::{knight_move, rook_move};
+use super::{board::BoardState, moves::pawn_move};
 use serde::{Deserialize, Serialize};
-
-use super::board::BoardState;
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq)]
 pub enum Color {
@@ -42,59 +42,42 @@ impl Default for Piece {
 // }
 
 /// Square reference in row and column
-type Square = (usize, usize);
-type IsAttack = bool;
-type MoveList = Vec<(Square, IsAttack)>;
-
+pub type Square = (usize, usize);
+pub type IsAttack = bool;
+pub type MoveList = Vec<(Square, IsAttack)>;
 /// Get a list of available moves for this piece
-pub trait GetMoves {
+pub trait GetState {
     fn get_moves(&self, square: Square, board_state: BoardState) -> MoveList;
+    fn get_colour(&self) -> Option<Color>;
 }
 
-// fn move_vectors (piece: Piece) -> Vec<(u8, u8)> {
-
-// }
-
-impl GetMoves for Piece {
-    fn get_moves(&self, square: Square, board_state: BoardState) -> MoveList {
-        let mut moves: MoveList = Vec::new(); // start with empty movelist
+impl GetState for Piece {
+    fn get_colour(&self) -> Option<Color> {
+        match &self {
+            Piece::None => None,
+            Piece::Pawn(color, _) => Some(*color),
+            Piece::King(color, _, _, _) => Some(*color),
+            Piece::Queen(color, _) => Some(*color),
+            Piece::Bishop(color, _) => Some(*color),
+            Piece::Knight(color, _) => Some(*color),
+            Piece::Rook(color, _) => Some(*color),
+        }
+    }
+    fn get_moves(&self, sq: Square, board: BoardState) -> MoveList {
         match &self {
             // what type of piece am I?
-            Piece::None => {
-                // moves.push((square, false));
-                moves
+            Piece::None => Vec::new(),
+            //* For each actual piece we need to work out what moves it could do on an empty board, then remove moves that are blocked by other pieces
+            Piece::Pawn(color, first_move) => pawn_move(sq, color, first_move, &board),
+            // Piece::King(color, first_move, check, check_mate) => todo!(),
+            Piece::Queen(color, _first_move) => {
+                //* move in any direction until either another piece or the edge of the board
+                rook_move(sq, color, &board)
             }
-            // for each actual piece we need to work out what moves it could do on an empty board, then remove moves that are blocked by other pieces
-            Piece::Pawn(color, first_move) => {
-                // fill an array of possible move vectors
-                // move_array.push(vec![(0, 1)]);
-                // if *first_move {
-
-                //     move_array[0].push((0, 2));
-                // };
-                //* 3. potential attacks
-                match color {
-                    Color::White => {
-                        //* 1. move forward one
-                        if board_state[square.0][square.1 + 1] == Piece::None {
-                            moves.push(((square.0, square.1 + 1), false));
-                            //* 2. move forward two if first move
-                            if board_state[square.0][square.1 + 2] == Piece::None && *first_move {
-                                moves.push(((square.0, square.1 + 2), false));
-                            }
-                        }
-                    }
-                    Color::Black => todo!(),
-                }
-                moves
-            }
-            Piece::King(color, first_move, check, check_mate) => todo!(),
-            Piece::Queen(color, first_move) => todo!(),
-            Piece::Bishop(color, first_move) => todo!(),
-            Piece::Knight(color, first_move) => todo!(),
-            Piece::Rook(color, first_move) => todo!(),
+            // Piece::Bishop(color, first_move) => todo!(),
+            Piece::Knight(color, _first_move) => knight_move(sq, color, &board),
+            Piece::Rook(color, _first_move) => rook_move(sq, color, &board),
+            _ => Vec::new(),
         }
     }
 }
-/// Check if a potential move square for my piece is occupied by a friend or foe
-fn check_square_occupant(square: &Square, my_piece: &Piece) {}

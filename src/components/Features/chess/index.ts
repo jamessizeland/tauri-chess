@@ -8,6 +8,7 @@ import type {
   RustPiece,
   PieceType,
   PositionStyles,
+  MoveList,
 } from './types';
 
 // https://chessboardjsx.com/
@@ -51,10 +52,21 @@ const parseBoardState = (boardArray: BoardStateArray) => {
   return state;
 };
 
-const highlightSquares = (squares: Square[]): PositionStyles => {
+const numToLetter = (num: number) => (num + 9).toString(36);
+
+const coordToSquare = (row: number, col: number) => {
+  return `${numToLetter(row + 1)}${col + 1}` as keyof PositionStyles;
+};
+
+const highlightSquares = (moveOptions: MoveList): PositionStyles => {
   // turn this array of squares into an object with cssProperties defined
-  const props = squares.reduce<PositionStyles>((result, item, index) => {
-    result[item] = { backgroundColor: 'yellow', borderRadius: '50%' };
+  const props = moveOptions.reduce<PositionStyles>((result, move, index) => {
+    const [isAttack, row, col] = [move[1], move[0][0], move[0][1]];
+
+    result[coordToSquare(row, col)] = {
+      backgroundColor: isAttack ? 'red' : 'yellow',
+      borderRadius: '50%',
+    };
     return result;
   }, {});
   console.log(props);
