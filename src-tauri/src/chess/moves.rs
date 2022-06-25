@@ -1,8 +1,7 @@
 //! Logic for deciding where chess pieces can go, and moving them
 
-use super::board::BoardState;
 use super::pieces::GetState;
-use super::types::{Color, MoveList, Piece};
+use super::types::{BoardState, Color, MoveList, Piece};
 use super::utils::check_enemy;
 
 pub fn pawn_move(
@@ -202,7 +201,7 @@ pub fn king_move(
     sq: (usize, usize),
     color: &Color,
     board: &BoardState,
-    first_move: bool,
+    _first_move: bool,
 ) -> MoveList {
     let mut moves: MoveList = Vec::new(); // start with empty movelist
     const VECTORS: [(i8, i8); 8] = [

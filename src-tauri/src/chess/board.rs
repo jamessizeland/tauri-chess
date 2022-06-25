@@ -1,19 +1,79 @@
 //! Logic for the chess board actions
 
+use super::data::{PieceLocation, Score, SelectedSquare};
 use super::pieces::GetState;
-use super::types::{Color, MoveList, Piece, Square};
+use super::types::{BoardState, Color, MoveList, Piece, Square};
 use super::utils::letter_to_row;
-use std::sync::Mutex; // mutual exclusion wrapper
 
-pub type BoardState = [[Piece; 8]; 8];
+#[tauri::command]
+pub fn get_state(state: tauri::State<PieceLocation>) -> BoardState {
+    let game = state.0.lock().expect("game state access");
+    *game
+}
+#[tauri::command]
+pub fn get_score(state: tauri::State<Score>) -> i32 {
+    let score = state.0.lock().expect("score state access");
+    *score
+}
+fn square_to_coord(square: &str) -> (usize, usize) {
+    let sq_vec: Vec<char> = square.chars().collect();
+    if sq_vec.len() != 2 {
+        panic!("square string wasn't 2 characters");
+    } else {
+        (
+            letter_to_row(sq_vec[0]),
+            (sq_vec[1].to_digit(10).unwrap() - 1) as usize,
+        )
+    }
+}
 
-/// game move history, stored as FEN strings
-// pub struct History(Vec<i32>);
-/// game score stored relative to white
-pub struct Score(pub Mutex<i32>);
+#[tauri::command]
+/// Highlight available moves for the piece occupying this square
+pub fn hover_square(
+    square: &str,
+    state: tauri::State<PieceLocation>,
+    clicked: tauri::State<SelectedSquare>,
+) -> MoveList {
+    let game = state.0.lock().expect("game state access");
 
-/// game state 8x8 board
-pub struct PieceLocation(pub Mutex<BoardState>);
+    let selected = *clicked.0.lock().unwrap();
+    let mut coord: Square = square_to_coord(square);
+
+    if selected != Option::None {
+        coord = selected.unwrap();
+    }
+    dbg!(&coord, &square);
+    game[coord.0][coord.1].get_moves(coord, *game)
+}
+
+#[tauri::command]
+/// Remove any highlighting for square just left
+pub fn unhover_square(_square: &str) -> bool {
+    true
+}
+
+#[tauri::command]
+/// Perform the boardstate change associated with a chess piece being moved
+pub fn drop_square(source_square: &str, target_square: &str, piece: &str) {
+    dbg!(source_square, target_square, piece);
+}
+
+#[tauri::command]
+pub fn click_square(
+    square: &str,
+    state: tauri::State<PieceLocation>,
+    clicked: tauri::State<SelectedSquare>,
+) -> MoveList {
+    let selected = *clicked.0.lock().unwrap();
+    let coord = square_to_coord(square);
+    if selected == Some(coord) || state.0.lock().unwrap()[coord.0][coord.1] == Piece::None {
+        // if we have clicked on the same square again, unselect it
+        *clicked.0.lock().unwrap() = Option::None;
+    } else {
+        *clicked.0.lock().unwrap() = Some(coord);
+    }
+    hover_square(square, state, clicked)
+}
 
 #[tauri::command]
 /// Initialize a new game by sending a starting set of coords
@@ -67,45 +127,3 @@ pub fn new_game(state: tauri::State<PieceLocation>) -> BoardState {
     game[2][4] = Piece::King(Color::Black, true, false, false);
     *game // return dereferenced game state to frontend
 }
-
-#[tauri::command]
-pub fn get_state(state: tauri::State<PieceLocation>) -> BoardState {
-    let game = state.0.lock().expect("game state access");
-    *game
-}
-#[tauri::command]
-pub fn get_score(state: tauri::State<Score>) -> i32 {
-    let score = state.0.lock().expect("score state access");
-    *score
-}
-
-#[tauri::command]
-/// Highlight available moves for the piece occupying this square
-pub fn hover_square<'a>(square: &'a str, state: tauri::State<PieceLocation>) -> MoveList {
-    let game = state.0.lock().expect("game state access");
-    let sq_vec: Vec<char> = square.chars().collect();
-    let coord: Square = (
-        letter_to_row(sq_vec[0]),
-        (sq_vec[1].to_digit(10).unwrap() - 1) as usize,
-    );
-    dbg!(&coord, &square);
-    game[coord.0][coord.1].get_moves(coord, *game)
-    // let mut highlights = Vec::new();
-    // highlights.push(square);
-    // highlights
-}
-
-#[tauri::command]
-/// Remove any highlighting for square just left
-pub fn unhover_square(_square: &str) -> bool {
-    true
-}
-
-#[tauri::command]
-/// Perform the boardstate change associated with a chess piece being moved
-pub fn drop_square(source_square: &str, target_square: &str, piece: &str) {
-    dbg!(source_square, target_square, piece);
-}
-
-// #[tauri::command]
-// pub fn click_square(square)

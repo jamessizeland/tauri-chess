@@ -2,6 +2,8 @@
 
 use serde::{Deserialize, Serialize};
 
+pub type BoardState = [[Piece; 8]; 8];
+
 /// Square reference in row and column
 pub type Square = (usize, usize);
 pub type IsAttack = bool;

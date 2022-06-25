@@ -1,8 +1,7 @@
 //! Chess pieces traits
 
-use super::board::BoardState;
 use super::moves::{bish_move, king_move, knight_move, pawn_move, rook_move};
-use super::types::{Color, MoveList, Piece, Square};
+use super::types::{BoardState, Color, MoveList, Piece, Square};
 
 /// Get a list of available moves for this piece
 pub trait GetState {
