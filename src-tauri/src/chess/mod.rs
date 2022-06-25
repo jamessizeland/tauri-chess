@@ -89,6 +89,9 @@ pub mod board {
         game[3][2] = Piece::Pawn(Color::Black, true);
         game[1][5] = Piece::Pawn(Color::White, true);
         game[3][5] = Piece::Pawn(Color::White, true);
+        game[5][3] = Piece::Rook(Color::Black, true);
+        game[7][3] = Piece::Pawn(Color::White, true);
+        game[1][3] = Piece::Pawn(Color::White, true);
         *game // return dereferenced game state to frontend
     }
 

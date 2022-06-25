@@ -1,6 +1,12 @@
 use super::board::BoardState;
 use super::pieces::{Color, GetState, MoveList, Piece};
 
+/// check if the square we are looking at contains an enemy piece
+fn check_enemy(color: &Color, piece: Piece) -> bool {
+    (piece.get_colour() == Some(Color::Black) && *color == Color::White)
+        || (piece.get_colour() == Some(Color::White) && *color == Color::Black)
+}
+
 pub fn pawn_move(
     sq: (usize, usize),
     color: &Color,
@@ -71,42 +77,61 @@ pub fn rook_move(sq: (usize, usize), color: &Color, board: &BoardState) -> MoveL
         //* right
         let (row, col) = (sq.0 + add, sq.1);
         if row > 7 {
-            break;
+            break; // out of bounds, stop
+        }
+        if board[row][col] != Piece::None {
+            if check_enemy(color, board[row][col]) {
+                moves.push(((row, col), true));
+            }
+            break; // stop
         }
         moves.push(((row, col), false));
     }
     for sub in 1..8 {
         //* left
-        if sq.0 != 0 {
-            let (row, col) = (sq.0 - sub, sq.1);
-            moves.push(((row, col), false));
-            if row == 0 {
-                break;
+        let (row, col) = (sq.0 as i8 - sub, sq.1);
+        if row < 0 {
+            break; // out of bounds
+        }
+        let row = row as usize; // recast back to usize now we know it's >= 0
+        if board[row][col] != Piece::None {
+            if check_enemy(color, board[row][col]) {
+                moves.push(((row, col), true));
             }
-        } else {
             break;
         }
+        moves.push(((row, col), false));
     }
     for add in 1..8 {
         //* up
         let (row, col) = (sq.0, sq.1 + add);
         if col > 7 {
-            break;
+            break; // out of bounds, stop
+        }
+        if board[row][col] != Piece::None {
+            if check_enemy(color, board[row][col]) {
+                moves.push(((row, col), true));
+            }
+            break; // stop
         }
         moves.push(((row, col), false));
     }
     for sub in 1..8 {
         //* down
-        if sq.1 != 0 {
-            let (row, col) = (sq.0, sq.1 - sub);
-            moves.push(((row, col), false));
-            if col == 0 {
-                break;
+        let (row, col) = (sq.0, sq.1 as i8 - sub);
+        if col < 0 {
+            break; // out of bounds
+        }
+        let col = col as usize; // recast back to usize now we know it's >= 0
+        if board[row][col] != Piece::None {
+            if check_enemy(color, board[row][col]) {
+                moves.push(((row, col), true));
             }
-        } else {
             break;
         }
+        moves.push(((row, col), false));
     }
+
     moves
 }
 
@@ -129,12 +154,10 @@ pub fn knight_move(sq: (usize, usize), color: &Color, board: &BoardState) -> Mov
         if row >= 0 && row <= 7 && col >= 0 && col <= 7 {
             // valid square
             let (row, col) = (row as usize, col as usize);
-            let target_colour = board[row][col].get_colour();
+            // let target_colour = board[row][col].get_colour();
             if board[row][col] == Piece::None {
                 moves.push(((row, col), false));
-            } else if (*color == Color::Black && target_colour == Some(Color::White))
-                || (*color == Color::White && target_colour == Some(Color::Black))
-            {
+            } else if check_enemy(color, board[row][col]) {
                 moves.push(((row, col), true));
             }
         }
