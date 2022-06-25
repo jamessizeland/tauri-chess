@@ -2,7 +2,6 @@
   "recommendations": [
     "dbaeumer.vscode-eslint",
     "EditorConfig.EditorConfig",
-    "msjsdiag.debugger-for-chrome",
     "dkundel.vscode-new-file",
     "aaron-bond.better-comments",
     "wix.vscode-import-cost",
@@ -13,6 +12,8 @@
     "formulahendry.auto-rename-tag",
     "VisualStudioExptTeam.vscodeintellicode",
     "oderwat.indent-rainbow",
-    "alefragnani.Bookmarks"
+    "alefragnani.Bookmarks",
+    "tamasfe.even-better-toml",
+    "rust-lang.rust-analyzer"
   ]
 }

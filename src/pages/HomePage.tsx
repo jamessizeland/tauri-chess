@@ -1,20 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import Chessboard, { Position, Piece } from 'chessboardjsx';
-import { notify } from 'services/notifications';
+import Chessboard, { Position } from 'chessboardjsx';
+import { Square } from 'chess.js';
+// import { notify } from 'services/notifications';
 import { invoke } from '@tauri-apps/api/tauri';
-
-// https://chessboardjsx.com/
+import { Button } from 'components/Elements';
+import { highlightSquares, startNewGame } from 'components/Features/chess';
+import type {
+  BoardStateArray,
+  MoveList,
+  PositionStyles,
+} from 'components/Features/chess/types';
+import { checkEnv } from 'utils';
 
 const HomePage = (): JSX.Element => {
   const [position, setPosition] = useState<Position | 'start'>('start');
-  const [pieceSquare, setPieceSquare] = useState('');
-  const [square, setSquare] = useState('');
+  const [square, setSquare] = useState(''); // currently clicked square
   const [history, setHistory] = useState<string[]>([]);
+  const [squareStyles, setSquareStyles] = useState<PositionStyles>();
+  const [hoveredSquare, setHoveredSquare] = useState<Square | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
-    // set a new board up when we go to this page
-    notify('starting new game');
-    setPosition('start');
+    // ask if we want to start a new game
+    startNewGame(setPosition);
   }, []);
 
   return (
@@ -25,25 +34,50 @@ const HomePage = (): JSX.Element => {
           id="testBoard"
           width={400}
           position={position}
-          sparePieces
+          // sparePieces
           onDrop={(state) => invoke<Position>('drop_square', state)}
-          onMouseOverSquare={(square) =>
-            invoke('hover_square', { square: square })
-          }
-          onMouseOutSquare={(square) =>
-            invoke('unhover_square', { square: square })
-          }
+          onMouseOverSquare={(square) => {
+            // stop unnecessary repeats of this function call
+            if (square !== hoveredSquare) {
+              invoke<MoveList>('hover_square', { square: square }).then((sq) =>
+                setSquareStyles(highlightSquares(sq)),
+              );
+            }
+            setHoveredSquare(square);
+          }}
+          onMouseOutSquare={(square) => {
+            // this doesn't work as expected yet...
+            if (square !== hoveredSquare) {
+              invoke('unhover_square', { square: square }).then(() =>
+                setSquareStyles(highlightSquares([])),
+              );
+              setHoveredSquare(undefined);
+            }
+          }}
           boardStyle={{
             borderRadius: '5px',
             boxShadow: `0 5px 15px rgba(0,0,0,0.5)`,
           }}
-          // squareStyles={}
+          squareStyles={squareStyles}
           // dropSquareStyle={}
           // onDragOverSquare={}
           // onSquareClick={}
           // onSquareRightClick={}
         />
       </div>
+      {!checkEnv('production') ? (
+        <Button
+          onClick={() =>
+            invoke<BoardStateArray>('get_state').then((gameState) =>
+              console.log(gameState),
+            )
+          }
+        >
+          Get State
+        </Button>
+      ) : (
+        <></>
+      )}
     </div>
   );
 };

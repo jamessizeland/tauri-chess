@@ -15,7 +15,7 @@ export * from './drawer/drawer';
 export * from './hamburger-menu/hamburgerMenu';
 // export * from './jumbotron/jumbotron';
 // export * from './list-group/listGroup';
-// export * from './modal/modal';
+export * from './modal/modal';
 export * from './navbar/navbar';
 // export * from './scroll-indicator/scrollIndicator';
 export * from './sidenav/sidenav';
