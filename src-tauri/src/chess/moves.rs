@@ -135,6 +135,71 @@ pub fn rook_move(sq: (usize, usize), color: &Color, board: &BoardState) -> MoveL
     moves
 }
 
+pub fn bish_move(sq: (usize, usize), color: &Color, board: &BoardState) -> MoveList {
+    let mut moves: MoveList = Vec::new(); // start with empty movelist
+    for add in 1..8 {
+        //* right up
+        let (row, col) = (sq.0 + add, sq.1 + add);
+        if row > 7 || col > 7 {
+            break; // out of bounds, stop
+        }
+        if board[row][col] != Piece::None {
+            if check_enemy(color, board[row][col]) {
+                moves.push(((row, col), true));
+            }
+            break; // stop
+        }
+        moves.push(((row, col), false));
+    }
+    for sub in 1..8 {
+        //* left down
+        let (row, col) = (sq.0 as i8 - sub, sq.1 as i8 - sub);
+        if row < 0 || col < 0 {
+            break; // out of bounds
+        }
+        let (row, col) = (row as usize, col as usize); // recast back to usize
+        if board[row][col] != Piece::None {
+            if check_enemy(color, board[row][col]) {
+                moves.push(((row, col), true));
+            }
+            break;
+        }
+        moves.push(((row, col), false));
+    }
+    for add in 1..8 {
+        //* left up
+        let (row, col) = (sq.0 as i8 - add, sq.1 as i8 + add);
+        if col > 7 || row < 0 {
+            break; // out of bounds, stop
+        }
+        let (row, col) = (row as usize, col as usize); // recast back to usize
+        if board[row][col] != Piece::None {
+            if check_enemy(color, board[row][col]) {
+                moves.push(((row, col), true));
+            }
+            break; // stop
+        }
+        moves.push(((row, col), false));
+    }
+    for sub in 1..8 {
+        //* right down
+        let (row, col) = (sq.0 as i8 + sub, sq.1 as i8 - sub);
+        if col < 0 || row > 7 {
+            break; // out of bounds
+        }
+        let (row, col) = (row as usize, col as usize); // recast back to usize
+        if board[row][col] != Piece::None {
+            if check_enemy(color, board[row][col]) {
+                moves.push(((row, col), true));
+            }
+            break;
+        }
+        moves.push(((row, col), false));
+    }
+
+    moves
+}
+
 pub fn knight_move(sq: (usize, usize), color: &Color, board: &BoardState) -> MoveList {
     let mut moves: MoveList = Vec::new(); // start with empty movelist
                                           //* list all possible vectors for a knight to move

@@ -1,6 +1,6 @@
 //! Chess pieces logic
 
-use super::moves::{knight_move, rook_move};
+use super::moves::{bish_move, knight_move, rook_move};
 use super::{board::BoardState, moves::pawn_move};
 use serde::{Deserialize, Serialize};
 
@@ -74,7 +74,7 @@ impl GetState for Piece {
                 //* move in any direction until either another piece or the edge of the board
                 rook_move(sq, color, &board)
             }
-            // Piece::Bishop(color, first_move) => todo!(),
+            Piece::Bishop(color, _first_move) => bish_move(sq, color, &board),
             Piece::Knight(color, _first_move) => knight_move(sq, color, &board),
             Piece::Rook(color, _first_move) => rook_move(sq, color, &board),
             _ => Vec::new(),
