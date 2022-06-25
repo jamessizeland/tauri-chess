@@ -200,6 +200,41 @@ pub fn bish_move(sq: (usize, usize), color: &Color, board: &BoardState) -> MoveL
     moves
 }
 
+pub fn king_move(
+    sq: (usize, usize),
+    color: &Color,
+    board: &BoardState,
+    first_move: bool,
+) -> MoveList {
+    let mut moves: MoveList = Vec::new(); // start with empty movelist
+    const VECTORS: [(i8, i8); 8] = [
+        (1, 1),
+        (1, -1),
+        (-1, 1),
+        (-1, -1),
+        (0, 1),
+        (1, 0),
+        (-1, 0),
+        (0, -1),
+    ];
+    for vector in VECTORS {
+        let row = sq.0 as i8 + vector.0;
+        let col = sq.1 as i8 + vector.1;
+        if row >= 0 && row <= 7 && col >= 0 && col <= 7 {
+            // valid square
+            let (row, col) = (row as usize, col as usize);
+            // let target_colour = board[row][col].get_colour();
+            if board[row][col] == Piece::None {
+                moves.push(((row, col), false));
+            } else if check_enemy(color, board[row][col]) {
+                moves.push(((row, col), true));
+            }
+        }
+    }
+
+    moves
+}
+
 pub fn knight_move(sq: (usize, usize), color: &Color, board: &BoardState) -> MoveList {
     let mut moves: MoveList = Vec::new(); // start with empty movelist
                                           //* list all possible vectors for a knight to move

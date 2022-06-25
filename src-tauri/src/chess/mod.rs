@@ -93,6 +93,8 @@ pub mod board {
         game[7][3] = Piece::Pawn(Color::White, true);
         game[1][3] = Piece::Pawn(Color::White, true);
         game[4][4] = Piece::Bishop(Color::White, true);
+        game[5][5] = Piece::Queen(Color::Black, true);
+        game[2][4] = Piece::King(Color::Black, true, false, false);
         *game // return dereferenced game state to frontend
     }
 

@@ -1,6 +1,6 @@
 //! Chess pieces logic
 
-use super::moves::{bish_move, knight_move, rook_move};
+use super::moves::{bish_move, king_move, knight_move, rook_move};
 use super::{board::BoardState, moves::pawn_move};
 use serde::{Deserialize, Serialize};
 
@@ -69,15 +69,20 @@ impl GetState for Piece {
             Piece::None => Vec::new(),
             //* For each actual piece we need to work out what moves it could do on an empty board, then remove moves that are blocked by other pieces
             Piece::Pawn(color, first_move) => pawn_move(sq, color, first_move, &board),
-            // Piece::King(color, first_move, check, check_mate) => todo!(),
+            Piece::King(color, first_move, _check, _check_mate) => {
+                king_move(sq, color, &board, *first_move)
+            }
             Piece::Queen(color, _first_move) => {
                 //* move in any direction until either another piece or the edge of the board
-                rook_move(sq, color, &board)
+                let mut moves = rook_move(sq, color, &board);
+                let mut diag_moves = bish_move(sq, color, &board);
+                moves.append(&mut diag_moves);
+                moves
             }
             Piece::Bishop(color, _first_move) => bish_move(sq, color, &board),
             Piece::Knight(color, _first_move) => knight_move(sq, color, &board),
             Piece::Rook(color, _first_move) => rook_move(sq, color, &board),
-            _ => Vec::new(),
+            // _ => Vec::new(),
         }
     }
 }
