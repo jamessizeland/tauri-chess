@@ -17,6 +17,7 @@ const HomePage = (): JSX.Element => {
   const [square, setSquare] = useState(''); // currently clicked square
   const [history, setHistory] = useState<string[]>([]);
   const [squareStyles, setSquareStyles] = useState<PositionStyles>();
+  const [dragStyles, setDragStyles] = useState<{}>();
   const [hoveredSquare, setHoveredSquare] = useState<Square | undefined>(
     undefined,
   );
@@ -31,11 +32,15 @@ const HomePage = (): JSX.Element => {
       <h1 className="text-3xl font-bold underline text-center">Game</h1>
       <div className="flex justify-around items-center flex-wrap pt-5">
         <Chessboard
+          draggable={false}
           id="testBoard"
           width={400}
           position={position}
-          // sparePieces
-          onDrop={(state) => invoke<Position>('drop_square', state)}
+          onDrop={(state) =>
+            invoke<Position>('drop_square', state).then((pos) =>
+              setPosition(pos),
+            )
+          }
           onMouseOverSquare={(square) => {
             // stop unnecessary repeats of this function call
             if (square !== hoveredSquare) {
@@ -59,8 +64,10 @@ const HomePage = (): JSX.Element => {
             boxShadow: `0 5px 15px rgba(0,0,0,0.5)`,
           }}
           squareStyles={squareStyles}
-          // dropSquareStyle={}
-          // onDragOverSquare={}
+          dropSquareStyle={dragStyles}
+          onDragOverSquare={(square) => {
+            setDragStyles({ boxShadow: 'inset 0 0 1px 4px rgb(255, 255, 0)' });
+          }}
           // onSquareClick={}
           // onSquareRightClick={}
         />
