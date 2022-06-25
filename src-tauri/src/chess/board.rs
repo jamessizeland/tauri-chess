@@ -1,30 +1,22 @@
 //! Logic for the chess board actions
 
-use super::data::{PieceLocation, Score, SelectedSquare};
+use super::data::{GameMeta, PieceLocation, SelectedSquare};
 use super::pieces::GetState;
 use super::types::{BoardState, Color, MoveList, Piece, Square};
-use super::utils::letter_to_row;
+use super::utils::square_to_coord;
 
 #[tauri::command]
+/// Get the location of all pieces from global memory
 pub fn get_state(state: tauri::State<PieceLocation>) -> BoardState {
-    let game = state.0.lock().expect("game state access");
+    let game = state.0.lock().expect("board state access");
     *game
 }
+
 #[tauri::command]
-pub fn get_score(state: tauri::State<Score>) -> i32 {
-    let score = state.0.lock().expect("score state access");
-    *score
-}
-fn square_to_coord(square: &str) -> (usize, usize) {
-    let sq_vec: Vec<char> = square.chars().collect();
-    if sq_vec.len() != 2 {
-        panic!("square string wasn't 2 characters");
-    } else {
-        (
-            letter_to_row(sq_vec[0]),
-            (sq_vec[1].to_digit(10).unwrap() - 1) as usize,
-        )
-    }
+/// Get the game score from global memory
+pub fn get_score(state: tauri::State<GameMeta>) -> i32 {
+    let score = state.0.lock().expect("game state access").score;
+    score
 }
 
 #[tauri::command]
@@ -59,6 +51,8 @@ pub fn drop_square(source_square: &str, target_square: &str, piece: &str) {
 }
 
 #[tauri::command]
+/// Click on a square to select or deselect it
+/// If a square is selected, the hover command will be deactivated
 pub fn click_square(
     square: &str,
     state: tauri::State<PieceLocation>,
