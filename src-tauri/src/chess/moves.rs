@@ -1,11 +1,9 @@
-use super::board::BoardState;
-use super::pieces::{Color, GetState, MoveList, Piece};
+//! Logic for deciding where chess pieces can go, and moving them
 
-/// check if the square we are looking at contains an enemy piece
-fn check_enemy(color: &Color, piece: Piece) -> bool {
-    (piece.get_colour() == Some(Color::Black) && *color == Color::White)
-        || (piece.get_colour() == Some(Color::White) && *color == Color::Black)
-}
+use super::board::BoardState;
+use super::pieces::GetState;
+use super::types::{Color, MoveList, Piece};
+use super::utils::check_enemy;
 
 pub fn pawn_move(
     sq: (usize, usize),

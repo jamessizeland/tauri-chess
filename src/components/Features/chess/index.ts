@@ -58,7 +58,10 @@ const coordToSquare = (row: number, col: number) => {
   return `${numToLetter(row + 1)}${col + 1}` as keyof PositionStyles;
 };
 
-const highlightSquares = (moveOptions: MoveList): PositionStyles => {
+const highlightSquares = (
+  moveOptions: MoveList,
+  square?: Square,
+): PositionStyles => {
   // turn this array of squares into an object with cssProperties defined
   const props = moveOptions.reduce<PositionStyles>((result, move, index) => {
     const [isAttack, row, col] = [move[1], move[0][0], move[0][1]];
@@ -69,7 +72,9 @@ const highlightSquares = (moveOptions: MoveList): PositionStyles => {
     };
     return result;
   }, {});
-  console.log(props);
+  if (square) {
+    props[square] = { boxShadow: 'inset 0 0 1px 4px rgb(255, 255, 0)' };
+  }
   return props;
 };
 

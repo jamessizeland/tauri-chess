@@ -45,20 +45,20 @@ const HomePage = (): JSX.Element => {
             // stop unnecessary repeats of this function call
             if (square !== hoveredSquare) {
               invoke<MoveList>('hover_square', { square: square }).then((sq) =>
-                setSquareStyles(highlightSquares(sq)),
+                setSquareStyles(highlightSquares(sq, square)),
               );
             }
             setHoveredSquare(square);
           }}
-          onMouseOutSquare={(square) => {
-            // this doesn't work as expected yet...
-            if (square !== hoveredSquare) {
-              invoke('unhover_square', { square: square }).then(() =>
-                setSquareStyles(highlightSquares([])),
-              );
-              setHoveredSquare(undefined);
-            }
-          }}
+          // onMouseOutSquare={(square) => {
+          //   // this doesn't work as expected yet...
+          //   if (square !== hoveredSquare) {
+          //     invoke('unhover_square', { square: square }).then(() =>
+          //       setSquareStyles(highlightSquares([])),
+          //     );
+          //     setHoveredSquare(undefined);
+          //   }
+          // }}
           boardStyle={{
             borderRadius: '5px',
             boxShadow: `0 5px 15px rgba(0,0,0,0.5)`,
@@ -68,7 +68,11 @@ const HomePage = (): JSX.Element => {
           onDragOverSquare={(square) => {
             setDragStyles({ boxShadow: 'inset 0 0 1px 4px rgb(255, 255, 0)' });
           }}
-          // onSquareClick={}
+          onSquareClick={(square) => {
+            invoke<MoveList>('click_square', { square: square }).then((sq) =>
+              setSquareStyles(highlightSquares(sq, square)),
+            );
+          }}
           // onSquareRightClick={}
         />
       </div>
