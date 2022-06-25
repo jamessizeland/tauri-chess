@@ -22,6 +22,7 @@
     "dayjs": "^1.11.3",
     "debounce": "^1.2.1",
     "react": "^18.0.0",
+    "react-chessboard": "^1.2.5",
     "react-color": "^2.19.3",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.3.0",
