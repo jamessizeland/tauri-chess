@@ -24,7 +24,7 @@ const SideNavigation = () => {
           <SidenavItems />
         </ul>
       </DrawerBody>
-      <DrawerFooter>Copyright 2021</DrawerFooter>
+      <DrawerFooter>Copyright 2022</DrawerFooter>
     </Drawer>
   );
 };
