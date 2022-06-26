@@ -15,16 +15,19 @@ import type {
 
 const parseBoardState = (boardArray: BoardStateArray) => {
   // get 8x8 array of strings
-  console.log({ boardArray });
   const coordToSquare = (row: number, col: number) => {
     const colRef = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
     // construct the square from the row/col coords
-    return `${colRef[row]}${col + 1}` as Square;
+    let square: Square = `${colRef[row]}${col + 1}` as Square;
+    // console.log({ square });
+    return square;
   };
+
   const rustToPiece = (pieceObj: RustPiece) => {
     let color: 'w' | 'b' =
       Object.values(pieceObj)[0][0] === 'Black' ? 'b' : 'w';
-    switch (Object.keys(pieceObj)[0] as PieceType) {
+    let type = Object.keys(pieceObj)[0] as PieceType;
+    switch (type) {
       case 'Queen':
         return `${color}Q` as Piece;
       case 'King':
@@ -37,18 +40,19 @@ const parseBoardState = (boardArray: BoardStateArray) => {
         return `${color}R` as Piece;
       case 'Pawn':
         return `${color}P` as Piece;
+      default:
+        return undefined;
     }
   };
-
-  let state: Position = boardArray.reduce<Position>((result, row, i) => {
-    row.forEach((col, j) => {
-      if (col !== 'None') {
-        console.log(col);
-        result[coordToSquare(i, j)] = rustToPiece(col as unknown as RustPiece);
-      }
+  let state = boardArray.reduce<Position>((result, row, rowi) => {
+    row.forEach((sq, coli) => {
+      let piece = rustToPiece(sq as unknown as RustPiece);
+      if (piece) result[coordToSquare(rowi, coli)] = piece;
     });
     return result;
   }, {});
+  console.log({ state });
+  alert(JSON.stringify(state));
   return state;
 };
 
@@ -85,4 +89,10 @@ const startNewGame = (setPosition: (positions: Position) => void) => {
   });
 };
 
-export { parseBoardState, highlightSquares, startNewGame };
+const getGameState = (setPosition: (positions: Position) => void) => {
+  invoke<BoardStateArray>('get_state').then((board) => {
+    setPosition(parseBoardState(board));
+  });
+};
+
+export { parseBoardState, highlightSquares, startNewGame, getGameState };

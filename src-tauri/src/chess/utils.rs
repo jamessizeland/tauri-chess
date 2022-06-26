@@ -1,7 +1,7 @@
 //! General utility functions for chess
 
 use super::pieces::GetState;
-use super::types::{Color, Piece};
+use super::types::{BoardState, Color, Piece};
 
 /// Convert letters a-h to a row index from a standard chessboard
 pub fn letter_to_row(letter: char) -> usize {
@@ -51,4 +51,12 @@ pub fn square_to_coord(square: &str) -> (usize, usize) {
             (sq_vec[1].to_digit(10).unwrap() - 1) as usize,
         )
     }
+}
+
+/// Check if the square we clicked on is a valid move of the currently selected piece
+pub fn valid_move(source: (usize, usize), target: (usize, usize), board: BoardState) -> bool {
+    println!("checking if valid");
+    let move_options = board[source.0][source.1].get_moves(source, board);
+    // dbg!(&source, &target);
+    move_options.iter().any(|&ele| ele.0 == target)
 }
