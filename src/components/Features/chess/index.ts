@@ -52,7 +52,7 @@ const parseBoardState = (boardArray: BoardStateArray) => {
     return result;
   }, {});
   console.log({ state });
-  alert(JSON.stringify(state));
+  // alert(JSON.stringify(state));
   return state;
 };
 
