@@ -36,10 +36,10 @@ export function fenToObj(fen: string): Position | false {
   // cut off any move, castling, etc info from the end
   // we're only interested in position information
   fen = fen.replace(/ .+$/, '');
-  let [rows, position, currentRow] = [fen.split('/'), {}, 8];
+  let [rows, currentRow] = [fen.split('/'), 8];
+  let position: Position = {};
   for (let i = 0; i < 8; i++) {
-    let row = rows[i].split('');
-    let colIdx = 0;
+    let [row, colIdx] = [rows[i].split(''), 0];
     // loop through each character in the FEN section
     for (let j = 0; j < row.length; j++) {
       // number / empty squares
@@ -48,9 +48,9 @@ export function fenToObj(fen: string): Position | false {
         colIdx += numEmptySquares;
       } else {
         // piece
-        let square = COLUMNS[colIdx] + currentRow;
-        position[square] = fenToPieceCode(row[j]);
-        colIdx = colIdx + 1;
+        let square = (COLUMNS[colIdx] + currentRow) as Square;
+        position[square] = fenToPieceCode(row[j] as FENpiece);
+        colIdx += 1;
       }
     }
 
