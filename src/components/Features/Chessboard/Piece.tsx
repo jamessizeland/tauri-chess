@@ -1,42 +1,29 @@
 import React, { Component } from 'react';
-import DragSource from 'react-dnd';
+import { useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { CSSProperties } from 'react';
 import { Square } from 'chess.js';
 
 import { ItemTypes } from './helpers';
+import { Piece } from './types';
 
 type ChessPieceProps = {
-  dropTarget: Square;
-  square: Square;
-  targetSquare: Square;
-  waitForTransition: boolean;
-  getSquareCoordinates: (sourceSquare: Square, targetSquare: Square) => {
-  
-  }
+  dropTarget?: Square;
+  square?: Square;
+  targetSquare?: Square;
+  waitForTransition?: boolean;
+  getSquareCoordinates?: (sourceSquare: Square, targetSquare: Square) => {};
+  piece: Piece;
+  width: number;
+  pieces: Object;
+  transitionDuration?: number;
+  isDragging: boolean;
+  sourceSquare: Square;
+  onPieceClick?: () => void;
+  allowDrag?: ({ piece, sourceSquare }: {piece: Piece; sourceSquare: Square; }) => string;
+  customDragLayerStyles: CSSProperties;
+  phantomPieceStyles?: CSSProperties;
 }
-
-// static propTypes = {
-//   piece: PropTypes.string,
-//   square: PropTypes.string,
-//   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-//   width: PropTypes.number,
-//   connectDragSource: PropTypes.func,
-//   isDragging: PropTypes.bool,
-//   connectDragPreview: PropTypes.func,
-//   dropOffBoard: PropTypes.string,
-//   getSquareCoordinates: PropTypes.func,
-//   onDrop: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
-//   transitionDuration: PropTypes.number,
-//   pieces: PropTypes.object,
-//   sourceSquare: PropTypes.string,
-//   targetSquare: PropTypes.string,
-//   waitForTransition: PropTypes.bool,
-//   setTouchState: PropTypes.func,
-//   onPieceClick: PropTypes.func,
-//   wasSquareClicked: PropTypes.func,
-//   allowDrag: PropTypes.func,
-// };
 
 export const renderChessPiece = ({
   dropTarget,
@@ -55,6 +42,7 @@ export const renderChessPiece = ({
   customDragLayerStyles = {},
   phantomPieceStyles = {},
 }: ChessPieceProps): JSX.Element => {
+
   const renderChessPieceArgs = {
     squareWidth: width / 8,
     isDragging,
@@ -95,7 +83,16 @@ export const renderChessPiece = ({
   );
 };
 
-const Piece = ({piece, square, id, width, connectDragSource, isDragging,}): JSX.Element => {
+type PieceProps = {
+  piece: Piece;
+  square: Square;
+  id: number | string;
+  width: number;
+  connectDragSource: () => void;
+  isDragging: boolean;
+}
+
+const Piece = ({piece, square, id, width, connectDragSource, isDragging}: PieceProps): JSX.Element => {
   static propTypes = {
     piece: PropTypes.string,
     square: PropTypes.string,
@@ -146,24 +143,6 @@ const Piece = ({piece, square, id, width, connectDragSource, isDragging,}): JSX.
   componentWillUnmount() {
     window.removeEventListener('touchstart', this.props.setTouchState);
   }
-
-  render() {
-    const {
-      square,
-      targetSquare,
-      waitForTransition,
-      getSquareCoordinates,
-      piece,
-      width,
-      pieces,
-      transitionDuration,
-      isDragging,
-      connectDragSource,
-      sourceSquare,
-      dropTarget,
-      onPieceClick,
-      allowDrag,
-    } = this.props;
 
     return connectDragSource(
       renderChessPiece({
@@ -260,7 +239,7 @@ const isActivePiece = (square: Square, targetSquare: Square) =>
   targetSquare && targetSquare === square;
 
 type TransitionProps = {
-  getSquareCoordinates: (sourceSq: Square, targetSq: Square) => void;
+  getSquareCoordinates: (sourceSq: Square, targetSq: Square) => {sourceSquare: {x: number; y: number}, targetSquare: {x: number; y: number}};
   sourceSq: Square;
   targetSq: Square;
 }
@@ -283,7 +262,7 @@ type TranslationProps = {
   square: Square;
   targetSquare: Square;
   sourceSquare: Square;
-  getSquareCoordinates: () => void;
+  getSquareCoordinates: (sourceSq: Square, targetSq: Square) => {sourceSquare: {x: number; y: number}, targetSquare: {x: number; y: number}};
 }
 
 const getTranslation = ({

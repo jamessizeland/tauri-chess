@@ -1,78 +1,71 @@
-import React, { Component } from 'react';
+import React, { Component, CSSProperties } from 'react';
 import PropTypes from 'prop-types';
-import { DragLayer } from 'react-dnd';
-
+import type { XYCoord } from 'react-dnd';
+import { useDragLayer } from 'react-dnd';
 import { renderChessPiece } from './Piece';
+import { CustomPieces } from './types';
+import { Square } from 'chess.js';
 
-class CustomDragLayer extends Component {
-  static propTypes = {
-    item: PropTypes.object,
-    currentOffset: PropTypes.shape({
-      x: PropTypes.number.isRequired,
-      y: PropTypes.number.isRequired
-    }),
-    isDragging: PropTypes.bool.isRequired,
-    width: PropTypes.number,
-    pieces: PropTypes.object,
-    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    wasPieceTouched: PropTypes.bool,
-    sourceSquare: PropTypes.string
-  };
+type Props = {
+  width: number;
+  pieces: CustomPieces;
+  wasPieceTouched: boolean;
+  sourceSquare: Square;
+  id?: string | number;
+};
 
-  render() {
-    const {
-      isDragging,
-      width,
-      item,
-      id,
-      currentOffset,
-      wasPieceTouched,
-      pieces,
-      sourceSquare
-    } = this.props;
-
-    return isDragging && item.board === id ? (
-      <div style={layerStyles}>
-        <div style={getItemStyle(currentOffset, wasPieceTouched)}>
-          {renderChessPiece({
-            width,
-            pieces,
-            piece: item.piece,
-            isDragging,
-            customDragLayerStyles: { opacity: 1 },
-            sourceSquare
-          })}
-        </div>
-      </div>
-    ) : null;
-  }
-}
-
-function collect(monitor) {
-  return {
-    item: monitor.getItem(),
-    currentOffset: monitor.getSourceClientOffset(),
-    isDragging: monitor.isDragging()
-  };
-}
-
-export default DragLayer(collect)(CustomDragLayer);
-
-const layerStyles = {
+const layerStyles: CSSProperties = {
   position: 'fixed',
   pointerEvents: 'none',
   zIndex: 10,
   left: 0,
-  top: 0
+  top: 0,
 };
 
-const getItemStyle = (currentOffset, wasPieceTouched) => {
+const getItemStyle = (
+  currentOffset: XYCoord | null,
+  wasPieceTouched: boolean,
+): CSSProperties => {
   if (!currentOffset) return { display: 'none' };
 
   let { x, y } = currentOffset;
   const transform = wasPieceTouched
     ? `translate(${x}px, ${y + -25}px) scale(2)`
     : `translate(${x}px, ${y}px)`;
-
   return { transform };
 };
+
+const CustomDragLayer = ({
+  id,
+  pieces,
+  sourceSquare,
+  wasPieceTouched,
+  width,
+}: Props) => {
+  const { itemType, isDragging, item, currentOffset } = useDragLayer(
+    (monitor) => ({
+      item: monitor.getItem(),
+      itemType: monitor.getItemType(),
+      // initialOffset: monitor.getInitialSourceClientOffset(),
+      currentOffset: monitor.getSourceClientOffset(),
+      isDragging: monitor.isDragging(),
+    }),
+  );
+
+  return isDragging ? (
+    <div style={layerStyles}>
+      <div style={getItemStyle(currentOffset, wasPieceTouched)}>
+        {renderChessPiece({
+          width,
+          pieces,
+          piece: item.piece,
+          isDragging,
+          customDragLayerStyles: { opacity: 1 },
+          sourceSquare,
+        })}
+      </div>
+    </div>
+  ) : null;
+};
+
+export default CustomDragLayer;

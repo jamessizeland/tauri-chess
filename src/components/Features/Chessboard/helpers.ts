@@ -5,34 +5,62 @@ import type { FENpiece, Piece, Position } from './types';
 export const ItemTypes = { PIECE: 'piece' };
 export const COLUMNS = 'abcdefgh'.split('');
 
-export const constructPositionAttributes = (
-  currentPosition: string | Position,
-  position: string | Position,
-) => {
-  const difference = diff(currentPosition, position);
-  const squaresAffected = difference?.length || 0;
-  const sourceSquare: Square =
-    difference && difference[1] && difference && difference[1].kind === 'D'
-      ? difference[1].path && difference[1].path[0]
-      : difference[0].path && difference[0].path[0];
-  const targetSquare: Square =
-    difference && difference[1] && difference && difference[1].kind === 'D'
-      ? difference[0] && difference[0].path[0]
-      : difference[1] && difference[1].path[0];
-  const sourcePiece: Piece =
-    difference && difference[1] && difference && difference[1].kind === 'D'
-      ? difference[1] && difference[1].lhs
-      : difference[1] && difference[1].rhs;
-  return { sourceSquare, targetSquare, sourcePiece, squaresAffected };
+export const constructPositionAttributes = (from: Position, to: Position) => {
+  type PosChange = {
+    from: Square;
+    to: Square;
+    piece: Piece;
+    type: 'move' | 'attack' | 'promotion';
+  };
+  let changesArr: PosChange[] = [];
+  const change = diff(from, to); // change in board states between turns
+  if (change) {
+    // something has changed, filter to collect New, Edited and Deleted elements
+    change.forEach((element) => {
+      if (element.kind === 'D') {
+        // Delete (piece removed from square)
+        const i = changesArr.findIndex((e) => element.lhs === e.piece);
+        if (i != -1 && element.path) {
+          // found where this piece has gone, add to this move obj
+          changesArr[i].from = element.path[0];
+        } else if (element.path) {
+          changesArr.push({
+            to: element.path[0],
+            from: element.path[0],
+            piece: element.lhs as Piece,
+            type: 'move',
+          });
+        }
+      } else if (element.kind === 'E' || element.kind === 'N') {
+        // Edit (piece replaced with another) or New (piece moved to a previously empty square)
+        const i = changesArr.findIndex((e) => element.rhs === e.piece);
+        if (i != -1 && element.path) {
+          // found where this piece has come from, add to this move obj
+          changesArr[i].to = element.path[0];
+        } else if (element.path) {
+          changesArr.push({
+            to: element.path[0],
+            from: element.path[0],
+            piece: element.rhs as Piece,
+            type: element.kind === 'E' ? 'attack' : 'move',
+          });
+        }
+      }
+    });
+  }
+  changesArr = changesArr.map((element) => {
+    if (element.from === element.to) element.type = 'promotion';
+    return element;
+  });
+  return changesArr;
 };
 
 function isString(s: any): boolean {
   return typeof s === 'string';
 }
 
-// convert FEN string to a Position Object i.e. {'a1': 'wK',...}
-export function fenToObj(fen: string): Position | false {
-  if (!validFen(fen)) return false;
+/** convert FEN string to a Position Object i.e. {'a1': 'wK',...} */
+export function fenToObj(fen: string): Position {
   // cut off any move, castling, etc info from the end
   // we're only interested in position information
   fen = fen.replace(/ .+$/, '');
@@ -60,7 +88,7 @@ export function fenToObj(fen: string): Position | false {
   return position;
 }
 
-// replace summed gaps between pieces with several '1' spacers
+/** replace summed gaps between pieces with several '1' spacers */
 function expandFenEmptySquares(fen: string) {
   return fen
     .replace(/8/g, '11111111')
@@ -72,7 +100,7 @@ function expandFenEmptySquares(fen: string) {
     .replace(/2/g, '11');
 }
 
-// check if the input string is a valid FEN string
+/**  check if the input string is a valid FEN string */
 export function validFen(fen: string): boolean {
   if (!isString(fen)) return false;
   // cut off any move, castling, etc info from the end
@@ -92,7 +120,7 @@ export function validFen(fen: string): boolean {
   return true;
 }
 
-// convert FEN piece code to bP, wK, etc
+/** convert FEN piece code to bP, wK, etc */
 function fenToPieceCode(piece: FENpiece): Piece {
   // black piece
   if (piece.toLowerCase() === piece) {
@@ -102,17 +130,17 @@ function fenToPieceCode(piece: FENpiece): Piece {
   return ('w' + piece.toUpperCase()) as Piece;
 }
 
-// check if the input square string conforms to the square syntax i.e. 'a1'
+/** check if the input square string conforms to the square syntax i.e. 'a1' */
 function validSquare(square: Square | string): boolean {
   return isString(square) && square.search(/^[a-h][1-8]$/) !== -1;
 }
 
-// check if the input piece string conforms to the piece syntax i.e. 'bQ'
+/** check if the input piece string conforms to the piece syntax i.e. 'bQ' */
 function validPieceCode(code: Piece | string): boolean {
   return isString(code) && code.search(/^[bw][KQRNBP]$/) !== -1;
 }
 
-// check if the input position object is valid
+/** check if the input position object is valid */
 export function validPositionObject(pos: Position | string): boolean {
   if (pos === null || typeof pos !== 'object') return false;
 
@@ -129,7 +157,7 @@ export function validPositionObject(pos: Position | string): boolean {
   return true;
 }
 
-// replace placeholder '1' spacers with the sum of those spacers
+/** replace placeholder '1' spacers with the sum of those spacers */
 function squeezeFenEmptySquares(fen: string) {
   return fen
     .replace(/11111111/g, '8')
@@ -141,7 +169,7 @@ function squeezeFenEmptySquares(fen: string) {
     .replace(/11/g, '2');
 }
 
-// convert bP, wK, etc code to FEN structure
+/** convert bP, wK, etc code to FEN structure */
 function pieceCodeToFen(piece: Piece): FENpiece {
   let pieceCodeLetters = piece.split('');
   // white piece
@@ -152,8 +180,8 @@ function pieceCodeToFen(piece: Piece): FENpiece {
   return pieceCodeLetters[1].toLowerCase() as FENpiece;
 }
 
-// position object to FEN string
-// returns false if the obj is not a valid position object
+/** position object to FEN string
+ * returns false if the obj is not a valid position object */
 export function objToFen(obj: Position): false | string {
   if (!validPositionObject(obj)) return false;
   let [fen, currentRow] = ['', 8];

@@ -6,6 +6,7 @@ import Notation from './Notation';
 import Chessboard from './index';
 import PhantomPiece from './PhantomPiece';
 import Row from './Row';
+import { Position } from './types';
 
 const Board = () => {
 
@@ -39,7 +40,7 @@ const getSquareCoordinates = (sourceSquare: Square, targetSquare: Square): {sour
     );
   };
 
-  const hasPiece = (currentPosition, square: Square) =>
+  const hasPiece = (currentPosition: Position, square: Square) =>
     currentPosition &&
     Object.keys(currentPosition) &&
     Object.keys(currentPosition).includes(square);

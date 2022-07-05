@@ -1,12 +1,21 @@
+import { Square } from 'chess.js';
 import React, { CSSProperties } from 'react'; // eslint-disable-line no-unused-vars
 
 import { renderChessPiece } from './Piece';
+import { Piece } from './types';
 
 type Props = {
   width: number;
-  phantomPieceValue: string;
+  phantomPieceValue: Piece;
   pieces: {};
-  allowDrag: () => void;
+  allowDrag: ({
+    piece,
+    sourceSquare,
+  }: {
+    piece: Piece;
+    sourceSquare: Square;
+  }) => string;
+  piece: Piece;
 };
 
 function PhantomPiece({ width, pieces, phantomPieceValue, allowDrag }: Props) {
