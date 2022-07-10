@@ -1,72 +1,40 @@
-import React, { PureComponent, Fragment } from 'react';
-import PropTypes from 'prop-types';
+import React, { Fragment, CSSProperties } from 'react';
+import { Orientation } from './types';
+import { COLUMNS } from './helpers';
+import { Property } from 'csstype';
 
-const getRow = (orientation, row) =>
+//-----------------------------//
+type SquareProps = {
+  row: number;
+  col: number;
+  width: number;
+  orientation?: Orientation;
+};
+type NotationProps = SquareProps & {
+  lightSquareStyle?: CSSProperties;
+  darkSquareStyle?: CSSProperties;
+};
+type WhiteColor = { whiteColor: Property.BackgroundColor | undefined };
+type BlackColor = { blackColor: Property.BackgroundColor | undefined };
+
+//-----------------------------//
+// helper functions
+
+/** Get Row as a number */
+const getRow = (orientation: Orientation, row: number) =>
   orientation === 'white' ? row + 1 : row - 1;
 
-const getColumn = (orientation, alpha, col) =>
-  orientation === 'black' ? alpha[7 - col] : alpha[col];
+/** Get Column as a letter */
+const getColumn = (orientation: Orientation, col: number) =>
+  orientation === 'black' ? COLUMNS[7 - col] : COLUMNS[col];
 
-class Notation extends PureComponent {
-  static propTypes = {
-    row: PropTypes.number,
-    col: PropTypes.number,
-    alpha: PropTypes.array,
-    orientation: PropTypes.string,
-    width: PropTypes.number,
-    lightSquareStyle: PropTypes.object,
-    darkSquareStyle: PropTypes.object
-  };
-
-  render() {
-    const {
-      row,
-      col,
-      orientation,
-      lightSquareStyle,
-      darkSquareStyle
-    } = this.props;
-
-    const whiteColor = lightSquareStyle.backgroundColor;
-    const blackColor = darkSquareStyle.backgroundColor;
-
-    const isRow = col === 0;
-    const isColumn =
-      (orientation === 'white' && row === 0) ||
-      (orientation === 'black' && row === 9);
-    const isBottomLeftSquare = isRow && isColumn;
-
-    if (isBottomLeftSquare) {
-      return renderBottomLeft(this.props, { whiteColor });
-    }
-
-    if (isColumn) {
-      return renderLetters(this.props, {
-        whiteColor,
-        blackColor
-      });
-    }
-
-    if (isRow) {
-      return renderNumbers(this.props, {
-        whiteColor,
-        blackColor,
-        isRow,
-        isBottomLeftSquare
-      });
-    }
-
-    return null;
-  }
-}
-
-export default Notation;
-
-/* eslint react/prop-types: 0 */
-function renderBottomLeft(
-  { orientation, row, width, alpha, col },
-  { whiteColor }
-) {
+const renderBottomLeft = ({
+  orientation = 'white',
+  row,
+  width,
+  col,
+  whiteColor,
+}: SquareProps & WhiteColor) => {
   return (
     <Fragment>
       <div
@@ -74,47 +42,57 @@ function renderBottomLeft(
         style={{
           ...notationStyle,
           ...{ fontSize: width / 48, color: whiteColor },
-          ...numericStyle(width)
+          ...numericStyle(width),
         }}
       >
         {getRow(orientation, row)}
       </div>
       <div
-        data-testid={`bottom-left-${getColumn(orientation, alpha, col)}`}
+        data-testid={`bottom-left-${getColumn(orientation, col)}`}
         style={{
           ...notationStyle,
           ...{ fontSize: width / 48, color: whiteColor },
-          ...alphaStyle(width)
+          ...alphaStyle(width),
         }}
       >
-        {getColumn(orientation, alpha, col)}
+        {getColumn(orientation, col)}
       </div>
     </Fragment>
   );
-}
+};
 
-function renderLetters(
-  { orientation, width, alpha, col },
-  { whiteColor, blackColor }
-) {
+const renderLetters = ({
+  orientation = 'white',
+  width,
+  col,
+  whiteColor,
+  blackColor,
+}: Omit<SquareProps, 'row'> & WhiteColor & BlackColor) => {
   return (
     <div
-      data-testid={`column-${getColumn(orientation, alpha, col)}`}
+      data-testid={`column-${getColumn(orientation, col)}`}
       style={{
         ...notationStyle,
         ...columnStyle({ col, width, blackColor, whiteColor }),
-        ...alphaStyle(width)
+        ...alphaStyle(width),
       }}
     >
-      {getColumn(orientation, alpha, col)}
+      {getColumn(orientation, col)}
     </div>
   );
-}
+};
 
-function renderNumbers(
-  { orientation, row, width },
-  { whiteColor, blackColor, isRow, isBottomLeftSquare }
-) {
+const renderNumbers = ({
+  orientation = 'white',
+  row,
+  width,
+  whiteColor,
+  blackColor,
+  isRow,
+  isBottomLeftSquare,
+}: Omit<SquareProps, 'col'> &
+  WhiteColor &
+  BlackColor & { isRow: boolean; isBottomLeftSquare: boolean }) => {
   return (
     <div
       style={{
@@ -126,19 +104,24 @@ function renderNumbers(
           whiteColor,
           orientation,
           isBottomLeftSquare,
-          isRow
+          isRow,
         }),
-        ...numericStyle(width)
+        ...numericStyle(width),
       }}
     >
       {getRow(orientation, row)}
     </div>
   );
-}
+};
 
-const columnStyle = ({ col, width, blackColor, whiteColor }) => ({
+const columnStyle = ({
+  col,
+  width,
+  blackColor,
+  whiteColor,
+}: Omit<SquareProps, 'row'> & BlackColor & WhiteColor): CSSProperties => ({
   fontSize: width / 48,
-  color: col % 2 !== 0 ? blackColor : whiteColor
+  color: col % 2 !== 0 ? blackColor : whiteColor,
 });
 
 const rowStyle = ({
@@ -148,8 +131,13 @@ const rowStyle = ({
   whiteColor,
   orientation,
   isBottomLeftSquare,
-  isRow
-}) => {
+  isRow,
+}: Omit<SquareProps, 'col'> &
+  WhiteColor &
+  BlackColor & {
+    isRow: boolean;
+    isBottomLeftSquare: boolean;
+  }): CSSProperties => {
   return {
     fontSize: width / 48,
     color:
@@ -158,23 +146,68 @@ const rowStyle = ({
           ? blackColor
           : whiteColor
         : isRow && !isBottomLeftSquare && row % 2 !== 0
-          ? blackColor
-          : whiteColor
+        ? blackColor
+        : whiteColor,
   };
 };
 
-const alphaStyle = width => ({
+const alphaStyle = (width: number): CSSProperties => ({
   alignSelf: 'flex-end',
-  paddingLeft: width / 8 - width / 48
+  paddingLeft: width / 8 - width / 48,
 });
 
-const numericStyle = width => ({
+const numericStyle = (width: number): CSSProperties => ({
   alignSelf: 'flex-start',
-  paddingRight: width / 8 - width / 48
+  paddingRight: width / 8 - width / 48,
 });
 
-const notationStyle = {
+const notationStyle: CSSProperties = {
   fontFamily: 'Helvetica Neue',
   zIndex: 3,
-  position: 'absolute'
+  position: 'absolute',
 };
+
+//-----------------------------//
+
+/** Render the numbers and letters on the board squares */
+const Notation = ({
+  row,
+  col,
+  orientation = 'white',
+  width,
+  lightSquareStyle = { backgroundColor: 'rgb(240, 217, 181)' },
+  darkSquareStyle = { backgroundColor: 'rgb(181, 136, 99)' },
+}: NotationProps) => {
+  console.log({ row, col });
+  const whiteColor = lightSquareStyle.backgroundColor;
+  const blackColor = darkSquareStyle.backgroundColor;
+  const isRow: boolean = col === 0;
+  const isColumn: boolean =
+    (orientation === 'white' && row === 0) ||
+    (orientation === 'black' && row === 9);
+  const isBottomLeftSquare: boolean = isRow && isColumn;
+
+  if (isBottomLeftSquare) {
+    return renderBottomLeft({ col, row, width, orientation, whiteColor });
+  }
+
+  if (isColumn) {
+    return renderLetters({ col, width, orientation, whiteColor, blackColor });
+  }
+
+  if (isRow) {
+    return renderNumbers({
+      row,
+      width,
+      orientation,
+      whiteColor,
+      blackColor,
+      isRow,
+      isBottomLeftSquare,
+    });
+  }
+
+  return null;
+};
+
+export default Notation;

@@ -158,7 +158,7 @@ export interface ChessboardProps {
   /**
    * The position to display on the board.
    */
-  position?: Position;
+  position: Position;
   /**
    * A function that gives access to the underlying square element.  It
    * allows for customizations with rough.js. See chessboardjsx.com/custom for an

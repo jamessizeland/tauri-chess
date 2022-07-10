@@ -1,8 +1,7 @@
 import React, { Component, CSSProperties } from 'react';
-import PropTypes from 'prop-types';
 import type { XYCoord } from 'react-dnd';
 import { useDragLayer } from 'react-dnd';
-import { renderChessPiece } from './Piece';
+// import { renderChessPiece } from './Piece';
 import { CustomPieces } from './types';
 import { Square } from 'chess.js';
 
@@ -55,14 +54,15 @@ const CustomDragLayer = ({
   return isDragging ? (
     <div style={layerStyles}>
       <div style={getItemStyle(currentOffset, wasPieceTouched)}>
-        {renderChessPiece({
+        <p>P</p>
+        {/* {renderChessPiece({
           width,
           pieces,
           piece: item.piece,
           isDragging,
           customDragLayerStyles: { opacity: 1 },
           sourceSquare,
-        })}
+        })} */}
       </div>
     </div>
   ) : null;

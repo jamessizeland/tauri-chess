@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import Chessboard, { Position } from 'chessboardjsx';
+import type { Position } from 'components/Features/Chessboard/types';
+import ChessBoard from 'components/Features/Chessboard';
 import { Square } from 'chess.js';
 // import { notify } from 'services/notifications';
 import { invoke } from '@tauri-apps/api/tauri';
@@ -17,9 +18,10 @@ import type {
   PositionStyles,
 } from 'components/Features/chess/types';
 import { checkEnv } from 'utils';
+import Chessboard from 'components/Features/Chessboard';
 
 const HomePage = (): JSX.Element => {
-  const [position, setPosition] = useState<Position | 'start'>('start');
+  const [position, setPosition] = useState<Position>({});
   const [square, setSquare] = useState(''); // currently clicked square
   const [history, setHistory] = useState<string[]>([]);
   const [squareStyles, setSquareStyles] = useState<PositionStyles>();
