@@ -153,7 +153,7 @@ const rowStyle = ({
 
 const alphaStyle = (width: number): CSSProperties => ({
   alignSelf: 'flex-end',
-  paddingTop: width / 8 - width / 48 - 10,
+  paddingTop: width / 8 - width / 48 - 14,
   paddingLeft: width / 8 - width / 48 - 5,
 });
 

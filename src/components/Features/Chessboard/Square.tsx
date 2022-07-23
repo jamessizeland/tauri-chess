@@ -16,8 +16,6 @@ export const Square = ({ black, coord, children }: SquareProps) => {
   const color = black ? 'white' : 'black';
   return (
     <div
-      className="tooltip"
-      data-tip={`row ${coord.x} | col ${coord.y}`}
       style={{
         ...squareStyle,
         color,
