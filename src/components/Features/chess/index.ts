@@ -44,8 +44,8 @@ const parseBoardState = (boardArray: BoardStateArray) => {
         return undefined;
     }
   };
-  let state = boardArray.reduce<Position>((result, col, coli) => {
-    col.forEach((sq, rowi) => {
+  let state = boardArray.reduce<Position>((result, row, rowi) => {
+    row.forEach((sq, coli) => {
       let piece = rustToPiece(sq as unknown as RustPiece);
       if (piece) result[coordToSquare(rowi, coli)] = piece;
     });
@@ -59,7 +59,7 @@ const parseBoardState = (boardArray: BoardStateArray) => {
 const numToLetter = (num: number) => (num + 9).toString(36);
 
 const coordToSquare = (row: number, col: number) => {
-  return `${numToLetter(row + 1)}${col + 1}` as Square;
+  return `${numToLetter(col + 1)}${row + 1}` as Square;
 };
 
 const highlightSquares = (

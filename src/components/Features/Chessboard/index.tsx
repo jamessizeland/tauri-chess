@@ -67,6 +67,13 @@ const ChessBoard = ({
           lightSquareStyle={lightSquareStyle}
           darkSquareStyle={darkSquareStyle}
           boardStyle={boardStyle}
+          onDragOverSquare={onDragOverSquare}
+          onDrop={onDrop}
+          onMouseOutSquare={onMouseOutSquare}
+          onMouseOverSquare={onMouseOverSquare}
+          onPieceClick={onPieceClick}
+          onSquareClick={onSquareClick}
+          onSquareRightClick={onSquareRightClick}
         />
         {/* <CustomDragLayer
         width={560}

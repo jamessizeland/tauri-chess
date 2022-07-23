@@ -1,17 +1,24 @@
+import { Square } from 'chess.js';
 import clsx from 'clsx';
 import type { CSSProperties, ReactNode } from 'react';
 import { useDrop } from 'react-dnd';
+import { coordToSquare } from '../chess';
 import { ItemTypes } from './helpers';
-import { Square } from './Square';
 import type { Orientation } from './types';
 
 export interface BoardSquareProps {
-  x: number;
-  y: number;
+  row: number;
+  col: number;
   orientation?: Orientation;
   children?: ReactNode;
   lightSquareStyle: CSSProperties;
   darkSquareStyle: CSSProperties;
+  onMouseOverSquare?: (square: Square) => void;
+  onMouseOutSquare?: (square: Square) => void;
+  onDragOverSquare?: (square: Square) => void;
+  onDrop?: (square: Square) => void;
+  onSquareClick?: (square: Square) => void;
+  onSquareRightClick?: (square: Square) => void;
 }
 
 const squareStyle = {
@@ -20,11 +27,17 @@ const squareStyle = {
 };
 
 export const BoardSquare = ({
-  x,
-  y,
+  row,
+  col,
   orientation = 'white',
   lightSquareStyle = { backgroundColor: 'rgb(240, 217, 181)' },
   darkSquareStyle = { backgroundColor: 'rgb(181, 136, 99)' },
+  onMouseOverSquare,
+  onMouseOutSquare,
+  onDragOverSquare,
+  onDrop,
+  onSquareClick,
+  onSquareRightClick,
   children,
 }: BoardSquareProps): JSX.Element => {
   const [{ isOver, canDrop }, drop] = useDrop(
@@ -39,16 +52,23 @@ export const BoardSquare = ({
     }),
     [],
   );
-  const black = !((x + y) % 2 === 1);
+  const black = !((row + col) % 2 === 1);
   const backgroundColor = black ? darkSquareStyle : lightSquareStyle;
   const color = black ? 'white' : 'black';
   return (
     <div
       className={clsx('tooltip')}
-      data-tip={`row ${x} | col ${y}`}
+      data-tip={`row ${row} | col ${col}`}
+      onMouseEnter={() => onMouseOverSquare}
+      onMouseLeave={() => onMouseOutSquare}
+      onClick={(event) => {
+        console.log(`clicked on ${coordToSquare(row, col)} ${row},${col}`);
+        console.log(event.button);
+        // onSquareClick;
+      }}
       ref={drop}
       role="Space"
-      data-testid={`(${x},${y})`}
+      data-testid={`(${row},${col})`}
       style={{
         position: 'relative',
         width: '100%',

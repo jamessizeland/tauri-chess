@@ -25,6 +25,13 @@ const Board = ({
   lightSquareStyle = { backgroundColor: 'rgb(240, 217, 181)' },
   darkSquareStyle = { backgroundColor: 'rgb(181, 136, 99)' },
   boardStyle,
+  onPieceClick,
+  onDragOverSquare,
+  onDrop,
+  onMouseOutSquare,
+  onMouseOverSquare,
+  onSquareClick,
+  onSquareRightClick,
 }: ChessboardProps): JSX.Element => {
   const squares = [];
 
@@ -39,11 +46,15 @@ const Board = ({
     return (
       <div key={`${row}${col}`} style={squareStyle}>
         <BoardSquare
-          x={row}
-          y={col}
+          row={row}
+          col={col}
           orientation={orientation}
           lightSquareStyle={lightSquareStyle}
           darkSquareStyle={darkSquareStyle}
+          onDragOverSquare={onDragOverSquare}
+          onSquareClick={onSquareClick}
+          onMouseOverSquare={onMouseOverSquare}
+          onMouseOutSquare={onMouseOutSquare}
         >
           {showNotation && (
             <Notation
@@ -58,6 +69,7 @@ const Board = ({
             <ChessPiece
               width={560}
               square={square}
+              onPieceClick={onPieceClick}
               id={`${row}${col}${position[square]}`}
               piece={position[square]}
             />

@@ -10,6 +10,7 @@ type PieceProps = {
   id: number | string;
   width: number;
   connectDragSource?: () => void;
+  onPieceClick?: (piece: Piece) => void;
   isDragging?: boolean;
 };
 
@@ -17,6 +18,7 @@ export default function ChessPiece({
   piece,
   isDragging = false,
   width,
+  onPieceClick,
 }: PieceProps) {
   return (
     <div className="h-full">
@@ -27,6 +29,7 @@ export default function ChessPiece({
           viewBox={`1 1 43 43`}
           width={width / 11}
           height={width / 11}
+          onClick={() => onPieceClick}
         >
           <g>{pieceSVG[piece]}</g>
         </svg>
