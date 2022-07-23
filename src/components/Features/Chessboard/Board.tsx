@@ -1,8 +1,10 @@
+import { Square } from 'chess.js';
 import clsx from 'clsx';
 import type { CSSProperties } from 'react';
+import { coordToSquare } from '../chess';
 import { BoardSquare } from './BoardSquare';
 import Notation from './Notation';
-import type { ChessboardProps } from './types';
+import type { ChessboardProps, Position } from './types';
 
 /** Styling properties applied to the board element */
 const boardStyle: CSSProperties = {
@@ -15,12 +17,21 @@ const boardStyle: CSSProperties = {
 /** Styling properties applied to each square element */
 const squareStyle: CSSProperties = { width: '12.5%', height: '12.5%' };
 
-const Board = ({ orientation, showNotation }: ChessboardProps): JSX.Element => {
+const Board = ({
+  orientation,
+  showNotation,
+  position,
+}: ChessboardProps): JSX.Element => {
   const squares = [];
+
+  const hasPiece = (currentPosition: Position, square: Square): boolean =>
+    currentPosition &&
+    Object.keys(currentPosition) &&
+    Object.keys(currentPosition).includes(square);
+
   /** Render the board square appropriate for the coordinate given */
   function renderSquare(row: number, col: number) {
-    // const x = 8 - (i % 8);
-    // const y = Math.floor(i / 8);
+    const square = coordToSquare(row, col);
     return (
       <div key={`${row}${col}`} style={squareStyle}>
         <BoardSquare x={row} y={col} orientation={orientation}>
@@ -32,6 +43,9 @@ const Board = ({ orientation, showNotation }: ChessboardProps): JSX.Element => {
               key={`${row}${col}`}
               orientation="white"
             />
+          )}
+          {hasPiece(position, square) && (
+            <p className="inline">{position[square]}</p>
           )}
         </BoardSquare>
       </div>

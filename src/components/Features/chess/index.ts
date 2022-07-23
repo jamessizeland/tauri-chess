@@ -44,8 +44,8 @@ const parseBoardState = (boardArray: BoardStateArray) => {
         return undefined;
     }
   };
-  let state = boardArray.reduce<Position>((result, row, rowi) => {
-    row.forEach((sq, coli) => {
+  let state = boardArray.reduce<Position>((result, col, coli) => {
+    col.forEach((sq, rowi) => {
       let piece = rustToPiece(sq as unknown as RustPiece);
       if (piece) result[coordToSquare(rowi, coli)] = piece;
     });
@@ -59,7 +59,7 @@ const parseBoardState = (boardArray: BoardStateArray) => {
 const numToLetter = (num: number) => (num + 9).toString(36);
 
 const coordToSquare = (row: number, col: number) => {
-  return `${numToLetter(row + 1)}${col + 1}` as keyof PositionStyles;
+  return `${numToLetter(row + 1)}${col + 1}` as Square;
 };
 
 const highlightSquares = (
@@ -95,4 +95,10 @@ const getGameState = (setPosition: (positions: Position) => void) => {
   });
 };
 
-export { parseBoardState, highlightSquares, startNewGame, getGameState };
+export {
+  parseBoardState,
+  highlightSquares,
+  startNewGame,
+  getGameState,
+  coordToSquare,
+};
