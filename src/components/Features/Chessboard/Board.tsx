@@ -5,6 +5,7 @@ import { coordToSquare } from '../chess';
 import { BoardSquare } from './BoardSquare';
 import Notation from './Notation';
 import type { ChessboardProps, Position } from './types';
+import ChessPiece from './Piece';
 
 /** Styling properties applied to the board element */
 const basicBoardStyle: CSSProperties = {
@@ -54,7 +55,12 @@ const Board = ({
             />
           )}
           {hasPiece(position, square) && (
-            <p className="inline">{position[square]}</p>
+            <ChessPiece
+              width={560}
+              square={square}
+              id={`${row}${col}${position[square]}`}
+              piece={position[square]}
+            />
           )}
         </BoardSquare>
       </div>
