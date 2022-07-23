@@ -78,7 +78,7 @@ const HomePage = (): JSX.Element => {
         />
       </div>
       {!checkEnv('production') && (
-        <div className="pt-3">
+        <div className="pt-5">
           <Button className="mr-2" onClick={() => setNotation(!notation)}>
             Toggle Notation
           </Button>

@@ -54,7 +54,7 @@ const ChessBoard = ({
   const containerStyle: CSSProperties = {
     width: 500,
     height: 500,
-    border: '1px solid gray',
+    // border: '1px solid gray',
   };
 
   return (
@@ -64,6 +64,9 @@ const ChessBoard = ({
           orientation={orientation}
           showNotation={showNotation}
           position={position}
+          lightSquareStyle={lightSquareStyle}
+          darkSquareStyle={darkSquareStyle}
+          boardStyle={boardStyle}
         />
         {/* <CustomDragLayer
         width={560}

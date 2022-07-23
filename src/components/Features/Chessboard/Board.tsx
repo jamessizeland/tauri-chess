@@ -7,7 +7,7 @@ import Notation from './Notation';
 import type { ChessboardProps, Position } from './types';
 
 /** Styling properties applied to the board element */
-const boardStyle: CSSProperties = {
+const basicBoardStyle: CSSProperties = {
   width: '100%',
   height: '100%',
   display: 'flex',
@@ -21,6 +21,9 @@ const Board = ({
   orientation,
   showNotation,
   position,
+  lightSquareStyle = { backgroundColor: 'rgb(240, 217, 181)' },
+  darkSquareStyle = { backgroundColor: 'rgb(181, 136, 99)' },
+  boardStyle,
 }: ChessboardProps): JSX.Element => {
   const squares = [];
 
@@ -34,7 +37,13 @@ const Board = ({
     const square = coordToSquare(row, col);
     return (
       <div key={`${row}${col}`} style={squareStyle}>
-        <BoardSquare x={row} y={col} orientation={orientation}>
+        <BoardSquare
+          x={row}
+          y={col}
+          orientation={orientation}
+          lightSquareStyle={lightSquareStyle}
+          darkSquareStyle={darkSquareStyle}
+        >
           {showNotation && (
             <Notation
               col={col}
@@ -61,7 +70,7 @@ const Board = ({
   const rotate = orientation === 'black' ? 'rotate-180' : '';
   return (
     <div
-      style={boardStyle}
+      style={{ ...boardStyle, ...basicBoardStyle }}
       className={clsx(rotate, 'transition-transform duration-1000')}
     >
       {squares}
