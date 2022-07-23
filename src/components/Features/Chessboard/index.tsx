@@ -4,7 +4,7 @@ import defaultPieces from './svg/chesspieces/standard';
 import whiteKing from './svg/whiteKing';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import Board from './board';
+import Board from './Board';
 import CustomDragLayer from './CustomDragLayer';
 
 const ChessBoard = ({

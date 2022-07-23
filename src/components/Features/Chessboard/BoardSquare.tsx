@@ -39,7 +39,9 @@ export const BoardSquare = ({
         height: '100%',
       }}
     >
-      <Square black={black}>{children}</Square>
+      <Square black={black} coord={{ x, y }}>
+        {children}
+      </Square>
     </div>
   );
 };

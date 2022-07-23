@@ -169,5 +169,5 @@ module.exports = withAnimations({
     },
   },
   variants: {},
-  plugins: [],
+  plugins: [require('daisyui')],
 });

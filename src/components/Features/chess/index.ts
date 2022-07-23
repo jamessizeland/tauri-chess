@@ -1,5 +1,5 @@
 import react from 'React';
-import { Position, Piece } from 'chessboardjsx';
+import { Position, Piece } from '../Chessboard/types';
 import { Square } from 'chess.js';
 import { notify } from 'services/notifications';
 import { invoke } from '@tauri-apps/api/tauri';

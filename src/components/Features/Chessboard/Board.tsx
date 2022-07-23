@@ -13,21 +13,34 @@ const boardStyle: CSSProperties = {
 /** Styling properties applied to each square element */
 const squareStyle: CSSProperties = { width: '12.5%', height: '12.5%' };
 
+/** Render the board square appropriate for the coordinate given */
+function renderSquare(row: number, col: number) {
+  // const x = 8 - (i % 8);
+  // const y = Math.floor(i / 8);
+  return (
+    <div key={`${row}${col}`} style={squareStyle}>
+      <BoardSquare x={row} y={col}>
+        <Notation
+          col={col}
+          row={row}
+          width={560}
+          key={`${row}${col}`}
+          orientation={'black'}
+        />
+      </BoardSquare>
+    </div>
+  );
+}
+
 const Board = (): JSX.Element => {
-  function renderSquare(i: number) {
-    const x = i % 8;
-    const y = Math.floor(i / 8);
-    return (
-      <div key={i} style={squareStyle}>
-        <BoardSquare x={x} y={y}></BoardSquare>
-        <Notation col={x} row={y} width={560} key={i} />
-      </div>
-    );
-  }
   const squares = [];
-  for (let i = 0; i < 64; i += 1) {
-    squares.push(renderSquare(i));
+  for (let row = 1; row <= 8; row++) {
+    for (let col = 1; col <= 8; col++) {
+      squares.push(renderSquare(8 - row, col));
+    }
   }
+  console.log(squares.length);
+  console.log(squares);
   return <div style={boardStyle}>{squares}</div>;
 };
 
