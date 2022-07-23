@@ -14,11 +14,10 @@ const squareStyle = {
 export const Square = ({ black, coord, children }: SquareProps) => {
   const backgroundColor = black ? 'black' : 'white';
   const color = black ? 'white' : 'black';
-  const [hover, setHover] = useState(false);
   return (
     <div
       className="tooltip"
-      data-tip={`x${coord.x} y${coord.y}`}
+      data-tip={`row ${coord.x} | col ${coord.y}`}
       style={{
         ...squareStyle,
         color,
@@ -26,19 +25,8 @@ export const Square = ({ black, coord, children }: SquareProps) => {
       }}
     >
       {children}
-      {/* {hover && (
-        <ReactTooltip
-          id={JSON.stringify(coord)}
-          place="top"
-          effect="solid"
-          backgroundColor={black ? 'black' : 'white'}
-          textColor={black ? 'white' : 'black'}
-        >
-          x{coord.x} y{coord.y}
-        </ReactTooltip>
-      )} */}
       {/* <p className="inline">
-        x{coord.x} y{coord.y}
+        r{coord.x}|c{coord.y}
       </p> */}
     </div>
   );

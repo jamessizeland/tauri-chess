@@ -26,7 +26,7 @@ export const BoardSquare = ({
     }),
     [],
   );
-  const black = (x + y) % 2 === 1;
+  const black = !((x + y) % 2 === 1);
 
   return (
     <div

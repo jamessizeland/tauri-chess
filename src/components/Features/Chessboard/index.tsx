@@ -60,7 +60,11 @@ const ChessBoard = ({
   return (
     <DndProvider backend={HTML5Backend}>
       <div style={containerStyle}>
-        <Board />
+        <Board
+          orientation={orientation}
+          showNotation={showNotation}
+          position={position}
+        />
         {/* <CustomDragLayer
         width={560}
         pieces={pieces}

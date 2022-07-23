@@ -30,6 +30,7 @@ const HomePage = (): JSX.Element => {
   const [hoveredSquare, setHoveredSquare] = useState<Square | undefined>(
     undefined,
   );
+  const [notation, setNotation] = useState(true);
   // listen<Position>('update_position', (event) => {
   //   console.log('update position');
   //   setPosition(event.payload);
@@ -49,6 +50,7 @@ const HomePage = (): JSX.Element => {
           draggable={false}
           id="testBoard"
           width={400}
+          showNotation={notation}
           position={position}
           onMouseOverSquare={(square) => {
             // stop unnecessary repeats of this function call
@@ -75,18 +77,24 @@ const HomePage = (): JSX.Element => {
           }}
         />
       </div>
-      {!checkEnv('production') ? (
-        <Button
-          onClick={() =>
-            invoke<BoardStateArray>('get_state').then((gameState) =>
-              console.log(gameState),
-            )
-          }
-        >
-          Get State
-        </Button>
-      ) : (
-        <></>
+      {!checkEnv('production') && (
+        <div className="pt-3">
+          <Button className="mr-2" onClick={() => setNotation(!notation)}>
+            Toggle Notation
+          </Button>
+          <Button className="mr-2" onClick={() => setWhiteTurn(!whiteTurn)}>
+            {whiteTurn ? 'White' : 'Black'}
+          </Button>
+          <Button
+            onClick={() =>
+              invoke<BoardStateArray>('get_state').then((gameState) =>
+                console.log(gameState),
+              )
+            }
+          >
+            Get State
+          </Button>
+        </div>
       )}
     </div>
   );

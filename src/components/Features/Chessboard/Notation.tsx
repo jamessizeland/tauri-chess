@@ -22,7 +22,7 @@ type BlackColor = { blackColor: Property.BackgroundColor | undefined };
 
 /** Get Row as a number */
 const getRow = (orientation: Orientation, row: number) =>
-  orientation === 'white' ? row + 1 : row - 1;
+  orientation === 'white' ? row + 1 : row + 1;
 
 /** Get Column as a letter */
 const getColumn = (orientation: Orientation, col: number) =>
@@ -153,7 +153,8 @@ const rowStyle = ({
 
 const alphaStyle = (width: number): CSSProperties => ({
   alignSelf: 'flex-end',
-  paddingLeft: width / 8 - width / 48,
+  paddingTop: width / 8 - width / 48 - 10,
+  paddingLeft: width / 8 - width / 48 - 5,
 });
 
 const numericStyle = (width: number): CSSProperties => ({
@@ -184,7 +185,7 @@ const Notation = ({
   const isRow: boolean = col === 0;
   const isColumn: boolean =
     (orientation === 'white' && row === 0) ||
-    (orientation === 'black' && row === 9);
+    (orientation === 'black' && row === 7);
   const isBottomLeftSquare: boolean = isRow && isColumn;
 
   if (isBottomLeftSquare) {
