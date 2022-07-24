@@ -58,8 +58,10 @@ export const BoardSquare = ({
   );
   /** Handles right and left clicks on a board square */
   const handleClick = (event: React.MouseEvent) => {
+    const square = coordToSquare(col, row);
     if (event.type === 'click') {
       console.log(`clicked on ${coordToSquare(col, row)} ${col},${row}`);
+      onSquareClick(square);
     } else if (event.type === 'contextmenu') {
       event.preventDefault();
       console.log(`right-clicked on ${coordToSquare(col, row)} ${col},${row}`);
