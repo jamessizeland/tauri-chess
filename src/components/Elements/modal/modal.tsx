@@ -10,7 +10,7 @@ interface ModalProps extends Props {
   isOpen: boolean;
   position?: 'default' | 'large' | 'extraLarge';
   toggle: (isOpen?: boolean) => void;
-  closeOnClickOutside: boolean;
+  closeOnClickOutside?: boolean;
   animate?: boolean;
 }
 
@@ -20,17 +20,18 @@ const style = {
   headerTitle: `text-2xl md:text-3xl font-light`,
   header: `items-start justify-between p-4 border-b border-gray-300`,
   container: `fixed top-0 left-0 z-40 w-full h-full m-0 overflow-y-auto`,
-  overlay: `fixed top-0 left-0 z-30 w-screen h-screen bg-black opacity-50`,
+  overlay: `fixed top-0 left-0 z-30 w-screen h-screen backdrop-blur-sm`,
   footer: `flex flex-wrap items-center justify-end p-3 border-t border-gray-300`,
   content: {
     default: `relative flex flex-col bg-white pointer-events-auto`,
   },
   orientation: {
     default:
-      'mt-12 mx-8 pb-6 md:m-auto md:w-6/12 lg:w-4/12 md:pt-12 focus:outline-none',
+      'mt-24 mx-8 pb-0 md:m-auto md:w-6/12 lg:w-4/12 md:pt-0 focus:outline-none rounded-lg',
     large:
-      'mt-12 mx-8 pb-6 md:m-auto md:w-8/12 lg:w-8/12 md:pt-12 focus:outline-none',
-    extraLarge: 'mt-12 mx-8 pb-6 md:w-12/12 md:pt-12 focus:outline-none',
+      'mt-24 mx-8 pb-0 md:m-auto md:w-8/12 lg:w-8/12 md:pt-0 focus:outline-none rounded-lg',
+    extraLarge:
+      'mt-24 mx-8 pb-0 md:w-12/12 md:pt-0 focus:outline-none rounded-lg',
   },
 };
 
@@ -39,17 +40,19 @@ function Modal({
   toggle,
   children,
   animate = false,
-  closeOnClickOutside,
+  closeOnClickOutside = false,
   position = 'default',
 }: ModalProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   // close modal when you click outside the modal dialogue
   useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent) => {
+    const handleOutsideClick = (event: globalThis.MouseEvent) => {
       if (closeOnClickOutside && !ref.current?.contains(event.target as Node)) {
-        if (!isOpen) return;
-        toggle(false);
+        if (isOpen) return;
+        console.log('clicked outside');
+        toggle(true);
+        console.log({ isOpen });
       }
     };
     window.addEventListener('click', handleOutsideClick);
@@ -91,7 +94,7 @@ function Modal({
       {isOpen && (
         <>
           <div className={style.overlay} />
-          <div className={style.container}>
+          <div className={clsx(style.container)}>
             <div
               className={style.orientation[position]}
               ref={closeOnClickOutside ? ref : null}
