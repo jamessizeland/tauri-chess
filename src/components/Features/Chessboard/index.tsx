@@ -74,6 +74,7 @@ const ChessBoard = ({
           onPieceClick={onPieceClick}
           onSquareClick={onSquareClick}
           onSquareRightClick={onSquareRightClick}
+          squareStyles={squareStyles}
         />
         {/* <CustomDragLayer
         width={560}

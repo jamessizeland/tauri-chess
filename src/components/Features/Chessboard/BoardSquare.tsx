@@ -1,6 +1,7 @@
 import { Square } from 'chess.js';
 import clsx from 'clsx';
 import type { CSSProperties, ReactNode } from 'react';
+import React from 'react';
 import { useDrop } from 'react-dnd';
 import { coordToSquare } from '../chess';
 import { ItemTypes } from './helpers';
@@ -11,8 +12,9 @@ export interface BoardSquareProps {
   col: number;
   orientation?: Orientation;
   children?: ReactNode;
-  lightSquareStyle: CSSProperties;
-  darkSquareStyle: CSSProperties;
+  lightSquareStyle?: CSSProperties;
+  darkSquareStyle?: CSSProperties;
+  customSquareStyle?: CSSProperties;
   onMouseOverSquare?: (square: Square) => void;
   onMouseOutSquare?: (square: Square) => void;
   onDragOverSquare?: (square: Square) => void;
@@ -32,6 +34,7 @@ export const BoardSquare = ({
   orientation = 'white',
   lightSquareStyle = { backgroundColor: 'rgb(240, 217, 181)' },
   darkSquareStyle = { backgroundColor: 'rgb(181, 136, 99)' },
+  customSquareStyle,
   onMouseOverSquare,
   onMouseOutSquare,
   onDragOverSquare,
@@ -52,20 +55,27 @@ export const BoardSquare = ({
     }),
     [],
   );
+  /** Handles right and left clicks on a board square */
+  const handleClick = (event: React.MouseEvent) => {
+    if (event.type === 'click') {
+      console.log(`clicked on ${coordToSquare(row, col)} ${row},${col}`);
+    } else if (event.type === 'contextmenu') {
+      event.preventDefault();
+      console.log(`right-clicked on ${coordToSquare(row, col)} ${row},${col}`);
+    }
+    // onSquareClick;
+  };
   const black = !((row + col) % 2 === 1);
   const backgroundColor = black ? darkSquareStyle : lightSquareStyle;
   const color = black ? 'white' : 'black';
   return (
     <div
       className={clsx('tooltip')}
-      data-tip={`row ${row} | col ${col}`}
+      data-tip={`row ${row} | col ${col} | ${coordToSquare(row, col)}`}
       onMouseEnter={() => onMouseOverSquare}
       onMouseLeave={() => onMouseOutSquare}
-      onClick={(event) => {
-        console.log(`clicked on ${coordToSquare(row, col)} ${row},${col}`);
-        console.log(event.button);
-        // onSquareClick;
-      }}
+      onClick={handleClick}
+      onContextMenu={handleClick}
       ref={drop}
       role="Space"
       data-testid={`(${row},${col})`}
@@ -78,14 +88,12 @@ export const BoardSquare = ({
       <div
         style={{
           ...squareStyle,
-          color,
           ...backgroundColor,
+          color,
+          ...customSquareStyle,
         }}
       >
         {children}
-        {/* <p className="inline">
-        r{coord.x}|c{coord.y}
-      </p> */}
       </div>
     </div>
   );

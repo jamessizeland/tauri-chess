@@ -23,7 +23,6 @@ export default function ChessPiece({
   return (
     <div className="h-full">
       {piece && (
-        //   <p className="inline">{piece}</p>
         <svg
           className="mx-auto h-full"
           viewBox={`1 1 43 43`}
