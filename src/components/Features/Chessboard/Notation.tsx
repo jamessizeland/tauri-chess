@@ -179,7 +179,6 @@ const Notation = ({
   lightSquareStyle = { backgroundColor: 'rgb(240, 217, 181)' },
   darkSquareStyle = { backgroundColor: 'rgb(181, 136, 99)' },
 }: NotationProps) => {
-  console.log({ row, col });
   const whiteColor = lightSquareStyle.backgroundColor;
   const blackColor = darkSquareStyle.backgroundColor;
   const isRow: boolean = col === 0;

@@ -93,9 +93,19 @@ pub fn click_square(
 
 #[tauri::command]
 /// Initialize a new game by sending a starting set of coords
-pub fn new_game(state: tauri::State<PieceLocation>) -> BoardState {
+pub fn new_game(state: tauri::State<PieceLocation>, meta: tauri::State<GameMeta>) -> BoardState {
     // Lock the counter(Mutex) to get the current value
-    let mut game = state.0.lock().expect("state access error");
+    let mut game = state.0.lock().unwrap();
+    let mut game_meta = meta.0.lock().unwrap();
+    // reset game meta data
+    game_meta.score = 0;
+    game_meta.turn = 0;
+    // reset board to empty
+    for col in 0..8 {
+        for row in 0..8 {
+            game[col][row] = Piece::None
+        }
+    }
     // set up white pieces
     game[0][0] = Piece::Rook(Color::White, true);
     game[1][0] = Piece::Bishop(Color::White, true);
@@ -113,7 +123,7 @@ pub fn new_game(state: tauri::State<PieceLocation>) -> BoardState {
     game[5][1] = Piece::Pawn(Color::White, true);
     game[6][1] = Piece::Pawn(Color::White, true);
     game[7][1] = Piece::Pawn(Color::White, true);
-    // // set up black pieces
+    // set up black pieces
     game[0][7] = Piece::Rook(Color::Black, true);
     game[1][7] = Piece::Knight(Color::Black, true);
     game[2][7] = Piece::Bishop(Color::Black, true);
@@ -130,16 +140,5 @@ pub fn new_game(state: tauri::State<PieceLocation>) -> BoardState {
     game[5][6] = Piece::Pawn(Color::Black, true);
     game[6][6] = Piece::Pawn(Color::Black, true);
     game[7][6] = Piece::Pawn(Color::Black, true);
-    // debug
-    // game[1][2] = Piece::Pawn(Color::Black, true);
-    // game[3][2] = Piece::Pawn(Color::Black, true);
-    // game[1][5] = Piece::Pawn(Color::White, true);
-    // game[3][5] = Piece::Pawn(Color::White, true);
-    // game[5][3] = Piece::Rook(Color::Black, true);
-    // game[7][3] = Piece::Pawn(Color::White, true);
-    // game[1][3] = Piece::Pawn(Color::White, true);
-    // game[4][4] = Piece::Bishop(Color::White, true);
-    // game[5][5] = Piece::Queen(Color::Black, true);
-    // game[2][4] = Piece::King(Color::Black, true, false, false);
     *game // return dereferenced game state to frontend
 }

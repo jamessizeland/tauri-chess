@@ -54,7 +54,6 @@ const parseBoardState = (boardArray: BoardStateArray) => {
     });
     return result;
   }, {});
-  console.log({ state });
   // alert(JSON.stringify(state));
   return state;
 };
@@ -91,11 +90,13 @@ const startNewGame = (setPosition: (positions: Position) => void) => {
   invoke<BoardStateArray>('new_game').then((board) => {
     notify('starting new game', 'new_game');
     setPosition(parseBoardState(board));
+    console.log(board);
   });
 };
 
 const getGameState = (setPosition: (positions: Position) => void) => {
   invoke<BoardStateArray>('get_state').then((board) => {
+    console.log(board);
     setPosition(parseBoardState(board));
   });
 };
