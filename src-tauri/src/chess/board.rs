@@ -115,14 +115,9 @@ pub fn new_game(state: tauri::State<PieceLocation>, meta: tauri::State<GameMeta>
     game[5][0] = Piece::Knight(Color::White, true);
     game[6][0] = Piece::Bishop(Color::White, true);
     game[7][0] = Piece::Rook(Color::White, true);
-    game[0][1] = Piece::Pawn(Color::White, true);
-    game[1][1] = Piece::Pawn(Color::White, true);
-    game[2][1] = Piece::Pawn(Color::White, true);
-    game[3][1] = Piece::Pawn(Color::White, true);
-    game[4][1] = Piece::Pawn(Color::White, true);
-    game[5][1] = Piece::Pawn(Color::White, true);
-    game[6][1] = Piece::Pawn(Color::White, true);
-    game[7][1] = Piece::Pawn(Color::White, true);
+    for col in 0..8 {
+        game[col][1] = Piece::Pawn(Color::White, true);
+    }
     // set up black pieces
     game[0][7] = Piece::Rook(Color::Black, true);
     game[1][7] = Piece::Knight(Color::Black, true);
@@ -132,13 +127,8 @@ pub fn new_game(state: tauri::State<PieceLocation>, meta: tauri::State<GameMeta>
     game[5][7] = Piece::Bishop(Color::Black, true);
     game[6][7] = Piece::Knight(Color::Black, true);
     game[7][7] = Piece::Rook(Color::Black, true);
-    game[0][6] = Piece::Pawn(Color::Black, true);
-    game[1][6] = Piece::Pawn(Color::Black, true);
-    game[2][6] = Piece::Pawn(Color::Black, true);
-    game[3][6] = Piece::Pawn(Color::Black, true);
-    game[4][6] = Piece::Pawn(Color::Black, true);
-    game[5][6] = Piece::Pawn(Color::Black, true);
-    game[6][6] = Piece::Pawn(Color::Black, true);
-    game[7][6] = Piece::Pawn(Color::Black, true);
+    for col in 0..8 {
+        game[col][6] = Piece::Pawn(Color::Black, true);
+    }
     *game // return dereferenced game state to frontend
 }
