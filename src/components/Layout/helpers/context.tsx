@@ -7,7 +7,6 @@ import React, {
   createContext,
   ReactNode,
 } from 'react';
-import debounce from 'debounce';
 
 interface ContextProps {
   open: boolean;

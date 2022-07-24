@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { Position } from 'components/Features/Chessboard/types';
-import ChessBoard from 'components/Features/Chessboard';
 import { Square } from 'chess.js';
-// import { notify } from 'services/notifications';
 import { invoke } from '@tauri-apps/api/tauri';
 // import { listen } from '@tauri-apps/api/event';
 import { Button } from 'components/Elements';
@@ -22,8 +20,8 @@ import Chessboard from 'components/Features/Chessboard';
 
 const HomePage = (): JSX.Element => {
   const [position, setPosition] = useState<Position>({});
-  const [square, setSquare] = useState(''); // currently clicked square
-  const [history, setHistory] = useState<string[]>([]);
+  // const [square, setSquare] = useState(''); // currently clicked square
+  // const [history, setHistory] = useState<string[]>([]);
   const [squareStyles, setSquareStyles] = useState<PositionStyles>();
   const [dragStyles, setDragStyles] = useState<{}>();
   const [whiteTurn, setWhiteTurn] = useState<boolean>(true);
@@ -84,15 +82,6 @@ const HomePage = (): JSX.Element => {
           </Button>
           <Button className="mr-2" onClick={() => setWhiteTurn(!whiteTurn)}>
             {whiteTurn ? 'White' : 'Black'}
-          </Button>
-          <Button
-            onClick={() =>
-              invoke<BoardStateArray>('get_state').then((gameState) =>
-                console.log(gameState),
-              )
-            }
-          >
-            Get State
           </Button>
         </div>
       )}
