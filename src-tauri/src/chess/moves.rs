@@ -1,11 +1,8 @@
-use super::board::BoardState;
-use super::pieces::{Color, GetState, MoveList, Piece};
+//! Logic for deciding where chess pieces can go, and moving them
 
-/// check if the square we are looking at contains an enemy piece
-fn check_enemy(color: &Color, piece: Piece) -> bool {
-    (piece.get_colour() == Some(Color::Black) && *color == Color::White)
-        || (piece.get_colour() == Some(Color::White) && *color == Color::Black)
-}
+use super::pieces::GetState;
+use super::types::{BoardState, Color, MoveList, Piece};
+use super::utils::check_enemy;
 
 pub fn pawn_move(
     sq: (usize, usize),
@@ -18,52 +15,52 @@ pub fn pawn_move(
     match color {
         Color::White => {
             // need to make sure that we don't request squares outside of the array bounds
-            let (mut row, mut col) = (sq.0, sq.1 + 1);
+            let (mut col, mut row) = (sq.0, sq.1 + 1);
             //* 1. move forward one if square is empty
-            if board[row][col] == Piece::None {
-                moves.push(((row, col), false));
-                col = sq.1 + 2;
+            if board[col][row] == Piece::None {
+                moves.push(((col, row), false));
+                row = sq.1 + 2;
                 //* 2. move forward two if hasn't moved and squares are empty
-                if board[row][col] == Piece::None && *first_move {
-                    moves.push(((row, col), false));
+                if board[col][row] == Piece::None && *first_move {
+                    moves.push(((col, row), false));
                 }
             }
             //* 3. potential attacks if target square contains an enemy piece
             if sq.0 < 7 && sq.1 < 7 {
-                (row, col) = (sq.0 + 1, sq.1 + 1);
-                if board[row][col].get_colour() == Some(Color::Black) {
-                    moves.push(((row, col), true))
+                (col, row) = (sq.0 + 1, sq.1 + 1);
+                if board[col][row].get_colour() == Some(Color::Black) {
+                    moves.push(((col, row), true))
                 }
             }
             if sq.0 > 0 && sq.1 < 7 {
-                (row, col) = (sq.0 - 1, sq.1 + 1);
-                if board[row][col].get_colour() == Some(Color::Black) {
-                    moves.push(((row, col), true))
+                (col, row) = (sq.0 - 1, sq.1 + 1);
+                if board[col][row].get_colour() == Some(Color::Black) {
+                    moves.push(((col, row), true))
                 }
             }
         }
         Color::Black => {
-            let (mut row, mut col) = (sq.0, sq.1 - 1);
+            let (mut col, mut row) = (sq.0, sq.1 - 1);
             //* 1. move forward one if square is empty
-            if board[row][col] == Piece::None {
-                moves.push(((row, col), false));
-                col = sq.1 - 2;
+            if board[col][row] == Piece::None {
+                moves.push(((col, row), false));
+                row = sq.1 - 2;
                 //* 2. move forward two if hasn't moved and squares are empty
-                if board[row][col] == Piece::None && *first_move {
-                    moves.push(((row, col), false));
+                if board[col][row] == Piece::None && *first_move {
+                    moves.push(((col, row), false));
                 }
             }
             //* 3. potential attacks if target square contains an enemy piece
             if sq.0 < 7 && sq.1 > 0 {
-                (row, col) = (sq.0 + 1, sq.1 - 1);
-                if board[row][col].get_colour() == Some(Color::White) {
-                    moves.push(((row, col), true))
+                (col, row) = (sq.0 + 1, sq.1 - 1);
+                if board[col][row].get_colour() == Some(Color::White) {
+                    moves.push(((col, row), true))
                 }
             }
             if sq.0 > 0 && sq.1 > 0 {
-                (row, col) = (sq.0 - 1, sq.1 - 1);
-                if board[row][col].get_colour() == Some(Color::White) {
-                    moves.push(((row, col), true))
+                (col, row) = (sq.0 - 1, sq.1 - 1);
+                if board[col][row].get_colour() == Some(Color::White) {
+                    moves.push(((col, row), true))
                 }
             }
         }
@@ -204,7 +201,7 @@ pub fn king_move(
     sq: (usize, usize),
     color: &Color,
     board: &BoardState,
-    first_move: bool,
+    _first_move: bool,
 ) -> MoveList {
     let mut moves: MoveList = Vec::new(); // start with empty movelist
     const VECTORS: [(i8, i8); 8] = [

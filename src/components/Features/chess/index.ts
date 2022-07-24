@@ -1,5 +1,5 @@
 import react from 'React';
-import { Position, Piece } from 'chessboardjsx';
+import { Position, Piece } from '../Chessboard/types';
 import { Square } from 'chess.js';
 import { notify } from 'services/notifications';
 import { invoke } from '@tauri-apps/api/tauri';
@@ -13,18 +13,24 @@ import type {
 
 // https://chessboardjsx.com/
 
+//!NOTE coordinates are column then row
+
+/** Convert a number to its corresponding alphabetical character */
+const numToLetter = (num: number) => (num + 9).toString(36);
+
+/** Convert a row, col coordinate into a chessboard square i.e. (2,1) = b3 */
+const coordToSquare = (col: number, row: number) => {
+  return `${numToLetter(col + 1)}${row + 1}` as Square;
+};
+
 const parseBoardState = (boardArray: BoardStateArray) => {
   // get 8x8 array of strings
-  console.log({ boardArray });
-  const coordToSquare = (row: number, col: number) => {
-    const colRef = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-    // construct the square from the row/col coords
-    return `${colRef[row]}${col + 1}` as Square;
-  };
+
   const rustToPiece = (pieceObj: RustPiece) => {
     let color: 'w' | 'b' =
       Object.values(pieceObj)[0][0] === 'Black' ? 'b' : 'w';
-    switch (Object.keys(pieceObj)[0] as PieceType) {
+    let type = Object.keys(pieceObj)[0] as PieceType;
+    switch (type) {
       case 'Queen':
         return `${color}Q` as Piece;
       case 'King':
@@ -37,39 +43,47 @@ const parseBoardState = (boardArray: BoardStateArray) => {
         return `${color}R` as Piece;
       case 'Pawn':
         return `${color}P` as Piece;
+      default:
+        return undefined;
     }
   };
-
-  let state: Position = boardArray.reduce<Position>((result, row, i) => {
-    row.forEach((col, j) => {
-      if (col !== 'None') {
-        console.log(col);
-        result[coordToSquare(i, j)] = rustToPiece(col as unknown as RustPiece);
-      }
+  let state = boardArray.reduce<Position>((result, col, coli) => {
+    col.forEach((sq, rowi) => {
+      let piece = rustToPiece(sq as unknown as RustPiece);
+      if (piece) result[coordToSquare(coli, rowi)] = piece;
     });
     return result;
   }, {});
+  console.log({ state });
+  // alert(JSON.stringify(state));
   return state;
 };
 
-const numToLetter = (num: number) => (num + 9).toString(36);
-
-const coordToSquare = (row: number, col: number) => {
-  return `${numToLetter(row + 1)}${col + 1}` as keyof PositionStyles;
-};
-
-const highlightSquares = (moveOptions: MoveList): PositionStyles => {
+const highlightSquares = (
+  moveOptions: MoveList,
+  square?: Square,
+): PositionStyles => {
   // turn this array of squares into an object with cssProperties defined
   const props = moveOptions.reduce<PositionStyles>((result, move, index) => {
-    const [isAttack, row, col] = [move[1], move[0][0], move[0][1]];
+    const [isAttack, col, row] = [move[1], move[0][0], move[0][1]];
 
-    result[coordToSquare(row, col)] = {
-      backgroundColor: isAttack ? 'red' : 'yellow',
-      borderRadius: '50%',
+    result[coordToSquare(col, row)] = {
+      boxShadow: isAttack
+        ? '0 0 8px #ea4c89, inset 0 0 8px #ea4c89'
+        : '0 0 8px rgb(255, 255, 0), inset 0 0 1px 4px rgb(255, 255, 0)',
+      width: '100%',
+      height: '100%',
     };
     return result;
   }, {});
-  console.log(props);
+  if (square) {
+    props[square] = {
+      boxShadow: '0 0 8px black, inset 0 1px 4px black',
+      width: '100%',
+      height: '100%',
+    };
+    // { boxShadow: 'inset 0 0 1px 4px rgb(255, 255, 0)' };
+  }
   return props;
 };
 
@@ -80,4 +94,16 @@ const startNewGame = (setPosition: (positions: Position) => void) => {
   });
 };
 
-export { parseBoardState, highlightSquares, startNewGame };
+const getGameState = (setPosition: (positions: Position) => void) => {
+  invoke<BoardStateArray>('get_state').then((board) => {
+    setPosition(parseBoardState(board));
+  });
+};
+
+export {
+  parseBoardState,
+  highlightSquares,
+  startNewGame,
+  getGameState,
+  coordToSquare,
+};

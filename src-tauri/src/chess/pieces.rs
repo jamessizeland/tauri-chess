@@ -1,50 +1,8 @@
-//! Chess pieces logic
+//! Chess pieces traits
 
-use super::moves::{bish_move, king_move, knight_move, rook_move};
-use super::{board::BoardState, moves::pawn_move};
-use serde::{Deserialize, Serialize};
+use super::moves::{bish_move, king_move, knight_move, pawn_move, rook_move};
+use super::types::{BoardState, Color, MoveList, Piece, Square};
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq)]
-pub enum Color {
-    Black,
-    White,
-}
-
-pub type FirstMove = bool;
-pub type Check = bool;
-pub type CheckMate = bool;
-
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq)]
-pub enum Piece {
-    None,
-    Pawn(Color, FirstMove),
-    King(Color, FirstMove, Check, CheckMate),
-    Queen(Color, FirstMove),
-    Bishop(Color, FirstMove),
-    Knight(Color, FirstMove),
-    Rook(Color, FirstMove),
-}
-impl Default for Piece {
-    fn default() -> Self {
-        Piece::None
-    }
-}
-// #[repr(usize)]
-// pub enum Row {
-//     A,
-//     B,
-//     C,
-//     D,
-//     E,
-//     F,
-//     G,
-//     H,
-// }
-
-/// Square reference in row and column
-pub type Square = (usize, usize);
-pub type IsAttack = bool;
-pub type MoveList = Vec<(Square, IsAttack)>;
 /// Get a list of available moves for this piece
 pub trait GetState {
     fn get_moves(&self, square: Square, board_state: BoardState) -> MoveList;

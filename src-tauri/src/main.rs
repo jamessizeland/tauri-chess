@@ -7,8 +7,9 @@ mod chess;
 
 fn main() {
     tauri::Builder::default()
-        .manage(chess::board::PieceLocation(Default::default()))
-        .manage(chess::board::Score(Default::default()))
+        .manage(chess::data::PieceLocation(Default::default()))
+        .manage(chess::data::GameMeta(Default::default()))
+        .manage(chess::data::SelectedSquare(Default::default()))
         .invoke_handler(tauri::generate_handler![
             chess::board::new_game,
             chess::board::get_state,
@@ -16,6 +17,7 @@ fn main() {
             chess::board::hover_square,
             chess::board::unhover_square,
             chess::board::drop_square,
+            chess::board::click_square,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
