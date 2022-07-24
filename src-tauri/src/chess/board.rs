@@ -35,8 +35,8 @@ pub fn hover_square(
     if selected != Option::None {
         coord = selected.unwrap();
     }
-    dbg!(&coord, &square);
-    dbg!(game[coord.0][coord.1].get_moves(coord, *game));
+    // dbg!(&coord, &square);
+    // dbg!(game[coord.0][coord.1].get_moves(coord, *game));
     game[coord.0][coord.1].get_moves(coord, *game)
 }
 
@@ -131,15 +131,15 @@ pub fn new_game(state: tauri::State<PieceLocation>) -> BoardState {
     game[6][6] = Piece::Pawn(Color::Black, true);
     game[7][6] = Piece::Pawn(Color::Black, true);
     // debug
-    // game[1][2] = Piece::Pawn(Color::Black, true);
-    // game[3][2] = Piece::Pawn(Color::Black, true);
-    // game[1][5] = Piece::Pawn(Color::White, true);
-    // game[3][5] = Piece::Pawn(Color::White, true);
-    // game[5][3] = Piece::Rook(Color::Black, true);
-    // game[7][3] = Piece::Pawn(Color::White, true);
-    // game[1][3] = Piece::Pawn(Color::White, true);
-    // game[4][4] = Piece::Bishop(Color::White, true);
-    // game[5][5] = Piece::Queen(Color::Black, true);
-    // game[2][4] = Piece::King(Color::Black, true, false, false);
+    game[1][2] = Piece::Pawn(Color::Black, true);
+    game[3][2] = Piece::Pawn(Color::Black, true);
+    game[1][5] = Piece::Pawn(Color::White, true);
+    game[3][5] = Piece::Pawn(Color::White, true);
+    game[5][3] = Piece::Rook(Color::Black, true);
+    game[7][3] = Piece::Pawn(Color::White, true);
+    game[1][3] = Piece::Pawn(Color::White, true);
+    game[4][4] = Piece::Bishop(Color::White, true);
+    game[5][5] = Piece::Queen(Color::Black, true);
+    game[2][4] = Piece::King(Color::Black, true, false, false);
     *game // return dereferenced game state to frontend
 }

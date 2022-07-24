@@ -68,13 +68,21 @@ const highlightSquares = (
     const [isAttack, col, row] = [move[1], move[0][0], move[0][1]];
 
     result[coordToSquare(col, row)] = {
-      backgroundColor: isAttack ? 'red' : 'yellow',
-      borderRadius: '50%',
+      boxShadow: isAttack
+        ? '0 0 8px #ea4c89, inset 0 0 8px #ea4c89'
+        : '0 0 8px rgb(255, 255, 0), inset 0 0 1px 4px rgb(255, 255, 0)',
+      width: '100%',
+      height: '100%',
     };
     return result;
   }, {});
   if (square) {
-    props[square] = { boxShadow: 'inset 0 0 1px 4px rgb(255, 255, 0)' };
+    props[square] = {
+      boxShadow: '0 0 8px black, inset 0 1px 4px black',
+      width: '100%',
+      height: '100%',
+    };
+    // { boxShadow: 'inset 0 0 1px 4px rgb(255, 255, 0)' };
   }
   return props;
 };
