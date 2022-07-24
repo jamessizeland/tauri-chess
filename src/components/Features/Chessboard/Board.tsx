@@ -43,13 +43,13 @@ const Board = ({
     Object.keys(currentPosition).includes(square);
 
   /** Render the board square appropriate for the coordinate given */
-  function renderSquare(row: number, col: number) {
-    const square = coordToSquare(row, col);
+  function renderSquare(col: number, row: number) {
+    const square = coordToSquare(col, row);
     return (
-      <div key={`${row}${col}`} style={squareStyle}>
+      <div key={`${col}${row}`} style={squareStyle}>
         <BoardSquare
-          row={row}
           col={col}
+          row={row}
           orientation={orientation}
           lightSquareStyle={lightSquareStyle}
           darkSquareStyle={darkSquareStyle}
@@ -64,7 +64,7 @@ const Board = ({
               col={col}
               row={row}
               width={560}
-              key={`${row}${col}`}
+              key={`${col}${row}`}
               orientation="white"
             />
           )}
@@ -73,7 +73,7 @@ const Board = ({
               width={560}
               square={square}
               onPieceClick={onPieceClick}
-              id={`${row}${col}${position[square]}`}
+              id={`${col}${row}${position[square]}`}
               piece={position[square]}
             />
           )}
@@ -83,7 +83,7 @@ const Board = ({
   }
   for (let row = 0; row <= 7; row++) {
     for (let col = 0; col <= 7; col++) {
-      squares.push(renderSquare(7 - row, col));
+      squares.push(renderSquare(col, 7 - row));
     }
   }
   console.log(squares.length);

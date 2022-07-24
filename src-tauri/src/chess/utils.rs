@@ -39,8 +39,8 @@ pub fn check_enemy(color: &Color, piece: Piece) -> bool {
         || (piece.get_colour() == Some(Color::White) && *color == Color::Black)
 }
 
-/// convert a square string i.e. 'a1' to a coordinate tuple i.e. (0,0)
-/// row (letter) followed by column (number)
+/// convert a square string to a coordinate tuple i.e. b3 = (2,1)
+/// col (letter) followed by row (number)
 pub fn square_to_coord(square: &str) -> (usize, usize) {
     let sq_vec: Vec<char> = square.chars().collect();
     if sq_vec.len() != 2 {

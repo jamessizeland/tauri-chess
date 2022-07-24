@@ -8,8 +8,8 @@ import { ItemTypes } from './helpers';
 import type { Orientation } from './types';
 
 export interface BoardSquareProps {
-  row: number;
   col: number;
+  row: number;
   orientation?: Orientation;
   children?: ReactNode;
   lightSquareStyle?: CSSProperties;
@@ -29,20 +29,21 @@ const squareStyle = {
 };
 
 export const BoardSquare = ({
-  row,
   col,
+  row,
   orientation = 'white',
   lightSquareStyle = { backgroundColor: 'rgb(240, 217, 181)' },
   darkSquareStyle = { backgroundColor: 'rgb(181, 136, 99)' },
   customSquareStyle,
-  onMouseOverSquare,
-  onMouseOutSquare,
-  onDragOverSquare,
-  onDrop,
-  onSquareClick,
-  onSquareRightClick,
+  onMouseOverSquare = (square: Square) => null,
+  onMouseOutSquare = (square: Square) => null,
+  onDragOverSquare = (square: Square) => null,
+  onDrop = (square: Square) => null,
+  onSquareClick = (square: Square) => null,
+  onSquareRightClick = (square: Square) => null,
   children,
 }: BoardSquareProps): JSX.Element => {
+  const square = coordToSquare(col, row);
   const [{ isOver, canDrop }, drop] = useDrop(
     () => ({
       accept: ItemTypes.PIECE,
@@ -58,27 +59,26 @@ export const BoardSquare = ({
   /** Handles right and left clicks on a board square */
   const handleClick = (event: React.MouseEvent) => {
     if (event.type === 'click') {
-      console.log(`clicked on ${coordToSquare(row, col)} ${row},${col}`);
+      console.log(`clicked on ${coordToSquare(col, row)} ${col},${row}`);
     } else if (event.type === 'contextmenu') {
       event.preventDefault();
-      console.log(`right-clicked on ${coordToSquare(row, col)} ${row},${col}`);
+      console.log(`right-clicked on ${coordToSquare(col, row)} ${col},${row}`);
     }
-    // onSquareClick;
   };
-  const black = !((row + col) % 2 === 1);
+  const black = !((col + row) % 2 === 1);
   const backgroundColor = black ? darkSquareStyle : lightSquareStyle;
   const color = black ? 'white' : 'black';
   return (
     <div
       className={clsx('tooltip')}
-      data-tip={`row ${row} | col ${col} | ${coordToSquare(row, col)}`}
-      onMouseEnter={() => onMouseOverSquare}
-      onMouseLeave={() => onMouseOutSquare}
+      data-tip={`(col ${col}, row ${row}) = ${coordToSquare(col, row)}`}
+      onMouseEnter={() => onMouseOverSquare(square)}
+      onMouseLeave={() => onMouseOutSquare(square)}
       onClick={handleClick}
       onContextMenu={handleClick}
       ref={drop}
       role="Space"
-      data-testid={`(${row},${col})`}
+      data-testid={`(${col},${row})`}
       style={{
         position: 'relative',
         width: '100%',

@@ -13,15 +13,18 @@ import type {
 
 // https://chessboardjsx.com/
 
+//!NOTE coordinates are column then row
+
+/** Convert a number to its corresponding alphabetical character */
+const numToLetter = (num: number) => (num + 9).toString(36);
+
+/** Convert a row, col coordinate into a chessboard square i.e. (2,1) = b3 */
+const coordToSquare = (col: number, row: number) => {
+  return `${numToLetter(col + 1)}${row + 1}` as Square;
+};
+
 const parseBoardState = (boardArray: BoardStateArray) => {
   // get 8x8 array of strings
-  const coordToSquare = (row: number, col: number) => {
-    const colRef = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-    // construct the square from the row/col coords
-    let square: Square = `${colRef[row]}${col + 1}` as Square;
-    // console.log({ square });
-    return square;
-  };
 
   const rustToPiece = (pieceObj: RustPiece) => {
     let color: 'w' | 'b' =
@@ -44,10 +47,10 @@ const parseBoardState = (boardArray: BoardStateArray) => {
         return undefined;
     }
   };
-  let state = boardArray.reduce<Position>((result, row, rowi) => {
-    row.forEach((sq, coli) => {
+  let state = boardArray.reduce<Position>((result, col, coli) => {
+    col.forEach((sq, rowi) => {
       let piece = rustToPiece(sq as unknown as RustPiece);
-      if (piece) result[coordToSquare(rowi, coli)] = piece;
+      if (piece) result[coordToSquare(coli, rowi)] = piece;
     });
     return result;
   }, {});
@@ -56,21 +59,15 @@ const parseBoardState = (boardArray: BoardStateArray) => {
   return state;
 };
 
-const numToLetter = (num: number) => (num + 9).toString(36);
-
-const coordToSquare = (row: number, col: number) => {
-  return `${numToLetter(col + 1)}${row + 1}` as Square;
-};
-
 const highlightSquares = (
   moveOptions: MoveList,
   square?: Square,
 ): PositionStyles => {
   // turn this array of squares into an object with cssProperties defined
   const props = moveOptions.reduce<PositionStyles>((result, move, index) => {
-    const [isAttack, row, col] = [move[1], move[0][0], move[0][1]];
+    const [isAttack, col, row] = [move[1], move[0][0], move[0][1]];
 
-    result[coordToSquare(row, col)] = {
+    result[coordToSquare(col, row)] = {
       backgroundColor: isAttack ? 'red' : 'yellow',
       borderRadius: '50%',
     };

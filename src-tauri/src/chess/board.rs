@@ -35,7 +35,8 @@ pub fn hover_square(
     if selected != Option::None {
         coord = selected.unwrap();
     }
-    // dbg!(&coord, &square);
+    dbg!(&coord, &square);
+    dbg!(game[coord.0][coord.1].get_moves(coord, *game));
     game[coord.0][coord.1].get_moves(coord, *game)
 }
 
