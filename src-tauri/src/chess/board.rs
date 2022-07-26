@@ -127,11 +127,12 @@ pub fn click_square(
         //* 3. if we have clicked a valid move of selected, do move
         println!("valid move");
         let source = selected.unwrap();
-        let attacker = board[source.0][source.1].clone();
+        let attacker = board[source.0][source.1].clone().has_moved();
         board[coord.0][coord.1] = Piece::None; // remove attacked piece
         board[source.0][source.1] = Piece::None; // take attacked out of its square
         board[coord.0][coord.1] = attacker; // place attacker in the new square
-        dbg!(attacker);
+        game_meta.turn += 1;
+        selected = Option::None;
     } else if board[coord.0][coord.1] == Piece::None || contains_enemy {
         //* 4. Selected an empty or enemy square which isn't a valid move, unselect
         selected = Option::None;
