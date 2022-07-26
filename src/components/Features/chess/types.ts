@@ -20,6 +20,11 @@ type RustPiece =
 
 type MoveList = [[number, number], boolean][];
 
+type MetaGame = {
+  score: number;
+  turn: number;
+};
+
 export type {
   BoardStateArray,
   Color,
@@ -27,4 +32,5 @@ export type {
   PositionStyles,
   RustPiece,
   MoveList,
+  MetaGame,
 };

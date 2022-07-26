@@ -14,9 +14,9 @@ pub fn get_state(state: tauri::State<PieceLocation>) -> BoardState {
 
 #[tauri::command]
 /// Get the game score from global memory
-pub fn get_score(state: tauri::State<GameMeta>) -> i32 {
-    let score = state.0.lock().expect("game state access").score;
-    score
+pub fn get_score(state: tauri::State<GameMeta>) -> super::types::GameMeta {
+    let meta_game = state.0.lock().expect("game state access");
+    *meta_game
 }
 
 #[tauri::command]
@@ -103,7 +103,7 @@ pub fn click_square(
     state: tauri::State<PieceLocation>,
     clicked: tauri::State<SelectedSquare>,
     meta: tauri::State<GameMeta>,
-) -> (MoveList, BoardState) {
+) -> (MoveList, BoardState, super::types::GameMeta) {
     let mut selected = *clicked.0.lock().unwrap();
     let mut board = state.0.lock().unwrap();
     let mut game_meta = meta.0.lock().unwrap();
@@ -142,5 +142,5 @@ pub fn click_square(
         move_list = board[coord.0][coord.1].get_moves(coord, *board)
     }
     *clicked.0.lock().unwrap() = selected;
-    (move_list, *board)
+    (move_list, *board, *game_meta)
 }
