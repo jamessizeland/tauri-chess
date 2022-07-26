@@ -49,10 +49,8 @@ function Modal({
   useEffect(() => {
     const handleOutsideClick = (event: globalThis.MouseEvent) => {
       if (closeOnClickOutside && !ref.current?.contains(event.target as Node)) {
-        if (isOpen) return;
-        console.log('clicked outside');
-        toggle(true);
-        console.log({ isOpen });
+        if (!isOpen) return;
+        toggle(false);
       }
     };
     window.addEventListener('click', handleOutsideClick);

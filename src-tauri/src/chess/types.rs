@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 
 pub type BoardState = [[Piece; 8]; 8];
 
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct GameMeta {
     pub turn: usize,
     pub score: i32,

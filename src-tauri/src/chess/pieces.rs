@@ -44,3 +44,17 @@ impl GetState for Piece {
         }
     }
 }
+
+impl Piece {
+    pub fn has_moved(&mut self) -> Self {
+        match &self {
+            Piece::None => Piece::None,
+            Piece::Pawn(color, _) => Piece::Pawn(*color, false),
+            Piece::King(color, _, check, mate) => Piece::King(*color, false, *check, *mate),
+            Piece::Queen(color, _) => Piece::Queen(*color, false),
+            Piece::Bishop(color, _) => Piece::Bishop(*color, false),
+            Piece::Knight(color, _) => Piece::Knight(*color, false),
+            Piece::Rook(color, _) => Piece::Rook(*color, false),
+        }
+    }
+}

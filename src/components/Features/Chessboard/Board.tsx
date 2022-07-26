@@ -86,8 +86,6 @@ const Board = ({
       squares.push(renderSquare(col, 7 - row));
     }
   }
-  console.log(squares.length);
-  console.log(squares);
   const rotate = orientation === 'black' ? 'rotate-180' : '';
   return (
     <div
