@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Button,
   Modal,
@@ -7,8 +7,18 @@ import {
   ModalFooter,
 } from 'components/Elements';
 import { useToggle } from 'hooks';
+import { invoke } from '@tauri-apps/api/tauri';
+import { listen } from '@tauri-apps/api/event';
 
 const TestPage = (): JSX.Element => {
+  useEffect(() => {
+    const unlisten = listen<number>('update_score', (event) => {
+      console.log(event);
+      setScore(event.payload);
+    });
+  }, []);
+
+  const [score, setScore] = useState(0);
   const { isOpen, toggle } = useToggle();
   return (
     <div className="animate-backInRight animate-fast">
@@ -27,6 +37,8 @@ const TestPage = (): JSX.Element => {
           </ModalFooter>
         </Modal>
         <Button onClick={() => toggle(false)}>Modal</Button>
+        <Button onClick={() => invoke('get_score')}>Trigger Event</Button>
+        <p>{score}</p>
       </div>
     </div>
   );

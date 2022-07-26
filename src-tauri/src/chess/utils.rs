@@ -33,10 +33,10 @@ pub fn letter_to_row(letter: char) -> usize {
 //     }
 // }
 
-/// check if the square we are looking at contains an enemy piece
-pub fn check_enemy(color: &Color, piece: Piece) -> bool {
-    (piece.get_colour() == Some(Color::Black) && *color == Color::White)
-        || (piece.get_colour() == Some(Color::White) && *color == Color::Black)
+/// check if the piece we are looking is of the opposite colour to us
+pub fn check_enemy(our_color: &Color, considered_piece: Piece) -> bool {
+    (considered_piece.get_colour() == Some(Color::Black) && *our_color == Color::White)
+        || (considered_piece.get_colour() == Some(Color::White) && *our_color == Color::Black)
 }
 
 /// convert a square string to a coordinate tuple i.e. b3 = (2,1)
