@@ -5,8 +5,12 @@ use super::types::{BoardState, Color, MoveList, Piece, Square};
 
 /// Get a list of available moves for this piece
 pub trait GetState {
-    fn get_moves(&self, square: Square, board_state: BoardState) -> MoveList;
+    /// Return a list of all available moves for this piece
+    fn get_moves(&self, square: Square, board: BoardState) -> MoveList;
+    /// Return this piece's color
     fn get_colour(&self) -> Option<Color>;
+    /// If this piece is a king, return its color, otherwise return None
+    fn is_king(&self) -> Option<Color>;
 }
 
 impl GetState for Piece {
@@ -19,6 +23,12 @@ impl GetState for Piece {
             Piece::Bishop(color, _) => Some(*color),
             Piece::Knight(color, _) => Some(*color),
             Piece::Rook(color, _) => Some(*color),
+        }
+    }
+    fn is_king(&self) -> Option<Color> {
+        match &self {
+            Piece::King(color, _, _, _) => Some(*color),
+            _ => None,
         }
     }
     fn get_moves(&self, sq: Square, board: BoardState) -> MoveList {

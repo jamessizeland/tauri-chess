@@ -40,6 +40,7 @@ pub fn new_game(state: tauri::State<PieceLocation>, meta: tauri::State<GameMeta>
     board[2][0] = Piece::Knight(Color::White, true);
     board[3][0] = Piece::Queen(Color::White, true);
     board[4][0] = Piece::King(Color::White, true, false, false);
+    game_meta.white_king = (4, 0);
     board[5][0] = Piece::Knight(Color::White, true);
     board[6][0] = Piece::Bishop(Color::White, true);
     board[7][0] = Piece::Rook(Color::White, true);
@@ -52,6 +53,7 @@ pub fn new_game(state: tauri::State<PieceLocation>, meta: tauri::State<GameMeta>
     board[2][7] = Piece::Bishop(Color::Black, true);
     board[3][7] = Piece::Queen(Color::Black, true);
     board[4][7] = Piece::King(Color::Black, true, false, false);
+    game_meta.white_king = (4, 7);
     board[5][7] = Piece::Bishop(Color::Black, true);
     board[6][7] = Piece::Knight(Color::Black, true);
     board[7][7] = Piece::Rook(Color::Black, true);
@@ -78,7 +80,8 @@ pub fn hover_square(
     }
     // dbg!(&coord, &square);
     // dbg!(board[coord.0][coord.1].get_moves(coord, *board));
-    board[coord.0][coord.1].get_moves(coord, *board)
+    let hovered_piece = board[coord.0][coord.1];
+    hovered_piece.get_moves(coord, *board)
 }
 
 #[tauri::command]
@@ -131,6 +134,12 @@ pub fn click_square(
         board[coord.0][coord.1] = Piece::None; // remove attacked piece
         board[source.0][source.1] = Piece::None; // take attacked out of its square
         board[coord.0][coord.1] = attacker; // place attacker in the new square
+        if attacker.is_king() == Some(turn) {
+            match turn {
+                Color::Black => game_meta.black_king = coord,
+                Color::White => game_meta.white_king = coord,
+            }
+        }
         game_meta.turn += 1;
         selected = Option::None;
     } else if board[coord.0][coord.1] == Piece::None || contains_enemy {

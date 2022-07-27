@@ -1,5 +1,7 @@
 //! Logic for deciding where chess pieces can go, and moving them
 
+use crate::chess::utils::under_threat;
+
 use super::pieces::GetState;
 use super::types::{BoardState, Color, MoveList, Piece};
 use super::utils::check_enemy;
@@ -220,10 +222,10 @@ pub fn king_move(
         if row >= 0 && row <= 7 && col >= 0 && col <= 7 {
             // valid square
             let (row, col) = (row as usize, col as usize);
-            // let target_colour = board[row][col].get_colour();
-            if board[row][col] == Piece::None {
+            let potential_move = board[row][col];
+            if potential_move == Piece::None {
                 moves.push(((row, col), false));
-            } else if check_enemy(color, board[row][col]) {
+            } else if check_enemy(color, potential_move) {
                 moves.push(((row, col), true));
             }
         }

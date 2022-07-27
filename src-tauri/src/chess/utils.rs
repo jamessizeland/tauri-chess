@@ -60,3 +60,23 @@ pub fn valid_move(source: (usize, usize), target: (usize, usize), board: BoardSt
     // dbg!(&source, &target);
     move_options.iter().any(|&ele| ele.0 == target)
 }
+
+/// Check if this square is threatened, by exhaustive search
+pub fn under_threat(square: (usize, usize), our_color: &Color, board: BoardState) -> bool {
+    let mut threatened = false;
+    println!("checking threat");
+    'outer: for col in board {
+        for potential_threat in col {
+            if check_enemy(our_color, potential_threat) {
+                println!("found enemy here");
+                for m in potential_threat.get_moves(square, board) {
+                    if m.0 == square {
+                        threatened = true;
+                        break 'outer;
+                    }
+                }
+            }
+        }
+    }
+    threatened
+}

@@ -11,6 +11,7 @@ import {
   ModalHeader,
 } from 'components/Elements';
 import {
+  coordToSquare,
   getGameState,
   highlightSquares,
   parseBoardState,
@@ -48,10 +49,7 @@ const AskNewGame = ({
         <Button
           onClick={() => {
             startNewGame(setPosition);
-            setGameMeta({
-              score: 0,
-              turn: 0,
-            });
+            invoke<MetaGame>('get_score').then((meta) => setGameMeta(meta));
             toggle(true);
           }}
         >
@@ -68,7 +66,12 @@ const HomePage = (): JSX.Element => {
   const [newGame, setNewGame] = useState<boolean>(false);
   // const [square, setSquare] = useState(''); // currently clicked square
   // const [history, setHistory] = useState<string[]>([]);
-  const [gameMeta, setGameMeta] = useState<MetaGame>({ score: 0, turn: 0 });
+  const [gameMeta, setGameMeta] = useState<MetaGame>({
+    score: 0,
+    turn: 0,
+    black_king: [4, 7],
+    white_king: [4, 0],
+  });
   const [squareStyles, setSquareStyles] = useState<PositionStyles>();
   const [dragStyles, setDragStyles] = useState<{}>();
   const [whiteTurn, setWhiteTurn] = useState<boolean>(true);
@@ -134,20 +137,27 @@ const HomePage = (): JSX.Element => {
           }}
         />
       </div>
-      {!checkEnv('production') && (
-        <div className="pt-5">
-          <Button className="mr-2" onClick={() => setNotation(!notation)}>
-            Toggle Notation
-          </Button>
-          <Button className="mr-2" onClick={() => setWhiteTurn(!whiteTurn)}>
-            {whiteTurn ? 'White' : 'Black'}
-          </Button>
-          <p className="inline border border-black rounded-sm px-6 py-3 text-sm">
-            score: {gameMeta.score}, turn: {gameMeta.turn} (
-            {gameMeta.turn % 2 == 0 ? 'White' : 'Black'})
-          </p>
-        </div>
-      )}
+      {/* Game State Row */}
+      <div className="pt-5 w-full flex">
+        <p className="inline border border-black rounded-sm px-6 py-3 text-sm mr-1">
+          white king:{' '}
+          {coordToSquare(gameMeta.white_king[0], gameMeta.white_king[1])}
+        </p>
+        <p className="inline border border-black rounded-sm px-6 py-3 text-sm mr-1">
+          black king:{' '}
+          {coordToSquare(gameMeta.black_king[0], gameMeta.black_king[1])}
+        </p>
+        <p className="inline border border-black rounded-sm px-6 py-3 text-sm mr-2">
+          score: {gameMeta.score}, turn: {gameMeta.turn} (
+          {gameMeta.turn % 2 == 0 ? 'White' : 'Black'})
+        </p>
+        <Button className="mr-2" onClick={() => setNotation(!notation)}>
+          Toggle Notation
+        </Button>
+        <Button className="mr-2" onClick={() => setWhiteTurn(!whiteTurn)}>
+          {whiteTurn ? 'White' : 'Black'}
+        </Button>
+      </div>
     </div>
   );
 };
