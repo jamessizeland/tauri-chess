@@ -2,7 +2,7 @@
 use super::data::{GameMeta, PieceLocation, SelectedSquare};
 use super::pieces::GetState;
 use super::types::{BoardState, Color, MoveList, Piece, Square};
-use super::utils::{check_enemy, square_to_coord, valid_move};
+use super::utils::{check_enemy, square_to_coord, under_threat, valid_move};
 
 #[tauri::command]
 /// Get the location of all pieces from global memory
@@ -40,7 +40,7 @@ pub fn new_game(state: tauri::State<PieceLocation>, meta: tauri::State<GameMeta>
     board[2][0] = Piece::Knight(Color::White, true);
     board[3][0] = Piece::Queen(Color::White, true);
     board[4][0] = Piece::King(Color::White, true, false, false);
-    game_meta.white_king = (4, 0);
+    game_meta.white_king = (board[4][0], (4, 0));
     board[5][0] = Piece::Knight(Color::White, true);
     board[6][0] = Piece::Bishop(Color::White, true);
     board[7][0] = Piece::Rook(Color::White, true);
@@ -53,7 +53,7 @@ pub fn new_game(state: tauri::State<PieceLocation>, meta: tauri::State<GameMeta>
     board[2][7] = Piece::Bishop(Color::Black, true);
     board[3][7] = Piece::Queen(Color::Black, true);
     board[4][7] = Piece::King(Color::Black, true, false, false);
-    game_meta.white_king = (4, 7);
+    game_meta.black_king = (board[4][7], (4, 7));
     board[5][7] = Piece::Bishop(Color::Black, true);
     board[6][7] = Piece::Knight(Color::Black, true);
     board[7][7] = Piece::Rook(Color::Black, true);
@@ -81,7 +81,7 @@ pub fn hover_square(
     // dbg!(&coord, &square);
     // dbg!(board[coord.0][coord.1].get_moves(coord, *board));
     let hovered_piece = board[coord.0][coord.1];
-    hovered_piece.get_moves(coord, *board)
+    hovered_piece.get_moves(coord, &board)
 }
 
 #[tauri::command]
@@ -117,7 +117,7 @@ pub fn click_square(
     } else {
         Color::Black
     };
-    let contains_enemy = check_enemy(&turn, board[coord.0][coord.1]);
+    let contains_enemy = check_enemy(&turn, &board[coord.0][coord.1]);
     if selected == Option::None {
         //* 1.if we have nothing selected and the new coordinate doesn't contain an enemy piece, select it!
         if !contains_enemy {
@@ -126,7 +126,7 @@ pub fn click_square(
     } else if selected == Some(coord) {
         //* 2. if we have clicked on the same square again, unselect it
         selected = Option::None;
-    } else if valid_move(selected.unwrap(), coord, *board) {
+    } else if valid_move(selected.unwrap(), coord, &board) {
         //* 3. if we have clicked a valid move of selected, do move
         println!("valid move");
         let source = selected.unwrap();
@@ -136,8 +136,8 @@ pub fn click_square(
         board[coord.0][coord.1] = attacker; // place attacker in the new square
         if attacker.is_king() == Some(turn) {
             match turn {
-                Color::Black => game_meta.black_king = coord,
-                Color::White => game_meta.white_king = coord,
+                Color::Black => game_meta.black_king = (attacker, coord),
+                Color::White => game_meta.white_king = (attacker, coord),
             }
         }
         game_meta.turn += 1;
@@ -148,8 +148,11 @@ pub fn click_square(
     } else {
         //* 5. select the new square
         selected = Some(coord);
-        move_list = board[coord.0][coord.1].get_moves(coord, *board)
+        move_list = board[coord.0][coord.1].get_moves(coord, &board)
     }
+    let black_threatened = under_threat(game_meta.black_king.1, &Color::Black, &board);
+    let white_threatened = under_threat(game_meta.white_king.1, &Color::White, &board);
+    dbg!(black_threatened, white_threatened);
     *clicked.0.lock().unwrap() = selected;
     (move_list, *board, *game_meta)
 }

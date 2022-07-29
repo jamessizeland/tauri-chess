@@ -3,20 +3,14 @@ import type { Position } from 'components/Features/Chessboard/types';
 import { Square } from 'chess.js';
 import { invoke } from '@tauri-apps/api/tauri';
 // import { listen } from '@tauri-apps/api/event';
-import {
-  Button,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-} from 'components/Elements';
+import { Button } from 'components/Elements';
 import {
   coordToSquare,
   getGameState,
   highlightSquares,
   parseBoardState,
-  startNewGame,
-} from 'components/Features/chess';
+  AskNewGame,
+} from 'components/Features/chess/index';
 import type {
   BoardStateArray,
   MoveList,
@@ -27,39 +21,6 @@ import { checkEnv } from 'utils';
 import Chessboard from 'components/Features/Chessboard';
 import { useToggle } from 'hooks';
 
-const AskNewGame = ({
-  setPosition,
-  setGameMeta,
-  isOpen,
-  toggle,
-}: {
-  setPosition: (position: Position) => void;
-  setGameMeta: (meta: MetaGame) => void;
-  isOpen: boolean;
-  toggle: (open?: boolean) => void;
-}): JSX.Element => {
-  return (
-    <Modal toggle={toggle} isOpen={isOpen} animate position="extraLarge">
-      <ModalHeader>Welcome to Tauri Chess</ModalHeader>
-      <ModalBody>Do you want to start a new game?</ModalBody>
-      <ModalFooter>
-        <Button className="mr-2" onClick={() => toggle(true)}>
-          Cancel
-        </Button>
-        <Button
-          onClick={() => {
-            startNewGame(setPosition);
-            invoke<MetaGame>('get_score').then((meta) => setGameMeta(meta));
-            toggle(true);
-          }}
-        >
-          New
-        </Button>
-      </ModalFooter>
-    </Modal>
-  );
-};
-
 const HomePage = (): JSX.Element => {
   const { isOpen, toggle } = useToggle();
   const [position, setPosition] = useState<Position>({});
@@ -69,8 +30,14 @@ const HomePage = (): JSX.Element => {
   const [gameMeta, setGameMeta] = useState<MetaGame>({
     score: 0,
     turn: 0,
-    black_king: [4, 7],
-    white_king: [4, 0],
+    black_king: [
+      ['Black', true, false, false],
+      [4, 7],
+    ],
+    white_king: [
+      ['White', true, false, false],
+      [4, 0],
+    ],
   });
   const [squareStyles, setSquareStyles] = useState<PositionStyles>();
   const [dragStyles, setDragStyles] = useState<{}>();
@@ -141,11 +108,11 @@ const HomePage = (): JSX.Element => {
       <div className="pt-5 w-full flex">
         <p className="inline border border-black rounded-sm px-6 py-3 text-sm mr-1">
           white king:{' '}
-          {coordToSquare(gameMeta.white_king[0], gameMeta.white_king[1])}
+          {coordToSquare(gameMeta.white_king[1][0], gameMeta.white_king[1][1])}
         </p>
         <p className="inline border border-black rounded-sm px-6 py-3 text-sm mr-1">
           black king:{' '}
-          {coordToSquare(gameMeta.black_king[0], gameMeta.black_king[1])}
+          {coordToSquare(gameMeta.black_king[1][0], gameMeta.black_king[1][1])}
         </p>
         <p className="inline border border-black rounded-sm px-6 py-3 text-sm mr-2">
           score: {gameMeta.score}, turn: {gameMeta.turn} (

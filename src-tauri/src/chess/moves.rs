@@ -1,7 +1,5 @@
 //! Logic for deciding where chess pieces can go, and moving them
 
-use crate::chess::utils::under_threat;
-
 use super::pieces::GetState;
 use super::types::{BoardState, Color, MoveList, Piece};
 use super::utils::check_enemy;
@@ -79,7 +77,7 @@ pub fn rook_move(sq: (usize, usize), color: &Color, board: &BoardState) -> MoveL
             break; // out of bounds, stop
         }
         if board[row][col] != Piece::None {
-            if check_enemy(color, board[row][col]) {
+            if check_enemy(color, &board[row][col]) {
                 moves.push(((row, col), true));
             }
             break; // stop
@@ -94,7 +92,7 @@ pub fn rook_move(sq: (usize, usize), color: &Color, board: &BoardState) -> MoveL
         }
         let row = row as usize; // recast back to usize now we know it's >= 0
         if board[row][col] != Piece::None {
-            if check_enemy(color, board[row][col]) {
+            if check_enemy(color, &board[row][col]) {
                 moves.push(((row, col), true));
             }
             break;
@@ -108,7 +106,7 @@ pub fn rook_move(sq: (usize, usize), color: &Color, board: &BoardState) -> MoveL
             break; // out of bounds, stop
         }
         if board[row][col] != Piece::None {
-            if check_enemy(color, board[row][col]) {
+            if check_enemy(color, &board[row][col]) {
                 moves.push(((row, col), true));
             }
             break; // stop
@@ -123,7 +121,7 @@ pub fn rook_move(sq: (usize, usize), color: &Color, board: &BoardState) -> MoveL
         }
         let col = col as usize; // recast back to usize now we know it's >= 0
         if board[row][col] != Piece::None {
-            if check_enemy(color, board[row][col]) {
+            if check_enemy(color, &board[row][col]) {
                 moves.push(((row, col), true));
             }
             break;
@@ -143,7 +141,7 @@ pub fn bish_move(sq: (usize, usize), color: &Color, board: &BoardState) -> MoveL
             break; // out of bounds, stop
         }
         if board[row][col] != Piece::None {
-            if check_enemy(color, board[row][col]) {
+            if check_enemy(color, &board[row][col]) {
                 moves.push(((row, col), true));
             }
             break; // stop
@@ -158,7 +156,7 @@ pub fn bish_move(sq: (usize, usize), color: &Color, board: &BoardState) -> MoveL
         }
         let (row, col) = (row as usize, col as usize); // recast back to usize
         if board[row][col] != Piece::None {
-            if check_enemy(color, board[row][col]) {
+            if check_enemy(color, &board[row][col]) {
                 moves.push(((row, col), true));
             }
             break;
@@ -173,7 +171,7 @@ pub fn bish_move(sq: (usize, usize), color: &Color, board: &BoardState) -> MoveL
         }
         let (row, col) = (row as usize, col as usize); // recast back to usize
         if board[row][col] != Piece::None {
-            if check_enemy(color, board[row][col]) {
+            if check_enemy(color, &board[row][col]) {
                 moves.push(((row, col), true));
             }
             break; // stop
@@ -188,7 +186,7 @@ pub fn bish_move(sq: (usize, usize), color: &Color, board: &BoardState) -> MoveL
         }
         let (row, col) = (row as usize, col as usize); // recast back to usize
         if board[row][col] != Piece::None {
-            if check_enemy(color, board[row][col]) {
+            if check_enemy(color, &board[row][col]) {
                 moves.push(((row, col), true));
             }
             break;
@@ -225,7 +223,7 @@ pub fn king_move(
             let potential_move = board[row][col];
             if potential_move == Piece::None {
                 moves.push(((row, col), false));
-            } else if check_enemy(color, potential_move) {
+            } else if check_enemy(color, &potential_move) {
                 moves.push(((row, col), true));
             }
         }
@@ -256,7 +254,7 @@ pub fn knight_move(sq: (usize, usize), color: &Color, board: &BoardState) -> Mov
             // let target_colour = board[row][col].get_colour();
             if board[row][col] == Piece::None {
                 moves.push(((row, col), false));
-            } else if check_enemy(color, board[row][col]) {
+            } else if check_enemy(color, &board[row][col]) {
                 moves.push(((row, col), true));
             }
         }

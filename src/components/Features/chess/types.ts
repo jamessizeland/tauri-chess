@@ -23,8 +23,8 @@ type MoveList = [[number, number], boolean][];
 type MetaGame = {
   score: number;
   turn: number;
-  black_king: [number, number];
-  white_king: [number, number];
+  black_king: [[Color, FirstMove, Check, CheckMate], [number, number]];
+  white_king: [[Color, FirstMove, Check, CheckMate], [number, number]];
 };
 
 export type {

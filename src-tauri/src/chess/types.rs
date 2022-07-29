@@ -8,8 +8,8 @@ pub type BoardState = [[Piece; 8]; 8];
 pub struct GameMeta {
     pub turn: usize,
     pub score: i32,
-    pub black_king: Square,
-    pub white_king: Square,
+    pub black_king: (Piece, Square),
+    pub white_king: (Piece, Square),
 }
 
 impl Default for GameMeta {
@@ -17,8 +17,8 @@ impl Default for GameMeta {
         GameMeta {
             turn: 0,
             score: 0,
-            black_king: (4, 7),
-            white_king: (4, 0),
+            white_king: (Piece::King(Color::White, true, false, false), (4, 0)),
+            black_king: (Piece::King(Color::Black, true, false, false), (4, 7)),
         }
     }
 }

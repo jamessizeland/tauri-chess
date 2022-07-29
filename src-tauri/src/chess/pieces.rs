@@ -6,7 +6,7 @@ use super::types::{BoardState, Color, MoveList, Piece, Square};
 /// Get a list of available moves for this piece
 pub trait GetState {
     /// Return a list of all available moves for this piece
-    fn get_moves(&self, square: Square, board: BoardState) -> MoveList;
+    fn get_moves(&self, square: Square, board: &BoardState) -> MoveList;
     /// Return this piece's color
     fn get_colour(&self) -> Option<Color>;
     /// If this piece is a king, return its color, otherwise return None
@@ -31,7 +31,7 @@ impl GetState for Piece {
             _ => None,
         }
     }
-    fn get_moves(&self, sq: Square, board: BoardState) -> MoveList {
+    fn get_moves(&self, sq: Square, board: &BoardState) -> MoveList {
         match &self {
             // what type of piece am I?
             Piece::None => Vec::new(),

@@ -9,7 +9,15 @@ import type {
   PieceType,
   PositionStyles,
   MoveList,
+  MetaGame,
 } from './types';
+import {
+  Button,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+} from 'components/Elements';
 
 // https://chessboardjsx.com/
 
@@ -86,12 +94,41 @@ const highlightSquares = (
   return props;
 };
 
-const startNewGame = (setPosition: (positions: Position) => void) => {
-  invoke<BoardStateArray>('new_game').then((board) => {
-    notify('starting new game', 'new_game');
-    setPosition(parseBoardState(board));
-    console.log(board);
-  });
+const AskNewGame = ({
+  setPosition,
+  setGameMeta,
+  isOpen,
+  toggle,
+}: {
+  setPosition: (position: Position) => void;
+  setGameMeta: (meta: MetaGame) => void;
+  isOpen: boolean;
+  toggle: (open?: boolean) => void;
+}): JSX.Element => {
+  return (
+    <Modal toggle={toggle} isOpen={isOpen} animate position="extraLarge">
+      <ModalHeader>Welcome to Tauri Chess</ModalHeader>
+      <ModalBody>Do you want to start a new game?</ModalBody>
+      <ModalFooter>
+        <Button className="mr-2" onClick={() => toggle(true)}>
+          Cancel
+        </Button>
+        <Button
+          onClick={() => {
+            invoke<BoardStateArray>('new_game').then((board) => {
+              notify('starting new game', 'new_game');
+              setPosition(parseBoardState(board));
+              console.log(board);
+            });
+            invoke<MetaGame>('get_score').then((meta) => setGameMeta(meta));
+            toggle(true);
+          }}
+        >
+          New
+        </Button>
+      </ModalFooter>
+    </Modal>
+  );
 };
 
 const getGameState = (setPosition: (positions: Position) => void) => {
@@ -104,7 +141,7 @@ const getGameState = (setPosition: (positions: Position) => void) => {
 export {
   parseBoardState,
   highlightSquares,
-  startNewGame,
+  AskNewGame,
   getGameState,
   coordToSquare,
 };
