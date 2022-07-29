@@ -2,8 +2,9 @@
 
 use super::moves::{bish_move, king_move, knight_move, pawn_move, rook_move};
 use super::types::{BoardState, Color, MoveList, Piece, Square};
+use super::utils::under_threat;
 
-/// Get a list of available moves for this piece
+/// Request state information from a selected piece
 pub trait GetState {
     /// Return a list of all available moves for this piece
     fn get_moves(&self, square: Square, board: &BoardState) -> MoveList;
@@ -11,6 +12,14 @@ pub trait GetState {
     fn get_colour(&self) -> Option<Color>;
     /// If this piece is a king, return its color, otherwise return None
     fn is_king(&self) -> Option<Color>;
+}
+
+/// Modify state information on a selected piece
+pub trait ModState {
+    /// This piece has been moved, so update its First Move status to false
+    fn has_moved(&self) -> Self;
+    /// If this piece is a king, update its check and checkmate states
+    fn king_threat(&mut self, location: &Square, board: &BoardState) -> ();
 }
 
 impl GetState for Piece {
@@ -55,16 +64,27 @@ impl GetState for Piece {
     }
 }
 
-impl Piece {
-    pub fn has_moved(&mut self) -> Self {
+impl ModState for Piece {
+    fn has_moved(&self) -> Self {
         match &self {
-            Piece::None => Piece::None,
-            Piece::Pawn(color, _) => Piece::Pawn(*color, false),
+            Piece::None => Self::None,
+            Piece::Pawn(color, _) => Self::Pawn(*color, false),
             Piece::King(color, _, check, mate) => Piece::King(*color, false, *check, *mate),
-            Piece::Queen(color, _) => Piece::Queen(*color, false),
-            Piece::Bishop(color, _) => Piece::Bishop(*color, false),
-            Piece::Knight(color, _) => Piece::Knight(*color, false),
-            Piece::Rook(color, _) => Piece::Rook(*color, false),
+            Piece::Queen(color, _) => Self::Queen(*color, false),
+            Piece::Bishop(color, _) => Self::Bishop(*color, false),
+            Piece::Knight(color, _) => Self::Knight(*color, false),
+            Piece::Rook(color, _) => Self::Rook(*color, false),
+        }
+    }
+    fn king_threat(&mut self, location: &Square, board: &BoardState) -> () {
+        *self = match *self {
+            Piece::King(color, first_move, _, _) => Self::King(
+                color,
+                first_move,
+                under_threat(*location, &color, board),
+                false, //NOTE to be replaced with something more substantial
+            ),
+            _ => *self,
         }
     }
 }

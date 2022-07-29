@@ -20,6 +20,7 @@ import type {
 import { checkEnv } from 'utils';
 import Chessboard from 'components/Features/Chessboard';
 import { useToggle } from 'hooks';
+import clsx from 'clsx';
 
 const HomePage = (): JSX.Element => {
   const { isOpen, toggle } = useToggle();
@@ -30,14 +31,18 @@ const HomePage = (): JSX.Element => {
   const [gameMeta, setGameMeta] = useState<MetaGame>({
     score: 0,
     turn: 0,
-    black_king: [
-      ['Black', true, false, false],
-      [4, 7],
-    ],
-    white_king: [
-      ['White', true, false, false],
-      [4, 0],
-    ],
+    white_king: {
+      piece: {
+        King: ['White', true, false, false],
+      },
+      square: [4, 0],
+    },
+    black_king: {
+      piece: {
+        King: ['Black', true, false, false],
+      },
+      square: [4, 7],
+    },
   });
   const [squareStyles, setSquareStyles] = useState<PositionStyles>();
   const [dragStyles, setDragStyles] = useState<{}>();
@@ -93,12 +98,14 @@ const HomePage = (): JSX.Element => {
           squareStyles={squareStyles}
           dropSquareStyle={dragStyles}
           onSquareClick={(square) => {
-            invoke<[MoveList, BoardStateArray, any]>('click_square', {
+            invoke<[MoveList, BoardStateArray, MetaGame]>('click_square', {
               square: square,
             }).then(([sq, board, gameMeta]) => {
               setSquareStyles(highlightSquares(sq, square));
               setPosition(parseBoardState(board));
               console.log(gameMeta);
+              console.log(gameMeta.white_king.piece.King[2]);
+              console.log(gameMeta.black_king.piece.King[2]);
               setGameMeta(gameMeta);
             });
           }}
@@ -106,13 +113,29 @@ const HomePage = (): JSX.Element => {
       </div>
       {/* Game State Row */}
       <div className="pt-5 w-full flex">
-        <p className="inline border border-black rounded-sm px-6 py-3 text-sm mr-1">
+        <p
+          className={clsx(
+            'inline border border-black rounded-sm px-6 py-3 text-sm mr-1',
+            gameMeta.white_king.piece.King[2] ? 'bg-yellow-500' : '',
+          )}
+        >
           white king:{' '}
-          {coordToSquare(gameMeta.white_king[1][0], gameMeta.white_king[1][1])}
+          {coordToSquare(
+            gameMeta.white_king.square[0],
+            gameMeta.white_king.square[1],
+          )}
         </p>
-        <p className="inline border border-black rounded-sm px-6 py-3 text-sm mr-1">
+        <p
+          className={clsx(
+            'inline border border-black rounded-sm px-6 py-3 text-sm mr-1',
+            gameMeta.black_king.piece.King[2] ? 'bg-yellow-500' : '',
+          )}
+        >
           black king:{' '}
-          {coordToSquare(gameMeta.black_king[1][0], gameMeta.black_king[1][1])}
+          {coordToSquare(
+            gameMeta.black_king.square[0],
+            gameMeta.black_king.square[1],
+          )}
         </p>
         <p className="inline border border-black rounded-sm px-6 py-3 text-sm mr-2">
           score: {gameMeta.score}, turn: {gameMeta.turn} (

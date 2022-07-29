@@ -55,7 +55,7 @@ pub fn square_to_coord(square: &str) -> (usize, usize) {
 
 /// Check if the square we clicked on is a valid move of the currently selected piece
 pub fn valid_move(source: (usize, usize), target: (usize, usize), board: &BoardState) -> bool {
-    println!("checking if valid");
+    // println!("checking if valid");
     let move_options = board[source.0][source.1].get_moves(source, board);
     // dbg!(&source, &target);
     move_options.iter().any(|&ele| ele.0 == target)
@@ -64,12 +64,12 @@ pub fn valid_move(source: (usize, usize), target: (usize, usize), board: &BoardS
 /// Check if this square is threatened, by exhaustive search
 pub fn under_threat(square: (usize, usize), our_color: &Color, board: &BoardState) -> bool {
     let mut threatened = false;
-    println!("checking threat");
+    // println!("checking threat");
     'outer: for col in 0..7 {
         for row in 0..7 {
             let potential_threat = board[col][row];
             if check_enemy(our_color, &potential_threat) {
-                println!("found enemy here");
+                // println!("found enemy here");
                 dbg!(potential_threat);
                 for m in potential_threat.get_moves((col, row), board) {
                     if m.0 == square {
@@ -82,3 +82,5 @@ pub fn under_threat(square: (usize, usize), our_color: &Color, board: &BoardStat
     }
     threatened
 }
+
+// pub fn update_kings
