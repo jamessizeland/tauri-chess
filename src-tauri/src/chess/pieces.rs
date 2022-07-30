@@ -89,14 +89,19 @@ impl ModState for Piece {
     }
     fn king_threat(&mut self, location: &Square, board: &BoardState, meta: GameMeta) -> () {
         *self = match *self {
-            Piece::King(color, first_move, _, _) => Self::King(
-                color,
-                first_move,
-                under_threat(*location, &color, board),
-                remove_invalid_moves(self.get_moves(*location, board), *location, &meta, board)
+            Piece::King(color, first_move, _, _) => {
+                let check = under_threat(*location, &color, board);
+                let mate = check
+                    && remove_invalid_moves(
+                        self.get_moves(*location, board),
+                        *location,
+                        &meta,
+                        board,
+                    )
                     .len()
-                    == 0,
-            ),
+                        == 0;
+                Self::King(color, first_move, check, mate)
+            }
             _ => *self,
         }
     }

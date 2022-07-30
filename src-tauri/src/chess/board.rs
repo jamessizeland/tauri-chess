@@ -37,31 +37,31 @@ pub fn new_game(
         }
     }
     // set up white pieces
-    // board[0][0] = Piece::Rook(Color::White, true);
-    // board[1][0] = Piece::Bishop(Color::White, true);
-    // board[2][0] = Piece::Knight(Color::White, true);
-    // board[3][0] = Piece::Queen(Color::White, true);
-    board[4][1] = Piece::Queen(Color::White, true);
+    board[0][0] = Piece::Rook(Color::White, true);
+    board[1][0] = Piece::Bishop(Color::White, true);
+    board[2][0] = Piece::Knight(Color::White, true);
+    board[3][0] = Piece::Queen(Color::White, true);
+    // board[4][1] = Piece::Queen(Color::White, true);
     board[4][0] = Piece::King(Color::White, true, false, false);
-    // board[5][0] = Piece::Knight(Color::White, true);
-    // board[6][0] = Piece::Bishop(Color::White, true);
-    // board[7][0] = Piece::Rook(Color::White, true);
-    // for col in 0..8 {
-    //     board[col][1] = Piece::Pawn(Color::White, true);
-    // }
+    board[5][0] = Piece::Knight(Color::White, true);
+    board[6][0] = Piece::Bishop(Color::White, true);
+    board[7][0] = Piece::Rook(Color::White, true);
+    for col in 0..8 {
+        board[col][1] = Piece::Pawn(Color::White, true);
+    }
     // set up black pieces
-    // board[0][7] = Piece::Rook(Color::Black, true);
-    // board[1][7] = Piece::Knight(Color::Black, true);
-    // board[2][7] = Piece::Bishop(Color::Black, true);
-    // board[3][7] = Piece::Queen(Color::Black, true);
-    board[4][6] = Piece::Queen(Color::Black, true);
+    board[0][7] = Piece::Rook(Color::Black, true);
+    board[1][7] = Piece::Knight(Color::Black, true);
+    board[2][7] = Piece::Bishop(Color::Black, true);
+    board[3][7] = Piece::Queen(Color::Black, true);
+    // board[4][6] = Piece::Queen(Color::Black, true);
     board[4][7] = Piece::King(Color::Black, true, false, false);
-    // board[5][7] = Piece::Bishop(Color::Black, true);
-    // board[6][7] = Piece::Knight(Color::Black, true);
-    // board[7][7] = Piece::Rook(Color::Black, true);
-    // for col in 0..8 {
-    //     board[col][6] = Piece::Pawn(Color::Black, true);
-    // }
+    board[5][7] = Piece::Bishop(Color::Black, true);
+    board[6][7] = Piece::Knight(Color::Black, true);
+    board[7][7] = Piece::Rook(Color::Black, true);
+    for col in 0..8 {
+        board[col][6] = Piece::Pawn(Color::Black, true);
+    }
     *board // return dereferenced board state to frontend
 }
 

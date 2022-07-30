@@ -86,17 +86,18 @@ pub fn remove_invalid_moves(
             || (meta.turn % 2 != 0 && our_color == Color::Black)
         {
             // our turn
-            let mut theory_board = board.clone();
+            let mut theory_board: BoardState = board.clone();
             let our_king = if our_color == Color::White {
                 meta.white_king
             } else {
                 meta.black_king
             };
-            dbg!(our_color, our_king, my_piece);
+            println!("{:?}, {:?}, {:?}", our_color, our_king, my_piece);
             //* Is my king in check? (there should only ever be one king in check, so if a king is in check then assume it is mine) */
             if our_king.piece.is_king_checked() == Some(false) {
                 //* Not currently in check, am I preventing check by being where I am? */
                 theory_board[my_square.0][my_square.1] = Piece::None;
+                pretty_print_board(&theory_board);
                 if !under_threat(our_king.square, &our_color, &theory_board) {
                     println!("king isn't threatened if I'm not there");
                     // doesn't become under threat, allow all moves
@@ -104,7 +105,9 @@ pub fn remove_invalid_moves(
                 } else {
                     for m in moves {
                         // check if any of the potential moves cause my king to go into check
-                        theory_board[m.0 .0][m.0 .1] = my_piece;
+                        theory_board = board.clone(); // reset the board
+                        theory_board[my_square.0][my_square.1] = Piece::None; // remove my piece
+                        theory_board[m.0 .0][m.0 .1] = my_piece; // place it in a potential move spot
                         if under_threat(our_king.square, &our_color, &theory_board) {
                             println!(
                                 "This move to ({},{}) causes check and was filtered out",
@@ -114,8 +117,6 @@ pub fn remove_invalid_moves(
                             println!("This move to ({},{}) is fine", m.0 .0, m.0 .1);
                             filtered_moves.push(m);
                         }
-                        theory_board = board.clone();
-                        theory_board[my_square.0][my_square.1] = Piece::None;
                     }
                 }
             }
@@ -123,4 +124,16 @@ pub fn remove_invalid_moves(
         }
     }
     filtered_moves
+}
+
+fn pretty_print_board(board: &BoardState) {
+    for row in 0..8 {
+        for col in 0..8 {
+            if col < 7 {
+                print!("|{}|", board[col][7 - row]);
+            } else {
+                println!("|{}|", board[col][7 - row]);
+            }
+        }
+    }
 }

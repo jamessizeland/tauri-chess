@@ -1,5 +1,7 @@
 //! Specific Types useful for a chess game
 
+use std::fmt::Display;
+
 use serde::{Deserialize, Serialize};
 
 use super::pieces::ModState;
@@ -102,5 +104,56 @@ pub enum Piece {
 impl Default for Piece {
     fn default() -> Self {
         Piece::None
+    }
+}
+
+impl Display for Piece {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let code = match *self {
+            Piece::None => "__",
+            Piece::Pawn(color, _) => {
+                if color == Color::White {
+                    "wP"
+                } else {
+                    "bP"
+                }
+            }
+            Piece::King(color, _, _, _) => {
+                if color == Color::White {
+                    "wK"
+                } else {
+                    "bK"
+                }
+            }
+            Piece::Queen(color, _) => {
+                if color == Color::White {
+                    "wQ"
+                } else {
+                    "bQ"
+                }
+            }
+            Piece::Bishop(color, _) => {
+                if color == Color::White {
+                    "wB"
+                } else {
+                    "bB"
+                }
+            }
+            Piece::Knight(color, _) => {
+                if color == Color::White {
+                    "wN"
+                } else {
+                    "bN"
+                }
+            }
+            Piece::Rook(color, _) => {
+                if color == Color::White {
+                    "wR"
+                } else {
+                    "bR"
+                }
+            }
+        };
+        write!(f, "{}", code)
     }
 }
