@@ -26,8 +26,9 @@ mod tests {
             Piece::Queen(Color::White, true),
         ];
         for piece in piece_list {
-            for col in 0..7 {
-                for row in 0..7 {
+            for col in 0..8 {
+                for row in 0..8 {
+                    println!("{:?}", piece);
                     piece.get_moves((col, row), &board);
                 }
             }

@@ -53,9 +53,9 @@ pub fn valid_move(source: Square, target: Square, board: &BoardState, meta: &Gam
 /// Check if this square is threatened, by exhaustive search
 pub fn under_threat(square: Square, our_color: &Color, board: &BoardState) -> bool {
     let mut threatened = false;
-    // println!("checking threat");
-    'outer: for col in 0..7 {
-        for row in 0..7 {
+    println!("checking threat");
+    'outer: for col in 0..8 {
+        for row in 0..8 {
             let potential_threat = board[col][row];
             if check_enemy(our_color, &potential_threat) {
                 for m in potential_threat.get_moves((col, row), board) {
