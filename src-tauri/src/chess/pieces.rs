@@ -12,13 +12,19 @@ pub trait GetState {
     fn get_colour(&self) -> Option<Color>;
     /// If this piece is a king, return its color, otherwise return None
     fn is_king(&self) -> Option<Color>;
+    /// If this piece is a king, is it in check?
+    fn is_king_checked(&self) -> Option<bool>;
 }
 
 /// Modify state information on a selected piece
 pub trait ModState {
     /// This piece has been moved, so update its First Move status to false
+    ///
+    /// Return modified piece
     fn has_moved(&self) -> Self;
     /// If this piece is a king, update its check and checkmate states
+    ///
+    /// Modifies piece in place
     fn king_threat(&mut self, location: &Square, board: &BoardState) -> ();
 }
 
@@ -40,11 +46,17 @@ impl GetState for Piece {
             _ => None,
         }
     }
+    fn is_king_checked(&self) -> Option<bool> {
+        match &self {
+            Piece::King(_, _, check, _) => Some(*check),
+            _ => None,
+        }
+    }
     fn get_moves(&self, sq: Square, board: &BoardState) -> MoveList {
+        //* For each actual piece we need to work out what moves it could do on an empty board, then remove moves that are blocked by other pieces
         match &self {
             // what type of piece am I?
             Piece::None => Vec::new(),
-            //* For each actual piece we need to work out what moves it could do on an empty board, then remove moves that are blocked by other pieces
             Piece::Pawn(color, first_move) => pawn_move(sq, color, first_move, &board),
             Piece::King(color, first_move, _check, _check_mate) => {
                 king_move(sq, color, &board, *first_move)
@@ -59,7 +71,6 @@ impl GetState for Piece {
             Piece::Bishop(color, _first_move) => bish_move(sq, color, &board),
             Piece::Knight(color, _first_move) => knight_move(sq, color, &board),
             Piece::Rook(color, _first_move) => rook_move(sq, color, &board),
-            // _ => Vec::new(),
         }
     }
 }

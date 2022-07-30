@@ -1,7 +1,8 @@
 //! General utility functions for chess
 
+// use super::data::GameMetaData;
 use super::pieces::GetState;
-use super::types::{BoardState, Color, Piece};
+use super::types::{BoardState, Color, GameMeta, MoveList, Piece, Square};
 
 /// Convert letters a-h to a row index from a standard chessboard
 pub fn letter_to_row(letter: char) -> usize {
@@ -17,21 +18,6 @@ pub fn letter_to_row(letter: char) -> usize {
         _ => panic!(),
     }
 }
-
-/// Convert letters row index to a-h from a standard chessboard
-// pub fn row_to_letter(row: usize) -> char {
-//     match row {
-//         0 => 'a',
-//         1 => 'b',
-//         2 => 'c',
-//         3 => 'd',
-//         4 => 'e',
-//         5 => 'f',
-//         6 => 'g',
-//         7 => 'h',
-//         _ => panic!(),
-//     }
-// }
 
 /// check if the piece we are looking is of the opposite colour to us
 pub fn check_enemy(our_color: &Color, considered_piece: &Piece) -> bool {
@@ -54,15 +40,18 @@ pub fn square_to_coord(square: &str) -> (usize, usize) {
 }
 
 /// Check if the square we clicked on is a valid move of the currently selected piece
-pub fn valid_move(source: (usize, usize), target: (usize, usize), board: &BoardState) -> bool {
+pub fn valid_move(source: Square, target: Square, board: &BoardState, meta: &GameMeta) -> bool {
     // println!("checking if valid");
     let move_options = board[source.0][source.1].get_moves(source, board);
+
+    let filtered_moves = remove_invalid_moves(move_options, source, meta, board);
+
     // dbg!(&source, &target);
-    move_options.iter().any(|&ele| ele.0 == target)
+    filtered_moves.iter().any(|&ele| ele.0 == target)
 }
 
 /// Check if this square is threatened, by exhaustive search
-pub fn under_threat(square: (usize, usize), our_color: &Color, board: &BoardState) -> bool {
+pub fn under_threat(square: Square, our_color: &Color, board: &BoardState) -> bool {
     let mut threatened = false;
     // println!("checking threat");
     'outer: for col in 0..7 {
@@ -83,4 +72,32 @@ pub fn under_threat(square: (usize, usize), our_color: &Color, board: &BoardStat
     threatened
 }
 
-// pub fn update_kings
+/// Check each move in this list to check it doesn't leave your king in check
+pub fn remove_invalid_moves(
+    moves: MoveList,
+    my_square: Square,
+    meta: &GameMeta,
+    board: &BoardState,
+) -> MoveList {
+    let mut theory_board = board.clone();
+    let mut filtered_moves: MoveList = vec![];
+    //* Is my king in check? (there should only ever be one king in check, so if a king is in check then assume it is mine) */
+    if meta.black_king.piece.is_king_checked() == Some(false) {
+        //* Not currently in check, am I preventing check by being where I am? */
+        println!("Black is not in check");
+        theory_board[my_square.0][my_square.1] = Piece::None;
+        if !under_threat(meta.black_king.square, &Color::Black, &theory_board) {
+            // doesn't become under threat, allow all moves
+            filtered_moves = moves
+        }
+    } else if meta.white_king.piece.is_king_checked() == Some(false) {
+        //* Not currently in check, am I preventing check by being where I am? */
+        theory_board[my_square.0][my_square.1] = Piece::None;
+        if !under_threat(meta.white_king.square, &Color::White, &theory_board) {
+            // doesn't become under threat, allow all moves
+            filtered_moves = moves
+        }
+    }
+    //* If in check, does moving to any of the spaces listed remove check?  */
+    filtered_moves
+}

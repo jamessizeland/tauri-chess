@@ -1,8 +1,8 @@
 //! Logic for the chess board actions
-use super::data::{GameMeta, PieceLocation, SelectedSquare};
+use super::data::{GameMetaData, PieceLocation, SelectedSquare};
 use super::pieces::{GetState, ModState};
 use super::types::{BoardState, Color, ModMeta, MoveList, Piece, Square};
-use super::utils::{check_enemy, square_to_coord, valid_move};
+use super::utils::{check_enemy, remove_invalid_moves, square_to_coord, valid_move};
 
 #[tauri::command]
 /// Get the location of all pieces from global memory
@@ -14,14 +14,17 @@ pub fn get_state(state: tauri::State<PieceLocation>) -> BoardState {
 
 #[tauri::command]
 /// Get the game score from global memory
-pub fn get_score(state: tauri::State<GameMeta>) -> super::types::GameMeta {
+pub fn get_score(state: tauri::State<GameMetaData>) -> super::types::GameMeta {
     let meta_game = state.0.lock().expect("game state access");
     *meta_game
 }
 
 #[tauri::command]
 /// Initialize a new game by sending a starting set of coords
-pub fn new_game(state: tauri::State<PieceLocation>, meta: tauri::State<GameMeta>) -> BoardState {
+pub fn new_game(
+    state: tauri::State<PieceLocation>,
+    meta: tauri::State<GameMetaData>,
+) -> BoardState {
     // Lock the counter(Mutex) to get the current value
     let mut board = state.0.lock().unwrap();
     let mut game_meta = meta.0.lock().unwrap();
@@ -66,8 +69,10 @@ pub fn hover_square(
     square: &str,
     state: tauri::State<PieceLocation>,
     clicked: tauri::State<SelectedSquare>,
+    meta: tauri::State<GameMetaData>,
 ) -> MoveList {
     let board = state.0.lock().expect("game state access");
+    let game_meta = meta.0.lock().unwrap();
 
     let selected = *clicked.0.lock().unwrap();
     let mut coord: Square = square_to_coord(square);
@@ -77,8 +82,9 @@ pub fn hover_square(
     }
     // dbg!(&coord, &square);
     // dbg!(board[coord.0][coord.1].get_moves(coord, *board));
-    let hovered_piece = board[coord.0][coord.1];
-    hovered_piece.get_moves(coord, &board)
+    let move_options = board[coord.0][coord.1].get_moves(coord, &board);
+    let filtered_options = remove_invalid_moves(move_options, coord, &game_meta, &board);
+    filtered_options
 }
 
 #[tauri::command]
@@ -102,7 +108,7 @@ pub fn click_square(
     square: &str,
     state: tauri::State<PieceLocation>,
     clicked: tauri::State<SelectedSquare>,
-    meta: tauri::State<GameMeta>,
+    meta: tauri::State<GameMetaData>,
 ) -> (MoveList, BoardState, super::types::GameMeta) {
     let mut selected = *clicked.0.lock().unwrap();
     let mut board = state.0.lock().unwrap();
@@ -123,7 +129,7 @@ pub fn click_square(
     } else if selected == Some(coord) {
         //* 2. if we have clicked on the same square again, unselect it
         selected = Option::None;
-    } else if valid_move(selected.unwrap(), coord, &board) {
+    } else if valid_move(selected.unwrap(), coord, &board, &game_meta) {
         //* 3. if we have clicked a valid move of selected, do move
         println!("valid move");
         let source = selected.unwrap();

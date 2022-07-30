@@ -15,50 +15,52 @@ pub fn pawn_move(
     match color {
         Color::White => {
             // need to make sure that we don't request squares outside of the array bounds
-            let (mut col, mut row) = (sq.0, sq.1 + 1);
+            let col = sq.0;
+            let mut row: i8 = sq.1 as i8 + 1;
             //* 1. move forward one if square is empty
-            if board[col][row] == Piece::None {
-                moves.push(((col, row), false));
-                row = sq.1 + 2;
+            if row <= 7 && board[col][row as usize] == Piece::None {
+                moves.push(((col, row as usize), false));
+                row = sq.1 as i8 + 2;
                 //* 2. move forward two if hasn't moved and squares are empty
-                if board[col][row] == Piece::None && *first_move {
-                    moves.push(((col, row), false));
+                if row <= 7 && board[col][row as usize] == Piece::None && *first_move {
+                    moves.push(((col, row as usize), false));
                 }
             }
             //* 3. potential attacks if target square contains an enemy piece
             if sq.0 < 7 && sq.1 < 7 {
-                (col, row) = (sq.0 + 1, sq.1 + 1);
+                let (col, row) = (sq.0 + 1, sq.1 + 1);
                 if board[col][row].get_colour() == Some(Color::Black) {
                     moves.push(((col, row), true))
                 }
             }
             if sq.0 > 0 && sq.1 < 7 {
-                (col, row) = (sq.0 - 1, sq.1 + 1);
+                let (col, row) = (sq.0 - 1, sq.1 + 1);
                 if board[col][row].get_colour() == Some(Color::Black) {
                     moves.push(((col, row), true))
                 }
             }
         }
         Color::Black => {
-            let (mut col, mut row) = (sq.0, sq.1 - 1);
+            let col = sq.0;
+            let mut row: i8 = sq.1 as i8 - 1;
             //* 1. move forward one if square is empty
-            if board[col][row] == Piece::None {
-                moves.push(((col, row), false));
-                row = sq.1 - 2;
+            if row >= 0 && board[col][row as usize] == Piece::None {
+                moves.push(((col, row as usize), false));
+                row = sq.1 as i8 - 2;
                 //* 2. move forward two if hasn't moved and squares are empty
-                if board[col][row] == Piece::None && *first_move {
-                    moves.push(((col, row), false));
+                if row >= 0 && board[col][row as usize] == Piece::None && *first_move {
+                    moves.push(((col, row as usize), false));
                 }
             }
             //* 3. potential attacks if target square contains an enemy piece
             if sq.0 < 7 && sq.1 > 0 {
-                (col, row) = (sq.0 + 1, sq.1 - 1);
+                let (col, row) = (sq.0 + 1, sq.1 - 1);
                 if board[col][row].get_colour() == Some(Color::White) {
                     moves.push(((col, row), true))
                 }
             }
             if sq.0 > 0 && sq.1 > 0 {
-                (col, row) = (sq.0 - 1, sq.1 - 1);
+                let (col, row) = (sq.0 - 1, sq.1 - 1);
                 if board[col][row].get_colour() == Some(Color::White) {
                     moves.push(((col, row), true))
                 }
