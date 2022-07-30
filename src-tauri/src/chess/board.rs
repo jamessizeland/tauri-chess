@@ -162,7 +162,7 @@ pub fn click_square(
         move_list = board[coord.0][coord.1].get_moves(coord, &board)
     }
     *clicked.0.lock().unwrap() = selected;
-    dbg!(game_meta.white_king.piece);
-    dbg!(game_meta.black_king.piece);
+    // dbg!(game_meta.white_king.piece);
+    // dbg!(game_meta.black_king.piece);
     (move_list, *board, *game_meta)
 }

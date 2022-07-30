@@ -58,8 +58,6 @@ pub fn under_threat(square: Square, our_color: &Color, board: &BoardState) -> bo
         for row in 0..7 {
             let potential_threat = board[col][row];
             if check_enemy(our_color, &potential_threat) {
-                // println!("found enemy here");
-                dbg!(potential_threat);
                 for m in potential_threat.get_moves((col, row), board) {
                     if m.0 == square {
                         threatened = true;
@@ -79,25 +77,46 @@ pub fn remove_invalid_moves(
     meta: &GameMeta,
     board: &BoardState,
 ) -> MoveList {
-    let mut theory_board = board.clone();
     let mut filtered_moves: MoveList = vec![];
-    //* Is my king in check? (there should only ever be one king in check, so if a king is in check then assume it is mine) */
-    if meta.black_king.piece.is_king_checked() == Some(false) {
-        //* Not currently in check, am I preventing check by being where I am? */
-        println!("Black is not in check");
-        theory_board[my_square.0][my_square.1] = Piece::None;
-        if !under_threat(meta.black_king.square, &Color::Black, &theory_board) {
-            // doesn't become under threat, allow all moves
-            filtered_moves = moves
-        }
-    } else if meta.white_king.piece.is_king_checked() == Some(false) {
-        //* Not currently in check, am I preventing check by being where I am? */
-        theory_board[my_square.0][my_square.1] = Piece::None;
-        if !under_threat(meta.white_king.square, &Color::White, &theory_board) {
-            // doesn't become under threat, allow all moves
-            filtered_moves = moves
+    let my_piece = board[my_square.0][my_square.1];
+    if my_piece != Piece::None {
+        // only do this if we're looking at a non-empty square
+        let our_color = my_piece.get_colour().expect("square has a color");
+        if (meta.turn % 2 == 0 && our_color == Color::White)
+            || (meta.turn % 2 != 0 && our_color == Color::Black)
+        {
+            // our turn
+            let mut theory_board = board.clone();
+            let our_king = if our_color == Color::White {
+                meta.white_king
+            } else {
+                meta.black_king
+            };
+            //* Is my king in check? (there should only ever be one king in check, so if a king is in check then assume it is mine) */
+            if our_king.piece.is_king_checked() == Some(false) {
+                //* Not currently in check, am I preventing check by being where I am? */
+                theory_board[my_square.0][my_square.1] = Piece::None;
+                if !under_threat(our_king.square, &our_color, &theory_board) {
+                    println!("king isn't threatened if I'm not there");
+                    // doesn't become under threat, allow all moves
+                    filtered_moves = moves;
+                } else {
+                    for m in moves {
+                        // check if any of the potential moves cause my king to go into check
+                        theory_board[m.0 .0][m.0 .1] = my_piece;
+                        if under_threat(our_king.square, &our_color, &theory_board) {
+                            println!(
+                                "This move to ({},{}) causes check and was filtered out",
+                                m.0 .0, m.0 .1
+                            );
+                        } else {
+                            filtered_moves.push(m);
+                        }
+                    }
+                }
+            }
+            //* If in check, does moving to any of the spaces listed remove check?  */
         }
     }
-    //* If in check, does moving to any of the spaces listed remove check?  */
     filtered_moves
 }
