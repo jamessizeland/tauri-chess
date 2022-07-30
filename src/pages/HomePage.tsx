@@ -104,8 +104,8 @@ const HomePage = (): JSX.Element => {
               setSquareStyles(highlightSquares(sq, square));
               setPosition(parseBoardState(board));
               console.log(gameMeta);
-              console.log(gameMeta.white_king.piece.King[2]);
-              console.log(gameMeta.black_king.piece.King[2]);
+              console.log(gameMeta.white_king.piece.King);
+              console.log(gameMeta.black_king.piece.King);
               setGameMeta(gameMeta);
             });
           }}
@@ -117,6 +117,7 @@ const HomePage = (): JSX.Element => {
           className={clsx(
             'inline border border-black rounded-sm px-6 py-3 text-sm mr-1',
             gameMeta.white_king.piece.King[2] ? 'bg-yellow-500' : '',
+            gameMeta.white_king.piece.King[3] ? 'bg-red-800' : '',
           )}
         >
           white king:{' '}
@@ -129,6 +130,7 @@ const HomePage = (): JSX.Element => {
           className={clsx(
             'inline border border-black rounded-sm px-6 py-3 text-sm mr-1',
             gameMeta.black_king.piece.King[2] ? 'bg-yellow-500' : '',
+            gameMeta.black_king.piece.King[3] ? 'bg-red-800' : '',
           )}
         >
           black king:{' '}

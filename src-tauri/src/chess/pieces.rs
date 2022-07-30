@@ -1,8 +1,8 @@
 //! Chess pieces traits
 
 use super::moves::{bish_move, king_move, knight_move, pawn_move, rook_move};
-use super::types::{BoardState, Color, MoveList, Piece, Square};
-use super::utils::under_threat;
+use super::types::{BoardState, Color, GameMeta, MoveList, Piece, Square};
+use super::utils::{remove_invalid_moves, under_threat};
 
 /// Request state information from a selected piece
 pub trait GetState {
@@ -25,7 +25,7 @@ pub trait ModState {
     /// If this piece is a king, update its check and checkmate states
     ///
     /// Modifies piece in place
-    fn king_threat(&mut self, location: &Square, board: &BoardState) -> ();
+    fn king_threat(&mut self, location: &Square, board: &BoardState, meta: GameMeta) -> ();
 }
 
 impl GetState for Piece {
@@ -87,13 +87,15 @@ impl ModState for Piece {
             Piece::Rook(color, _) => Self::Rook(*color, false),
         }
     }
-    fn king_threat(&mut self, location: &Square, board: &BoardState) -> () {
+    fn king_threat(&mut self, location: &Square, board: &BoardState, meta: GameMeta) -> () {
         *self = match *self {
             Piece::King(color, first_move, _, _) => Self::King(
                 color,
                 first_move,
                 under_threat(*location, &color, board),
-                false, //NOTE to be replaced with something more substantial
+                remove_invalid_moves(self.get_moves(*location, board), *location, &meta, board)
+                    .len()
+                    == 0,
             ),
             _ => *self,
         }

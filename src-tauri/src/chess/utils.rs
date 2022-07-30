@@ -92,6 +92,7 @@ pub fn remove_invalid_moves(
             } else {
                 meta.black_king
             };
+            dbg!(our_color, our_king, my_piece);
             //* Is my king in check? (there should only ever be one king in check, so if a king is in check then assume it is mine) */
             if our_king.piece.is_king_checked() == Some(false) {
                 //* Not currently in check, am I preventing check by being where I am? */
@@ -110,8 +111,11 @@ pub fn remove_invalid_moves(
                                 m.0 .0, m.0 .1
                             );
                         } else {
+                            println!("This move to ({},{}) is fine", m.0 .0, m.0 .1);
                             filtered_moves.push(m);
                         }
+                        theory_board = board.clone();
+                        theory_board[my_square.0][my_square.1] = Piece::None;
                     }
                 }
             }
