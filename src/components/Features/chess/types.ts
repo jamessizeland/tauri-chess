@@ -23,6 +23,14 @@ type MoveList = [[number, number], boolean][];
 type MetaGame = {
   score: number;
   turn: number;
+  black_king: {
+    piece: { King: [Color, FirstMove, Check, CheckMate] };
+    square: [number, number];
+  };
+  white_king: {
+    piece: { King: [Color, FirstMove, Check, CheckMate] };
+    square: [number, number];
+  };
 };
 
 export type {

@@ -13,3 +13,7 @@ Experiment with tauri passing data from rust to javascript, by creating a chess 
 ## Turns
 
 ![Chess Turns](./img/turns_logic.gif)
+
+## Checking
+
+![Check and Mate](./img/check_mate_logic.gif)

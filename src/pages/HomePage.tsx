@@ -3,19 +3,14 @@ import type { Position } from 'components/Features/Chessboard/types';
 import { Square } from 'chess.js';
 import { invoke } from '@tauri-apps/api/tauri';
 // import { listen } from '@tauri-apps/api/event';
+import { Button } from 'components/Elements';
 import {
-  Button,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-} from 'components/Elements';
-import {
+  coordToSquare,
   getGameState,
   highlightSquares,
   parseBoardState,
-  startNewGame,
-} from 'components/Features/chess';
+  AskNewGame,
+} from 'components/Features/chess/index';
 import type {
   BoardStateArray,
   MoveList,
@@ -25,42 +20,7 @@ import type {
 import { checkEnv } from 'utils';
 import Chessboard from 'components/Features/Chessboard';
 import { useToggle } from 'hooks';
-
-const AskNewGame = ({
-  setPosition,
-  setGameMeta,
-  isOpen,
-  toggle,
-}: {
-  setPosition: (position: Position) => void;
-  setGameMeta: (meta: MetaGame) => void;
-  isOpen: boolean;
-  toggle: (open?: boolean) => void;
-}): JSX.Element => {
-  return (
-    <Modal toggle={toggle} isOpen={isOpen} animate position="extraLarge">
-      <ModalHeader>Welcome to Tauri Chess</ModalHeader>
-      <ModalBody>Do you want to start a new game?</ModalBody>
-      <ModalFooter>
-        <Button className="mr-2" onClick={() => toggle(true)}>
-          Cancel
-        </Button>
-        <Button
-          onClick={() => {
-            startNewGame(setPosition);
-            setGameMeta({
-              score: 0,
-              turn: 0,
-            });
-            toggle(true);
-          }}
-        >
-          New
-        </Button>
-      </ModalFooter>
-    </Modal>
-  );
-};
+import clsx from 'clsx';
 
 const HomePage = (): JSX.Element => {
   const { isOpen, toggle } = useToggle();
@@ -68,7 +28,22 @@ const HomePage = (): JSX.Element => {
   const [newGame, setNewGame] = useState<boolean>(false);
   // const [square, setSquare] = useState(''); // currently clicked square
   // const [history, setHistory] = useState<string[]>([]);
-  const [gameMeta, setGameMeta] = useState<MetaGame>({ score: 0, turn: 0 });
+  const [gameMeta, setGameMeta] = useState<MetaGame>({
+    score: 0,
+    turn: 0,
+    white_king: {
+      piece: {
+        King: ['White', true, false, false],
+      },
+      square: [4, 0],
+    },
+    black_king: {
+      piece: {
+        King: ['Black', true, false, false],
+      },
+      square: [4, 7],
+    },
+  });
   const [squareStyles, setSquareStyles] = useState<PositionStyles>();
   const [dragStyles, setDragStyles] = useState<{}>();
   const [whiteTurn, setWhiteTurn] = useState<boolean>(true);
@@ -123,31 +98,58 @@ const HomePage = (): JSX.Element => {
           squareStyles={squareStyles}
           dropSquareStyle={dragStyles}
           onSquareClick={(square) => {
-            invoke<[MoveList, BoardStateArray, any]>('click_square', {
+            invoke<[MoveList, BoardStateArray, MetaGame]>('click_square', {
               square: square,
             }).then(([sq, board, gameMeta]) => {
               setSquareStyles(highlightSquares(sq, square));
               setPosition(parseBoardState(board));
               console.log(gameMeta);
+              console.log(gameMeta.white_king.piece.King);
+              console.log(gameMeta.black_king.piece.King);
               setGameMeta(gameMeta);
             });
           }}
         />
       </div>
-      {!checkEnv('production') && (
-        <div className="pt-5">
-          <Button className="mr-2" onClick={() => setNotation(!notation)}>
-            Toggle Notation
-          </Button>
-          <Button className="mr-2" onClick={() => setWhiteTurn(!whiteTurn)}>
-            {whiteTurn ? 'White' : 'Black'}
-          </Button>
-          <p className="inline border border-black rounded-sm px-6 py-3 text-sm">
-            score: {gameMeta.score}, turn: {gameMeta.turn} (
-            {gameMeta.turn % 2 == 0 ? 'White' : 'Black'})
-          </p>
-        </div>
-      )}
+      {/* Game State Row */}
+      <div className="pt-5 w-full flex">
+        <p
+          className={clsx(
+            'inline border border-black rounded-sm px-6 py-3 text-sm mr-1',
+            gameMeta.white_king.piece.King[2] ? 'bg-yellow-500' : '',
+            gameMeta.white_king.piece.King[3] ? 'bg-red-800' : '',
+          )}
+        >
+          white king:{' '}
+          {coordToSquare(
+            gameMeta.white_king.square[0],
+            gameMeta.white_king.square[1],
+          )}
+        </p>
+        <p
+          className={clsx(
+            'inline border border-black rounded-sm px-6 py-3 text-sm mr-1',
+            gameMeta.black_king.piece.King[2] ? 'bg-yellow-500' : '',
+            gameMeta.black_king.piece.King[3] ? 'bg-red-800' : '',
+          )}
+        >
+          black king:{' '}
+          {coordToSquare(
+            gameMeta.black_king.square[0],
+            gameMeta.black_king.square[1],
+          )}
+        </p>
+        <p className="inline border border-black rounded-sm px-6 py-3 text-sm mr-2">
+          score: {gameMeta.score}, turn: {gameMeta.turn} (
+          {gameMeta.turn % 2 == 0 ? 'White' : 'Black'})
+        </p>
+        <Button className="mr-2" onClick={() => setNotation(!notation)}>
+          Toggle Notation
+        </Button>
+        <Button className="mr-2" onClick={() => setWhiteTurn(!whiteTurn)}>
+          {whiteTurn ? 'White' : 'Black'}
+        </Button>
+      </div>
     </div>
   );
 };

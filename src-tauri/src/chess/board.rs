@@ -1,8 +1,8 @@
 //! Logic for the chess board actions
-use super::data::{GameMeta, PieceLocation, SelectedSquare};
-use super::pieces::GetState;
-use super::types::{BoardState, Color, MoveList, Piece, Square};
-use super::utils::{check_enemy, square_to_coord, valid_move};
+use super::data::{GameMetaData, PieceLocation, SelectedSquare};
+use super::pieces::{GetState, ModState};
+use super::types::{BoardState, Color, GameMeta, ModMeta, MoveList, Piece, Square};
+use super::utils::{check_enemy, remove_invalid_moves, square_to_coord, valid_move};
 
 #[tauri::command]
 /// Get the location of all pieces from global memory
@@ -14,26 +14,39 @@ pub fn get_state(state: tauri::State<PieceLocation>) -> BoardState {
 
 #[tauri::command]
 /// Get the game score from global memory
-pub fn get_score(state: tauri::State<GameMeta>) -> super::types::GameMeta {
+pub fn get_score(state: tauri::State<GameMetaData>) -> super::types::GameMeta {
     let meta_game = state.0.lock().expect("game state access");
     *meta_game
 }
 
 #[tauri::command]
 /// Initialize a new game by sending a starting set of coords
-pub fn new_game(state: tauri::State<PieceLocation>, meta: tauri::State<GameMeta>) -> BoardState {
+pub fn new_game(
+    state: tauri::State<PieceLocation>,
+    meta: tauri::State<GameMetaData>,
+) -> BoardState {
     // Lock the counter(Mutex) to get the current value
     let mut board = state.0.lock().unwrap();
     let mut game_meta = meta.0.lock().unwrap();
     // reset game meta data
-    game_meta.score = 0;
-    game_meta.turn = 0;
+    game_meta.new_game();
     // reset board to empty
     for col in 0..8 {
         for row in 0..8 {
             board[col][row] = Piece::None
         }
     }
+    // DEBUG PIECES
+    // board[3][0] = Piece::Queen(Color::White, true);
+    // board[4][0] = Piece::King(Color::White, true, false, false);
+    // board[3][1] = Piece::Pawn(Color::White, true);
+    // board[4][1] = Piece::Pawn(Color::White, true);
+    // board[5][1] = Piece::Pawn(Color::White, true);
+    // board[3][7] = Piece::Queen(Color::Black, true);
+    // board[4][7] = Piece::King(Color::Black, true, false, false);
+    // board[3][6] = Piece::Pawn(Color::Black, true);
+    // board[4][6] = Piece::Pawn(Color::Black, true);
+    // board[5][6] = Piece::Pawn(Color::Black, true);
     // set up white pieces
     board[0][0] = Piece::Rook(Color::White, true);
     board[1][0] = Piece::Bishop(Color::White, true);
@@ -58,6 +71,7 @@ pub fn new_game(state: tauri::State<PieceLocation>, meta: tauri::State<GameMeta>
     for col in 0..8 {
         board[col][6] = Piece::Pawn(Color::Black, true);
     }
+
     *board // return dereferenced board state to frontend
 }
 
@@ -67,18 +81,19 @@ pub fn hover_square(
     square: &str,
     state: tauri::State<PieceLocation>,
     clicked: tauri::State<SelectedSquare>,
+    meta: tauri::State<GameMetaData>,
 ) -> MoveList {
     let board = state.0.lock().expect("game state access");
-
+    let game_meta = meta.0.lock().unwrap();
     let selected = *clicked.0.lock().unwrap();
     let mut coord: Square = square_to_coord(square);
+    dbg!(selected);
 
     if selected != Option::None {
         coord = selected.unwrap();
     }
-    // dbg!(&coord, &square);
-    // dbg!(board[coord.0][coord.1].get_moves(coord, *board));
-    board[coord.0][coord.1].get_moves(coord, *board)
+    let move_options = board[coord.0][coord.1].get_moves(coord, &board);
+    remove_invalid_moves(move_options, coord, &game_meta, &board)
 }
 
 #[tauri::command]
@@ -102,8 +117,8 @@ pub fn click_square(
     square: &str,
     state: tauri::State<PieceLocation>,
     clicked: tauri::State<SelectedSquare>,
-    meta: tauri::State<GameMeta>,
-) -> (MoveList, BoardState, super::types::GameMeta) {
+    meta: tauri::State<GameMetaData>,
+) -> (MoveList, BoardState, GameMeta) {
     let mut selected = *clicked.0.lock().unwrap();
     let mut board = state.0.lock().unwrap();
     let mut game_meta = meta.0.lock().unwrap();
@@ -114,16 +129,22 @@ pub fn click_square(
     } else {
         Color::Black
     };
-    let contains_enemy = check_enemy(&turn, board[coord.0][coord.1]);
+    let contains_enemy = check_enemy(&turn, &board[coord.0][coord.1]);
     if selected == Option::None {
         //* 1.if we have nothing selected and the new coordinate doesn't contain an enemy piece, select it!
         if !contains_enemy {
-            selected = Some(coord);
+            move_list = board[coord.0][coord.1].get_moves(coord, &board);
+            move_list = remove_invalid_moves(move_list.clone(), coord, &game_meta, &board);
+            if move_list.is_empty() {
+                selected = Option::None;
+            } else {
+                selected = Some(coord);
+            }
         }
     } else if selected == Some(coord) {
         //* 2. if we have clicked on the same square again, unselect it
         selected = Option::None;
-    } else if valid_move(selected.unwrap(), coord, *board) {
+    } else if valid_move(selected.unwrap(), coord, &board, &game_meta) {
         //* 3. if we have clicked a valid move of selected, do move
         println!("valid move");
         let source = selected.unwrap();
@@ -131,15 +152,34 @@ pub fn click_square(
         board[coord.0][coord.1] = Piece::None; // remove attacked piece
         board[source.0][source.1] = Piece::None; // take attacked out of its square
         board[coord.0][coord.1] = attacker; // place attacker in the new square
-        game_meta.turn += 1;
+        if attacker.is_king() == Some(turn) {
+            match turn {
+                Color::Black => {
+                    game_meta.black_king.piece = attacker;
+                    game_meta.black_king.square = coord;
+                }
+                Color::White => {
+                    game_meta.white_king.piece = attacker;
+                    game_meta.white_king.square = coord;
+                }
+            }
+        }
         selected = Option::None;
+        //* 4. update the meta only if something has changed
+        game_meta.update_king_threat(&mut board);
+        game_meta.update_turn();
+        game_meta.update_king_threat(&mut board);
     } else if board[coord.0][coord.1] == Piece::None || contains_enemy {
         //* 4. Selected an empty or enemy square which isn't a valid move, unselect
         selected = Option::None;
     } else {
         //* 5. select the new square
         selected = Some(coord);
-        move_list = board[coord.0][coord.1].get_moves(coord, *board)
+        move_list = board[coord.0][coord.1].get_moves(coord, &board);
+        move_list = remove_invalid_moves(move_list.clone(), coord, &game_meta, &board);
+        if move_list.is_empty() {
+            selected = Option::None;
+        }
     }
     *clicked.0.lock().unwrap() = selected;
     (move_list, *board, *game_meta)

@@ -1,7 +1,8 @@
 //! General utility functions for chess
 
+// use super::data::GameMetaData;
 use super::pieces::GetState;
-use super::types::{BoardState, Color, Piece};
+use super::types::{BoardState, Color, GameMeta, MoveList, Piece, Square};
 
 /// Convert letters a-h to a row index from a standard chessboard
 pub fn letter_to_row(letter: char) -> usize {
@@ -18,23 +19,8 @@ pub fn letter_to_row(letter: char) -> usize {
     }
 }
 
-/// Convert letters row index to a-h from a standard chessboard
-// pub fn row_to_letter(row: usize) -> char {
-//     match row {
-//         0 => 'a',
-//         1 => 'b',
-//         2 => 'c',
-//         3 => 'd',
-//         4 => 'e',
-//         5 => 'f',
-//         6 => 'g',
-//         7 => 'h',
-//         _ => panic!(),
-//     }
-// }
-
 /// check if the piece we are looking is of the opposite colour to us
-pub fn check_enemy(our_color: &Color, considered_piece: Piece) -> bool {
+pub fn check_enemy(our_color: &Color, considered_piece: &Piece) -> bool {
     (considered_piece.get_colour() == Some(Color::Black) && *our_color == Color::White)
         || (considered_piece.get_colour() == Some(Color::White) && *our_color == Color::Black)
 }
@@ -54,9 +40,109 @@ pub fn square_to_coord(square: &str) -> (usize, usize) {
 }
 
 /// Check if the square we clicked on is a valid move of the currently selected piece
-pub fn valid_move(source: (usize, usize), target: (usize, usize), board: BoardState) -> bool {
-    println!("checking if valid");
+pub fn valid_move(source: Square, target: Square, board: &BoardState, meta: &GameMeta) -> bool {
+    // println!("checking if valid");
     let move_options = board[source.0][source.1].get_moves(source, board);
+
+    let filtered_moves = remove_invalid_moves(move_options, source, meta, board);
+
     // dbg!(&source, &target);
-    move_options.iter().any(|&ele| ele.0 == target)
+    filtered_moves.iter().any(|&ele| ele.0 == target)
+}
+
+/// Check if this square is threatened, by exhaustive search
+pub fn under_threat(square: Square, our_color: &Color, board: &BoardState) -> bool {
+    let mut threatened = false;
+    println!("checking threat");
+    'outer: for col in 0..8 {
+        for row in 0..8 {
+            let potential_threat = board[col][row];
+            if check_enemy(our_color, &potential_threat) {
+                for m in potential_threat.get_moves((col, row), board) {
+                    if m.0 == square {
+                        threatened = true;
+                        break 'outer;
+                    }
+                }
+            }
+        }
+    }
+    threatened
+}
+
+/// Check each move in this list to check it doesn't leave your king in check
+pub fn remove_invalid_moves(
+    moves: MoveList,
+    my_square: Square,
+    meta: &GameMeta,
+    board: &BoardState,
+) -> MoveList {
+    // println!("removing invalid moves");
+    let mut filtered_moves: MoveList = vec![];
+    let my_piece = board[my_square.0][my_square.1];
+    if my_piece != Piece::None {
+        // only do this if we're looking at a non-empty square
+        let our_color = my_piece.get_colour().expect("square has a color");
+        let i_am_king: bool = my_piece.is_king() == Some(our_color);
+        if (meta.turn % 2 == 0 && our_color == Color::White)
+            || (meta.turn % 2 != 0 && our_color == Color::Black)
+        {
+            // our turn
+            let mut theory_board: BoardState = *board;
+            let our_king = if our_color == Color::White {
+                meta.white_king
+            } else {
+                meta.black_king
+            };
+            println!("{:?}, {:?}, {:?}", our_color, our_king, my_piece);
+            //* Is my king not in check or, am I infact the king and could potentially move? */
+            if our_king.piece.is_king_checked() == Some(false) || i_am_king {
+                //* Am I preventing check by being where I am? */
+                theory_board[my_square.0][my_square.1] = Piece::None;
+                pretty_print_board(&theory_board);
+                println!("{:?}", my_piece.is_king());
+                if !under_threat(our_king.square, &our_color, &theory_board) && !i_am_king {
+                    println!("king isn't threatened if I'm not there");
+                    // doesn't become under threat, allow all moves
+                    filtered_moves = moves;
+                } else {
+                    for m in moves {
+                        // check if any of the potential moves cause my king to go into check
+                        theory_board = *board; // reset the board
+                        theory_board[my_square.0][my_square.1] = Piece::None; // remove my piece
+                        theory_board[m.0 .0][m.0 .1] = my_piece; // place it in a potential move spot
+                        let king_square = if my_piece.is_king() == Some(our_color) {
+                            println!("your majesty");
+                            m.0
+                        } else {
+                            our_king.square
+                        };
+                        if under_threat(king_square, &our_color, &theory_board) {
+                            println!(
+                                "This move to ({},{}) causes check and was filtered out",
+                                m.0 .0, m.0 .1
+                            );
+                        } else {
+                            println!("This move to ({},{}) is fine", m.0 .0, m.0 .1);
+                            filtered_moves.push(m);
+                        }
+                    }
+                }
+            }
+            //* If in check, does moving to any of the spaces listed remove check?  */
+        }
+    }
+    filtered_moves
+}
+
+fn pretty_print_board(board: &BoardState) {
+    for (i, row) in board.iter().enumerate().rev() {
+        for (j, _) in row.iter().enumerate() {
+            if j < 7 {
+                print!("|{}|", board[j][i]);
+            } else {
+                println!("|{}|", board[j][i]);
+            }
+        }
+    }
 }

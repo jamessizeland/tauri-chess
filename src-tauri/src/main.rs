@@ -33,7 +33,7 @@ fn main() {
             Ok(())
         })
         .manage(chess::data::PieceLocation(Default::default()))
-        .manage(chess::data::GameMeta(Default::default()))
+        .manage(chess::data::GameMetaData(Default::default()))
         .manage(chess::data::SelectedSquare(Default::default()))
         .invoke_handler(tauri::generate_handler![
             chess::board::new_game,

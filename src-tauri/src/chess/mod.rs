@@ -2,6 +2,7 @@ pub mod board;
 mod moves;
 mod pieces;
 mod types;
+mod unit_tests;
 mod utils;
 
 /// Chess logic crate
@@ -11,12 +12,12 @@ pub mod data {
     /// game move history, stored as FEN strings
     // pub struct History(Vec<i32>);
 
-    /// game score stored relative to white
-
-    /// game state 8x8 board
+    /// Game state 8x8 board, filled with empty space or Pieces
     pub struct PieceLocation(pub Mutex<super::types::BoardState>);
 
+    /// Track which square has been selected in the UI
     pub struct SelectedSquare(pub Mutex<Option<super::types::Square>>);
 
-    pub struct GameMeta(pub Mutex<super::types::GameMeta>);
+    /// Game score stored relative to white
+    pub struct GameMetaData(pub Mutex<super::types::GameMeta>);
 }
