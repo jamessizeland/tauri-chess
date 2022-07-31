@@ -93,9 +93,7 @@ pub fn hover_square(
         coord = selected.unwrap();
     }
     let move_options = board[coord.0][coord.1].get_moves(coord, &board);
-    let filtered_options = remove_invalid_moves(move_options, coord, &game_meta, &board, false);
-    // dbg!(&filtered_options);
-    filtered_options
+    remove_invalid_moves(move_options, coord, &game_meta, &board)
 }
 
 #[tauri::command]
@@ -136,8 +134,8 @@ pub fn click_square(
         //* 1.if we have nothing selected and the new coordinate doesn't contain an enemy piece, select it!
         if !contains_enemy {
             move_list = board[coord.0][coord.1].get_moves(coord, &board);
-            move_list = remove_invalid_moves(move_list.clone(), coord, &game_meta, &board, false);
-            if move_list.len() == 0 {
+            move_list = remove_invalid_moves(move_list.clone(), coord, &game_meta, &board);
+            if move_list.is_empty() {
                 selected = Option::None;
             } else {
                 selected = Some(coord);
@@ -178,8 +176,8 @@ pub fn click_square(
         //* 5. select the new square
         selected = Some(coord);
         move_list = board[coord.0][coord.1].get_moves(coord, &board);
-        move_list = remove_invalid_moves(move_list.clone(), coord, &game_meta, &board, false);
-        if move_list.len() == 0 {
+        move_list = remove_invalid_moves(move_list.clone(), coord, &game_meta, &board);
+        if move_list.is_empty() {
             selected = Option::None;
         }
     }

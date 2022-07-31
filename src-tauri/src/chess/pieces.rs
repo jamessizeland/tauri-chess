@@ -25,7 +25,7 @@ pub trait ModState {
     /// If this piece is a king, update its check and checkmate states
     ///
     /// Modifies piece in place
-    fn king_threat(&mut self, location: &Square, board: &BoardState, meta: GameMeta) -> ();
+    fn king_threat(&mut self, location: &Square, board: &BoardState, meta: GameMeta);
 }
 
 impl GetState for Piece {
@@ -57,20 +57,20 @@ impl GetState for Piece {
         match &self {
             // what type of piece am I?
             Piece::None => Vec::new(),
-            Piece::Pawn(color, first_move) => pawn_move(sq, color, first_move, &board),
+            Piece::Pawn(color, first_move) => pawn_move(sq, color, first_move, board),
             Piece::King(color, first_move, _check, _check_mate) => {
-                king_move(sq, color, &board, *first_move)
+                king_move(sq, color, board, *first_move)
             }
             Piece::Queen(color, _first_move) => {
                 //* move in any direction until either another piece or the edge of the board
-                let mut moves = rook_move(sq, color, &board);
-                let mut diag_moves = bish_move(sq, color, &board);
+                let mut moves = rook_move(sq, color, board);
+                let mut diag_moves = bish_move(sq, color, board);
                 moves.append(&mut diag_moves);
                 moves
             }
-            Piece::Bishop(color, _first_move) => bish_move(sq, color, &board),
-            Piece::Knight(color, _first_move) => knight_move(sq, color, &board),
-            Piece::Rook(color, _first_move) => rook_move(sq, color, &board),
+            Piece::Bishop(color, _first_move) => bish_move(sq, color, board),
+            Piece::Knight(color, _first_move) => knight_move(sq, color, board),
+            Piece::Rook(color, _first_move) => rook_move(sq, color, board),
         }
     }
 }
@@ -87,7 +87,7 @@ impl ModState for Piece {
             Piece::Rook(color, _) => Self::Rook(*color, false),
         }
     }
-    fn king_threat(&mut self, location: &Square, board: &BoardState, meta: GameMeta) -> () {
+    fn king_threat(&mut self, location: &Square, board: &BoardState, meta: GameMeta) {
         *self = match *self {
             Piece::King(color, first_move, _, _) => {
                 let check = under_threat(*location, &color, board);
@@ -101,7 +101,6 @@ impl ModState for Piece {
                                 (col, row),
                                 &meta,
                                 board,
-                                true,
                             )
                             .len();
                             team_moves += no_moves;

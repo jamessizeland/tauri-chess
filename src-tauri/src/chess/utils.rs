@@ -44,7 +44,7 @@ pub fn valid_move(source: Square, target: Square, board: &BoardState, meta: &Gam
     // println!("checking if valid");
     let move_options = board[source.0][source.1].get_moves(source, board);
 
-    let filtered_moves = remove_invalid_moves(move_options, source, meta, board, false);
+    let filtered_moves = remove_invalid_moves(move_options, source, meta, board);
 
     // dbg!(&source, &target);
     filtered_moves.iter().any(|&ele| ele.0 == target)
@@ -76,7 +76,6 @@ pub fn remove_invalid_moves(
     my_square: Square,
     meta: &GameMeta,
     board: &BoardState,
-    full_check: bool,
 ) -> MoveList {
     // println!("removing invalid moves");
     let mut filtered_moves: MoveList = vec![];
@@ -89,7 +88,7 @@ pub fn remove_invalid_moves(
             || (meta.turn % 2 != 0 && our_color == Color::Black)
         {
             // our turn
-            let mut theory_board: BoardState = board.clone();
+            let mut theory_board: BoardState = *board;
             let our_king = if our_color == Color::White {
                 meta.white_king
             } else {
@@ -109,7 +108,7 @@ pub fn remove_invalid_moves(
                 } else {
                     for m in moves {
                         // check if any of the potential moves cause my king to go into check
-                        theory_board = board.clone(); // reset the board
+                        theory_board = *board; // reset the board
                         theory_board[my_square.0][my_square.1] = Piece::None; // remove my piece
                         theory_board[m.0 .0][m.0 .1] = my_piece; // place it in a potential move spot
                         let king_square = if my_piece.is_king() == Some(our_color) {
@@ -137,12 +136,12 @@ pub fn remove_invalid_moves(
 }
 
 fn pretty_print_board(board: &BoardState) {
-    for row in 0..8 {
-        for col in 0..8 {
-            if col < 7 {
-                print!("|{}|", board[col][7 - row]);
+    for (i, row) in board.iter().enumerate().rev() {
+        for (j, _) in row.iter().enumerate() {
+            if j < 7 {
+                print!("|{}|", board[j][i]);
             } else {
-                println!("|{}|", board[col][7 - row]);
+                println!("|{}|", board[j][i]);
             }
         }
     }

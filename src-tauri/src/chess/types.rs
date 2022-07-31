@@ -24,15 +24,15 @@ pub struct KingMeta {
 
 pub trait ModMeta {
     /// Check if kings are under threat and update their status
-    fn update_king_threat(&mut self, board: &mut BoardState) -> ();
+    fn update_king_threat(&mut self, board: &mut BoardState);
     /// Increment the turn to the next player
-    fn update_turn(&mut self) -> ();
+    fn update_turn(&mut self);
     /// Set up new game
-    fn new_game(&mut self) -> ();
+    fn new_game(&mut self);
 }
 
 impl ModMeta for GameMeta {
-    fn update_king_threat(&mut self, board: &mut BoardState) -> () {
+    fn update_king_threat(&mut self, board: &mut BoardState) {
         let turn: Color = if self.turn % 2 == 0 {
             Color::White
         } else {
@@ -57,11 +57,11 @@ impl ModMeta for GameMeta {
             }
         }
     }
-    fn update_turn(&mut self) -> () {
+    fn update_turn(&mut self) {
         self.turn += 1;
         println!("turn {}", self.turn)
     }
-    fn new_game(&mut self) -> () {
+    fn new_game(&mut self) {
         self.score = 0;
         self.turn = 0;
         self.white_king.piece = Piece::King(Color::White, true, false, false);

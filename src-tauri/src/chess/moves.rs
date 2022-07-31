@@ -218,7 +218,7 @@ pub fn king_move(
     for vector in VECTORS {
         let col = sq.0 as i8 + vector.0;
         let row = sq.1 as i8 + vector.1;
-        if col >= 0 && col <= 7 && row >= 0 && row <= 7 {
+        if (0..8).contains(&col) && (0..8).contains(&row) {
             // valid square
             let (col, row) = (col as usize, row as usize);
             let potential_move = board[col][row];
@@ -248,7 +248,7 @@ pub fn knight_move(sq: (usize, usize), color: &Color, board: &BoardState) -> Mov
     for vector in VECTORS {
         let col = sq.0 as i8 + vector.0;
         let row = sq.1 as i8 + vector.1;
-        if col >= 0 && col <= 7 && row >= 0 && row <= 7 {
+        if (0..8).contains(&col) && (0..8).contains(&row) {
             // valid square
             let (col, row) = (col as usize, row as usize);
             // let target_colour = board[col][row].get_colour();
