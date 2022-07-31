@@ -77,11 +77,13 @@ pub fn remove_invalid_moves(
     meta: &GameMeta,
     board: &BoardState,
 ) -> MoveList {
+    println!("removing invalid moves");
     let mut filtered_moves: MoveList = vec![];
     let my_piece = board[my_square.0][my_square.1];
     if my_piece != Piece::None {
         // only do this if we're looking at a non-empty square
         let our_color = my_piece.get_colour().expect("square has a color");
+        let i_am_king: bool = my_piece.is_king() == Some(our_color);
         if (meta.turn % 2 == 0 && our_color == Color::White)
             || (meta.turn % 2 != 0 && our_color == Color::Black)
         {
@@ -93,12 +95,13 @@ pub fn remove_invalid_moves(
                 meta.black_king
             };
             println!("{:?}, {:?}, {:?}", our_color, our_king, my_piece);
-            //* Is my king in check? (there should only ever be one king in check, so if a king is in check then assume it is mine) */
-            if our_king.piece.is_king_checked() == Some(false) {
-                //* Not currently in check, am I preventing check by being where I am? */
+            //* Is my king not in check or, am I infact the king and could potentially move? */
+            if our_king.piece.is_king_checked() == Some(false) || i_am_king {
+                //* Am I preventing check by being where I am? */
                 theory_board[my_square.0][my_square.1] = Piece::None;
                 pretty_print_board(&theory_board);
-                if !under_threat(our_king.square, &our_color, &theory_board) {
+                println!("{:?}", my_piece.is_king());
+                if !under_threat(our_king.square, &our_color, &theory_board) && !i_am_king {
                     println!("king isn't threatened if I'm not there");
                     // doesn't become under threat, allow all moves
                     filtered_moves = moves;
@@ -108,7 +111,13 @@ pub fn remove_invalid_moves(
                         theory_board = board.clone(); // reset the board
                         theory_board[my_square.0][my_square.1] = Piece::None; // remove my piece
                         theory_board[m.0 .0][m.0 .1] = my_piece; // place it in a potential move spot
-                        if under_threat(our_king.square, &our_color, &theory_board) {
+                        let king_square = if my_piece.is_king() == Some(our_color) {
+                            println!("your majesty");
+                            m.0
+                        } else {
+                            our_king.square
+                        };
+                        if under_threat(king_square, &our_color, &theory_board) {
                             println!(
                                 "This move to ({},{}) causes check and was filtered out",
                                 m.0 .0, m.0 .1

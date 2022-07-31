@@ -91,15 +91,22 @@ impl ModState for Piece {
         *self = match *self {
             Piece::King(color, first_move, _, _) => {
                 let check = under_threat(*location, &color, board);
-                let mate = check
-                    && remove_invalid_moves(
-                        self.get_moves(*location, board),
-                        *location,
-                        &meta,
-                        board,
-                    )
-                    .len()
-                        == 0;
+                let mut team_moves: usize = 0;
+                for col in 0..8 {
+                    for row in 0..8 {
+                        let piece = board[col][row];
+                        if piece.get_colour() == Some(color) {
+                            team_moves += remove_invalid_moves(
+                                piece.get_moves((col, row), board),
+                                (col, row),
+                                &meta,
+                                board,
+                            )
+                            .len()
+                        }
+                    }
+                }
+                let mate = check && team_moves == 0;
                 Self::King(color, first_move, check, mate)
             }
             _ => *self,
