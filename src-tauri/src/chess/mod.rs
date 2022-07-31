@@ -9,8 +9,8 @@ mod utils;
 pub mod data {
     use std::sync::Mutex; // mutual exclusion wrapper
 
-    /// game move history, stored as FEN strings
-    // pub struct History(Vec<i32>);
+    /// game move history
+    pub struct HistoryData(pub Mutex<super::types::Hist>);
 
     /// Game state 8x8 board, filled with empty space or Pieces
     pub struct PieceLocation(pub Mutex<super::types::BoardState>);

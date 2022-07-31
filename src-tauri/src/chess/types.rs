@@ -4,16 +4,21 @@ use std::fmt::Display;
 
 use serde::{Deserialize, Serialize};
 
-use super::pieces::ModState;
+use super::pieces::{GetState, ModState};
 
 pub type BoardState = [[Piece; 8]; 8];
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct GameMeta {
     pub turn: usize,
-    pub score: i32,
+    pub score: isize,
     pub black_king: KingMeta,
     pub white_king: KingMeta,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Hist {
+    pub score: Vec<isize>,
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
@@ -23,12 +28,16 @@ pub struct KingMeta {
 }
 
 pub trait ModMeta {
+    /// run all necessary board state cleanup to start a new turn
+    fn new_turn(&mut self, board: &mut BoardState, history: &mut Hist);
     /// Check if kings are under threat and update their status
     fn update_king_threat(&mut self, board: &mut BoardState);
     /// Increment the turn to the next player
     fn update_turn(&mut self);
     /// Set up new game
     fn new_game(&mut self);
+    /// Update score based on value of pieces on the board
+    fn calc_score(&mut self, board: &BoardState);
 }
 
 impl ModMeta for GameMeta {
@@ -69,6 +78,28 @@ impl ModMeta for GameMeta {
         self.black_king.piece = Piece::King(Color::Black, true, false, false);
         self.black_king.square = (4, 7);
     }
+    fn new_turn(&mut self, board: &mut BoardState, history: &mut Hist) {
+        self.update_king_threat(board);
+        self.update_turn();
+        self.update_king_threat(board);
+        self.calc_score(board);
+        history.score.push(self.score);
+    }
+    fn calc_score(&mut self, board: &BoardState) {
+        let (mut white, mut black) = (0, 0);
+        for col in board.iter() {
+            for piece in col {
+                match piece.get_colour() {
+                    Some(color) => match color {
+                        Color::Black => black += piece.get_value(),
+                        Color::White => white += piece.get_value(),
+                    },
+                    None => (),
+                }
+            }
+        }
+        self.score = white - black;
+    }
 }
 
 impl Default for GameMeta {
@@ -84,6 +115,14 @@ impl Default for GameMeta {
                 piece: Piece::King(Color::Black, true, false, false),
                 square: (4, 7),
             },
+        }
+    }
+}
+
+impl Default for Hist {
+    fn default() -> Self {
+        Self {
+            score: Default::default(),
         }
     }
 }
