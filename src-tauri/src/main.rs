@@ -35,6 +35,7 @@ fn main() {
         .manage(chess::data::PieceLocation(Default::default()))
         .manage(chess::data::GameMetaData(Default::default()))
         .manage(chess::data::SelectedSquare(Default::default()))
+        .manage(chess::data::HistoryData(Default::default()))
         .invoke_handler(tauri::generate_handler![
             chess::board::new_game,
             chess::board::get_state,

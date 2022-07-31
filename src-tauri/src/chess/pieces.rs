@@ -14,6 +14,10 @@ pub trait GetState {
     fn is_king(&self) -> Option<Color>;
     /// If this piece is a king, is it in check?
     fn is_king_checked(&self) -> Option<bool>;
+    /// Return the relative weighting value of this piece based on its type
+    ///
+    /// https://en.wikipedia.org/wiki/Chess_piece_relative_value
+    fn get_value(&self) -> isize;
 }
 
 /// Modify state information on a selected piece
@@ -29,6 +33,27 @@ pub trait ModState {
 }
 
 impl GetState for Piece {
+    fn get_moves(&self, sq: Square, board: &BoardState) -> MoveList {
+        //* For each actual piece we need to work out what moves it could do on an empty board, then remove moves that are blocked by other pieces
+        match &self {
+            // what type of piece am I?
+            Piece::None => Vec::new(),
+            Piece::Pawn(color, first_move) => pawn_move(sq, color, first_move, board),
+            Piece::King(color, first_move, _check, _check_mate) => {
+                king_move(sq, color, board, *first_move)
+            }
+            Piece::Queen(color, _first_move) => {
+                //* move in any direction until either another piece or the edge of the board
+                let mut moves = rook_move(sq, color, board);
+                let mut diag_moves = bish_move(sq, color, board);
+                moves.append(&mut diag_moves);
+                moves
+            }
+            Piece::Bishop(color, _first_move) => bish_move(sq, color, board),
+            Piece::Knight(color, _first_move) => knight_move(sq, color, board),
+            Piece::Rook(color, _first_move) => rook_move(sq, color, board),
+        }
+    }
     fn get_colour(&self) -> Option<Color> {
         match &self {
             Piece::None => None,
@@ -52,25 +77,15 @@ impl GetState for Piece {
             _ => None,
         }
     }
-    fn get_moves(&self, sq: Square, board: &BoardState) -> MoveList {
-        //* For each actual piece we need to work out what moves it could do on an empty board, then remove moves that are blocked by other pieces
+    fn get_value(&self) -> isize {
         match &self {
-            // what type of piece am I?
-            Piece::None => Vec::new(),
-            Piece::Pawn(color, first_move) => pawn_move(sq, color, first_move, board),
-            Piece::King(color, first_move, _check, _check_mate) => {
-                king_move(sq, color, board, *first_move)
-            }
-            Piece::Queen(color, _first_move) => {
-                //* move in any direction until either another piece or the edge of the board
-                let mut moves = rook_move(sq, color, board);
-                let mut diag_moves = bish_move(sq, color, board);
-                moves.append(&mut diag_moves);
-                moves
-            }
-            Piece::Bishop(color, _first_move) => bish_move(sq, color, board),
-            Piece::Knight(color, _first_move) => knight_move(sq, color, board),
-            Piece::Rook(color, _first_move) => rook_move(sq, color, board),
+            Piece::None => 0,
+            Piece::Pawn(_, _) => 1,
+            Piece::King(_, _, _, _) => 0,
+            Piece::Queen(_, _) => 9,
+            Piece::Bishop(_, _) => 3,
+            Piece::Knight(_, _) => 3,
+            Piece::Rook(_, _) => 5,
         }
     }
 }
@@ -104,10 +119,10 @@ impl ModState for Piece {
                             )
                             .len();
                             team_moves += no_moves;
-                            println!(
-                                "friendly piece {:?} at ({},{} - {} moves)",
-                                piece, col, row, no_moves
-                            );
+                            // println!(
+                            //     "friendly piece {:?} at ({},{} - {} moves)",
+                            //     piece, col, row, no_moves
+                            // );
                         }
                     }
                 }

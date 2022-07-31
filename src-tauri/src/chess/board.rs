@@ -1,5 +1,5 @@
 //! Logic for the chess board actions
-use super::data::{GameMetaData, PieceLocation, SelectedSquare};
+use super::data::{GameMetaData, HistoryData, PieceLocation, SelectedSquare};
 use super::pieces::{GetState, ModState};
 use super::types::{BoardState, Color, GameMeta, ModMeta, MoveList, Piece, Square};
 use super::utils::{check_enemy, remove_invalid_moves, square_to_coord, valid_move};
@@ -7,7 +7,6 @@ use super::utils::{check_enemy, remove_invalid_moves, square_to_coord, valid_mov
 #[tauri::command]
 /// Get the location of all pieces from global memory
 pub fn get_state(state: tauri::State<PieceLocation>) -> BoardState {
-    println!("sending game state");
     let board = state.0.lock().expect("board state access");
     *board
 }
@@ -24,10 +23,13 @@ pub fn get_score(state: tauri::State<GameMetaData>) -> super::types::GameMeta {
 pub fn new_game(
     state: tauri::State<PieceLocation>,
     meta: tauri::State<GameMetaData>,
+    history_data: tauri::State<HistoryData>,
 ) -> BoardState {
     // Lock the counter(Mutex) to get the current value
     let mut board = state.0.lock().unwrap();
     let mut game_meta = meta.0.lock().unwrap();
+    let mut history = history_data.0.lock().unwrap();
+    *history = Default::default();
     // reset game meta data
     game_meta.new_game();
     // reset board to empty
@@ -87,7 +89,7 @@ pub fn hover_square(
     let game_meta = meta.0.lock().unwrap();
     let selected = *clicked.0.lock().unwrap();
     let mut coord: Square = square_to_coord(square);
-    dbg!(selected);
+    // dbg!(selected);
 
     if selected != Option::None {
         coord = selected.unwrap();
@@ -118,6 +120,7 @@ pub fn click_square(
     state: tauri::State<PieceLocation>,
     clicked: tauri::State<SelectedSquare>,
     meta: tauri::State<GameMetaData>,
+    history_data: tauri::State<HistoryData>,
 ) -> (MoveList, BoardState, GameMeta) {
     let mut selected = *clicked.0.lock().unwrap();
     let mut board = state.0.lock().unwrap();
@@ -166,9 +169,9 @@ pub fn click_square(
         }
         selected = Option::None;
         //* 4. update the meta only if something has changed
-        game_meta.update_king_threat(&mut board);
-        game_meta.update_turn();
-        game_meta.update_king_threat(&mut board);
+        let mut history = history_data.0.lock().unwrap();
+        game_meta.new_turn(&mut board, &mut history);
+        println!("score history: {:?}", history.score);
     } else if board[coord.0][coord.1] == Piece::None || contains_enemy {
         //* 4. Selected an empty or enemy square which isn't a valid move, unselect
         selected = Option::None;
