@@ -37,40 +37,40 @@ pub fn new_game(
         }
     }
     // DEBUG PIECES
-    board[3][0] = Piece::Queen(Color::White, true);
-    board[4][0] = Piece::King(Color::White, true, false, false);
-    board[3][1] = Piece::Pawn(Color::White, true);
-    board[4][1] = Piece::Pawn(Color::White, true);
-    board[5][1] = Piece::Pawn(Color::White, true);
-    board[3][7] = Piece::Queen(Color::Black, true);
-    board[4][7] = Piece::King(Color::Black, true, false, false);
-    board[3][6] = Piece::Pawn(Color::Black, true);
-    board[4][6] = Piece::Pawn(Color::Black, true);
-    board[5][6] = Piece::Pawn(Color::Black, true);
-    // set up white pieces
-    // board[0][0] = Piece::Rook(Color::White, true);
-    // board[1][0] = Piece::Bishop(Color::White, true);
-    // board[2][0] = Piece::Knight(Color::White, true);
     // board[3][0] = Piece::Queen(Color::White, true);
     // board[4][0] = Piece::King(Color::White, true, false, false);
-    // board[5][0] = Piece::Knight(Color::White, true);
-    // board[6][0] = Piece::Bishop(Color::White, true);
-    // board[7][0] = Piece::Rook(Color::White, true);
-    // for col in 0..8 {
-    //     board[col][1] = Piece::Pawn(Color::White, true);
-    // }
-    // // set up black pieces
-    // board[0][7] = Piece::Rook(Color::Black, true);
-    // board[1][7] = Piece::Knight(Color::Black, true);
-    // board[2][7] = Piece::Bishop(Color::Black, true);
+    // board[3][1] = Piece::Pawn(Color::White, true);
+    // board[4][1] = Piece::Pawn(Color::White, true);
+    // board[5][1] = Piece::Pawn(Color::White, true);
     // board[3][7] = Piece::Queen(Color::Black, true);
     // board[4][7] = Piece::King(Color::Black, true, false, false);
-    // board[5][7] = Piece::Bishop(Color::Black, true);
-    // board[6][7] = Piece::Knight(Color::Black, true);
-    // board[7][7] = Piece::Rook(Color::Black, true);
-    // for col in 0..8 {
-    //     board[col][6] = Piece::Pawn(Color::Black, true);
-    // }
+    // board[3][6] = Piece::Pawn(Color::Black, true);
+    // board[4][6] = Piece::Pawn(Color::Black, true);
+    // board[5][6] = Piece::Pawn(Color::Black, true);
+    // set up white pieces
+    board[0][0] = Piece::Rook(Color::White, true);
+    board[1][0] = Piece::Bishop(Color::White, true);
+    board[2][0] = Piece::Knight(Color::White, true);
+    board[3][0] = Piece::Queen(Color::White, true);
+    board[4][0] = Piece::King(Color::White, true, false, false);
+    board[5][0] = Piece::Knight(Color::White, true);
+    board[6][0] = Piece::Bishop(Color::White, true);
+    board[7][0] = Piece::Rook(Color::White, true);
+    for col in 0..8 {
+        board[col][1] = Piece::Pawn(Color::White, true);
+    }
+    // set up black pieces
+    board[0][7] = Piece::Rook(Color::Black, true);
+    board[1][7] = Piece::Knight(Color::Black, true);
+    board[2][7] = Piece::Bishop(Color::Black, true);
+    board[3][7] = Piece::Queen(Color::Black, true);
+    board[4][7] = Piece::King(Color::Black, true, false, false);
+    board[5][7] = Piece::Bishop(Color::Black, true);
+    board[6][7] = Piece::Knight(Color::Black, true);
+    board[7][7] = Piece::Rook(Color::Black, true);
+    for col in 0..8 {
+        board[col][6] = Piece::Pawn(Color::Black, true);
+    }
 
     *board // return dereferenced board state to frontend
 }
@@ -93,7 +93,7 @@ pub fn hover_square(
         coord = selected.unwrap();
     }
     let move_options = board[coord.0][coord.1].get_moves(coord, &board);
-    let filtered_options = remove_invalid_moves(move_options, coord, &game_meta, &board);
+    let filtered_options = remove_invalid_moves(move_options, coord, &game_meta, &board, false);
     // dbg!(&filtered_options);
     filtered_options
 }
@@ -136,7 +136,7 @@ pub fn click_square(
         //* 1.if we have nothing selected and the new coordinate doesn't contain an enemy piece, select it!
         if !contains_enemy {
             move_list = board[coord.0][coord.1].get_moves(coord, &board);
-            move_list = remove_invalid_moves(move_list.clone(), coord, &game_meta, &board);
+            move_list = remove_invalid_moves(move_list.clone(), coord, &game_meta, &board, false);
             if move_list.len() == 0 {
                 selected = Option::None;
             } else {
@@ -170,6 +170,7 @@ pub fn click_square(
         //* 4. update the meta only if something has changed
         game_meta.update_king_threat(&mut board);
         game_meta.update_turn();
+        game_meta.update_king_threat(&mut board);
     } else if board[coord.0][coord.1] == Piece::None || contains_enemy {
         //* 4. Selected an empty or enemy square which isn't a valid move, unselect
         selected = Option::None;
@@ -177,7 +178,7 @@ pub fn click_square(
         //* 5. select the new square
         selected = Some(coord);
         move_list = board[coord.0][coord.1].get_moves(coord, &board);
-        move_list = remove_invalid_moves(move_list.clone(), coord, &game_meta, &board);
+        move_list = remove_invalid_moves(move_list.clone(), coord, &game_meta, &board, false);
         if move_list.len() == 0 {
             selected = Option::None;
         }

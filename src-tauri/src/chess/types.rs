@@ -33,17 +33,29 @@ pub trait ModMeta {
 
 impl ModMeta for GameMeta {
     fn update_king_threat(&mut self, board: &mut BoardState) -> () {
-        // check white king status
-        self.white_king
-            .piece
-            .king_threat(&self.white_king.square, board, *self);
-        // check black king status
-        self.black_king
-            .piece
-            .king_threat(&self.black_king.square, board, *self);
-        // update kings on the board with the new statuses
-        board[self.white_king.square.0][self.white_king.square.1] = self.white_king.piece;
-        board[self.black_king.square.0][self.black_king.square.1] = self.black_king.piece;
+        let turn: Color = if self.turn % 2 == 0 {
+            Color::White
+        } else {
+            Color::Black
+        };
+        match turn {
+            Color::White => {
+                // check white king status
+                self.white_king
+                    .piece
+                    .king_threat(&self.white_king.square, board, *self);
+                board[self.white_king.square.0][self.white_king.square.1] = self.white_king.piece;
+            }
+            Color::Black => {
+                // check black king status
+                self.black_king
+                    .piece
+                    .king_threat(&self.black_king.square, board, *self);
+                // update kings on the board with the new statuses
+
+                board[self.black_king.square.0][self.black_king.square.1] = self.black_king.piece;
+            }
+        }
     }
     fn update_turn(&mut self) -> () {
         self.turn += 1;

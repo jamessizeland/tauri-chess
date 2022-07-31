@@ -44,7 +44,7 @@ pub fn valid_move(source: Square, target: Square, board: &BoardState, meta: &Gam
     // println!("checking if valid");
     let move_options = board[source.0][source.1].get_moves(source, board);
 
-    let filtered_moves = remove_invalid_moves(move_options, source, meta, board);
+    let filtered_moves = remove_invalid_moves(move_options, source, meta, board, false);
 
     // dbg!(&source, &target);
     filtered_moves.iter().any(|&ele| ele.0 == target)
@@ -76,8 +76,9 @@ pub fn remove_invalid_moves(
     my_square: Square,
     meta: &GameMeta,
     board: &BoardState,
+    full_check: bool,
 ) -> MoveList {
-    println!("removing invalid moves");
+    // println!("removing invalid moves");
     let mut filtered_moves: MoveList = vec![];
     let my_piece = board[my_square.0][my_square.1];
     if my_piece != Piece::None {

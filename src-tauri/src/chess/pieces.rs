@@ -96,17 +96,23 @@ impl ModState for Piece {
                     for row in 0..8 {
                         let piece = board[col][row];
                         if piece.get_colour() == Some(color) {
-                            team_moves += remove_invalid_moves(
+                            let no_moves = remove_invalid_moves(
                                 piece.get_moves((col, row), board),
                                 (col, row),
                                 &meta,
                                 board,
+                                true,
                             )
-                            .len()
+                            .len();
+                            team_moves += no_moves;
+                            println!(
+                                "friendly piece {:?} at ({},{} - {} moves)",
+                                piece, col, row, no_moves
+                            );
                         }
                     }
                 }
-                let mate = check && team_moves == 0;
+                let mate = check && (team_moves == 0);
                 Self::King(color, first_move, check, mate)
             }
             _ => *self,
