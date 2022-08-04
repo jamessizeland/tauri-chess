@@ -4,14 +4,14 @@ Experiment with tauri passing data from rust to javascript, by creating a chess 
 
 ## Try It Out!
 
-Requirements
+**Requirements**
 
+- git
 - yarn
 
 Use these steps to run and see the magic for yourself!
 
-1. Clone the repository.
-   - `git clone https://github.com/jamessizeland/tauri-chess.git`
+1. `git clone https://github.com/jamessizeland/tauri-chess.git`
 1. `cd tauri-chess`
 1. `yarn install`
 1. `yarn tauri dev`
