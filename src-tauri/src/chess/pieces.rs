@@ -14,6 +14,8 @@ pub trait GetState {
     fn is_king(&self) -> Option<Color>;
     /// If this piece is a king, is it in check?
     fn is_king_checked(&self) -> Option<bool>;
+    /// If this piece is a king, is it in checkmate?
+    fn is_king_mate(&self) -> Option<bool>;
     /// Return the relative weighting value of this piece based on its type
     ///
     /// https://en.wikipedia.org/wiki/Chess_piece_relative_value
@@ -86,6 +88,12 @@ impl GetState for Piece {
             Piece::Bishop(_, _) => 3,
             Piece::Knight(_, _) => 3,
             Piece::Rook(_, _) => 5,
+        }
+    }
+    fn is_king_mate(&self) -> Option<bool> {
+        match &self {
+            Piece::King(_, _, _, mate) => Some(*mate),
+            _ => None,
         }
     }
 }

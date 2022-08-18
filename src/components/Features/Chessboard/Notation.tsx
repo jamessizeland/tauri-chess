@@ -26,7 +26,7 @@ const getRow = (orientation: Orientation, row: number) =>
 
 /** Get Column as a letter */
 const getColumn = (orientation: Orientation, col: number) =>
-  orientation === 'black' ? COLUMNS[7 - col] : COLUMNS[col];
+  orientation === 'white' ? COLUMNS[7 - col] : COLUMNS[col];
 
 const renderBottomLeft = ({
   orientation = 'white',
@@ -68,12 +68,13 @@ const renderLetters = ({
   whiteColor,
   blackColor,
 }: Omit<SquareProps, 'row'> & WhiteColor & BlackColor) => {
+  const rotate = orientation === 'black' ? 'rotate-180' : '';
   return (
     <div
       data-testid={`column-${getColumn(orientation, col)}`}
       style={{
         ...notationStyle,
-        ...columnStyle({ col, width, blackColor, whiteColor }),
+        ...columnStyle({ col, width, blackColor, whiteColor, orientation }),
         ...alphaStyle(width),
       }}
     >
@@ -119,10 +120,17 @@ const columnStyle = ({
   width,
   blackColor,
   whiteColor,
-}: Omit<SquareProps, 'row'> & BlackColor & WhiteColor): CSSProperties => ({
-  fontSize: width / 48,
-  color: col % 2 !== 0 ? blackColor : whiteColor,
-});
+  orientation,
+}: Omit<SquareProps, 'row'> & BlackColor & WhiteColor): CSSProperties => {
+  let styleColor = col % 2 !== 0 ? blackColor : whiteColor;
+  if (orientation === 'black') {
+    styleColor = col % 2 !== 0 ? whiteColor : blackColor;
+  }
+  return {
+    fontSize: width / 48,
+    color: styleColor,
+  };
+};
 
 const rowStyle = ({
   row,
@@ -159,7 +167,7 @@ const alphaStyle = (width: number): CSSProperties => ({
 
 const numericStyle = (width: number): CSSProperties => ({
   alignSelf: 'flex-start',
-  paddingRight: width / 8 - width / 48,
+  paddingLeft: width / 48 - 10,
 });
 
 const notationStyle: CSSProperties = {
@@ -181,7 +189,9 @@ const Notation = ({
 }: NotationProps) => {
   const whiteColor = lightSquareStyle.backgroundColor;
   const blackColor = darkSquareStyle.backgroundColor;
-  const isRow: boolean = col === 0;
+  const isRow: boolean =
+    (orientation === 'white' && col === 0) ||
+    (orientation === 'black' && col === 7);
   const isColumn: boolean =
     (orientation === 'white' && row === 0) ||
     (orientation === 'black' && row === 7);

@@ -117,12 +117,7 @@ pub fn remove_invalid_moves(
                         our_king.square
                     };
                     if under_threat(king_square, &our_color, &theory_board) {
-                        // println!(
-                        //     "This move to ({},{}) causes check and was filtered out",
-                        //     m.0 .0, m.0 .1
-                        // );
                     } else {
-                        // println!("This move to ({},{}) is fine", m.0 .0, m.0 .1);
                         filtered_moves.push(m);
                     }
                 }

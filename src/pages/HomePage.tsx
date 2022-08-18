@@ -31,6 +31,7 @@ const HomePage = (): JSX.Element => {
   const [gameMeta, setGameMeta] = useState<MetaGame>({
     score: 0,
     turn: 0,
+    game_over: false,
     white_king: {
       piece: {
         King: ['White', true, false, false],
@@ -51,10 +52,7 @@ const HomePage = (): JSX.Element => {
     undefined,
   );
   const [notation, setNotation] = useState(true);
-  // listen<Position>('update_position', (event) => {
-  //   console.log('update position');
-  //   setPosition(event.payload);
-  // });
+  const [rotation, setRotation] = useState(false);
 
   useEffect(() => {
     // ask if we want to start a new game
@@ -98,16 +96,24 @@ const HomePage = (): JSX.Element => {
           squareStyles={squareStyles}
           dropSquareStyle={dragStyles}
           onSquareClick={(square) => {
-            invoke<[MoveList, BoardStateArray, MetaGame]>('click_square', {
-              square: square,
-            }).then(([sq, board, gameMeta]) => {
-              setSquareStyles(highlightSquares(sq, square));
-              setPosition(parseBoardState(board));
-              console.log(gameMeta);
-              console.log(gameMeta.white_king.piece.King);
-              console.log(gameMeta.black_king.piece.King);
-              setGameMeta(gameMeta);
-            });
+            if (!gameMeta.game_over) {
+              invoke<[MoveList, BoardStateArray, MetaGame]>('click_square', {
+                square: square,
+              }).then(([sq, board, gameMeta]) => {
+                setSquareStyles(highlightSquares(sq, square));
+                setPosition(parseBoardState(board));
+                console.log(gameMeta);
+                console.log(gameMeta.white_king.piece.King);
+                console.log(gameMeta.black_king.piece.King);
+                setGameMeta(gameMeta);
+                if (rotation) {
+                  gameMeta.turn % 2 == 0
+                    ? setWhiteTurn(true)
+                    : setWhiteTurn(false);
+                }
+                if (gameMeta.game_over) toggle(false); // ask if we want to start a new game
+              });
+            }
           }}
         />
       </div>
@@ -143,11 +149,20 @@ const HomePage = (): JSX.Element => {
           score: {gameMeta.score}, turn: {gameMeta.turn} (
           {gameMeta.turn % 2 == 0 ? 'White' : 'Black'})
         </p>
-        <Button className="mr-2" onClick={() => setNotation(!notation)}>
-          Toggle Notation
-        </Button>
-        <Button className="mr-2" onClick={() => setWhiteTurn(!whiteTurn)}>
-          {whiteTurn ? 'White' : 'Black'}
+        <Button
+          className="mr-2"
+          onClick={() => {
+            if (rotation) {
+              setWhiteTurn(true);
+              console.log('rotation off');
+            } else {
+              gameMeta.turn % 2 == 0 ? setWhiteTurn(true) : setWhiteTurn(false);
+              console.log(gameMeta.turn % 2);
+            }
+            setRotation(!rotation);
+          }}
+        >
+          {rotation ? 'Rotation On' : 'Rotation Off'}
         </Button>
       </div>
     </div>

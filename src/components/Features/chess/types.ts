@@ -23,6 +23,7 @@ type MoveList = [[number, number], boolean][];
 type MetaGame = {
   score: number;
   turn: number;
+  game_over: boolean;
   black_king: {
     piece: { King: [Color, FirstMove, Check, CheckMate] };
     square: [number, number];

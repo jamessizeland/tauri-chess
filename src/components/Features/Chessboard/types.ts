@@ -46,6 +46,8 @@ export type CustomPieces = {
 };
 
 export interface ChessboardProps {
+  /** classes to apply to the board */
+  className?: string;
   /**
    * A function to call when a piece drag is initiated.  Returns true if the piece is draggable,
    * false if not.

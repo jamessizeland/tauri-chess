@@ -4,14 +4,14 @@ const withAnimations = require('animated-tailwindcss');
 
 module.exports = withAnimations({
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
-  darkMode: false,
+  darkMode: 'media',
   theme: {
     extend: {
       colors: {
         transparent: 'transparent',
         current: 'currentColor',
-        primary: '#0694a2',
-        secondary: '#9fa6b2',
+        primary: '#0694a2', // change this to set global primary colour for the app
+        secondary: '#9fa6b2', // change this to set global secondary colour for the app
         gray: {
           50: '#f9fafb',
           100: '#f4f5f7',
