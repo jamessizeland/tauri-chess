@@ -132,58 +132,61 @@ pub fn click_square(
     } else {
         Color::Black
     };
-    let contains_enemy = check_enemy(&turn, &board[coord.0][coord.1]);
-    if selected == Option::None {
-        //* 1.if we have nothing selected and the new coordinate doesn't contain an enemy piece, select it!
-        if !contains_enemy {
+    // only do this if we haven't ended the game already
+    if !game_meta.game_over {
+        let contains_enemy = check_enemy(&turn, &board[coord.0][coord.1]);
+        if selected == Option::None {
+            //* 1.if we have nothing selected and the new coordinate doesn't contain an enemy piece, select it!
+            if !contains_enemy {
+                move_list = board[coord.0][coord.1].get_moves(coord, &board);
+                move_list = remove_invalid_moves(move_list.clone(), coord, &game_meta, &board);
+                if move_list.is_empty() {
+                    selected = Option::None;
+                } else {
+                    selected = Some(coord);
+                }
+            }
+        } else if selected == Some(coord) {
+            //* 2. if we have clicked on the same square again, unselect it
+            selected = Option::None;
+        } else if valid_move(selected.unwrap(), coord, &board, &game_meta) {
+            //* 3. if we have clicked a valid move of selected, do move
+            println!("valid move");
+            let source = selected.unwrap();
+            let attacker = board[source.0][source.1].clone().has_moved();
+            board[coord.0][coord.1] = Piece::None; // remove attacked piece
+            board[source.0][source.1] = Piece::None; // take attacked out of its square
+            board[coord.0][coord.1] = attacker; // place attacker in the new square
+            if attacker.is_king() == Some(turn) {
+                match turn {
+                    Color::Black => {
+                        game_meta.black_king.piece = attacker;
+                        game_meta.black_king.square = coord;
+                    }
+                    Color::White => {
+                        game_meta.white_king.piece = attacker;
+                        game_meta.white_king.square = coord;
+                    }
+                }
+            }
+            selected = Option::None;
+            //* 4. update the meta only if something has changed
+            let mut history = history_data.0.lock().unwrap();
+            game_meta.new_turn(&mut board, &mut history);
+            println!("score history: {:?}", history.score);
+        } else if board[coord.0][coord.1] == Piece::None || contains_enemy {
+            //* 4. Selected an empty or enemy square which isn't a valid move, unselect
+            selected = Option::None;
+        } else {
+            //* 5. select the new square
+            selected = Some(coord);
             move_list = board[coord.0][coord.1].get_moves(coord, &board);
             move_list = remove_invalid_moves(move_list.clone(), coord, &game_meta, &board);
             if move_list.is_empty() {
                 selected = Option::None;
-            } else {
-                selected = Some(coord);
             }
         }
-    } else if selected == Some(coord) {
-        //* 2. if we have clicked on the same square again, unselect it
-        selected = Option::None;
-    } else if valid_move(selected.unwrap(), coord, &board, &game_meta) {
-        //* 3. if we have clicked a valid move of selected, do move
-        println!("valid move");
-        let source = selected.unwrap();
-        let attacker = board[source.0][source.1].clone().has_moved();
-        board[coord.0][coord.1] = Piece::None; // remove attacked piece
-        board[source.0][source.1] = Piece::None; // take attacked out of its square
-        board[coord.0][coord.1] = attacker; // place attacker in the new square
-        if attacker.is_king() == Some(turn) {
-            match turn {
-                Color::Black => {
-                    game_meta.black_king.piece = attacker;
-                    game_meta.black_king.square = coord;
-                }
-                Color::White => {
-                    game_meta.white_king.piece = attacker;
-                    game_meta.white_king.square = coord;
-                }
-            }
-        }
-        selected = Option::None;
-        //* 4. update the meta only if something has changed
-        let mut history = history_data.0.lock().unwrap();
-        game_meta.new_turn(&mut board, &mut history);
-        println!("score history: {:?}", history.score);
-    } else if board[coord.0][coord.1] == Piece::None || contains_enemy {
-        //* 4. Selected an empty or enemy square which isn't a valid move, unselect
-        selected = Option::None;
-    } else {
-        //* 5. select the new square
-        selected = Some(coord);
-        move_list = board[coord.0][coord.1].get_moves(coord, &board);
-        move_list = remove_invalid_moves(move_list.clone(), coord, &game_meta, &board);
-        if move_list.is_empty() {
-            selected = Option::None;
-        }
+        *clicked.0.lock().unwrap() = selected;
     }
-    *clicked.0.lock().unwrap() = selected;
     (move_list, *board, *game_meta)
 }

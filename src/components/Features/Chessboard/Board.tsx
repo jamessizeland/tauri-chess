@@ -65,11 +65,12 @@ const Board = ({
               row={row}
               width={560}
               key={`${col}${row}`}
-              orientation="white"
+              orientation={orientation}
             />
           )}
           {hasPiece(position, square) && (
             <ChessPiece
+              orientation={orientation}
               width={560}
               square={square}
               onPieceClick={onPieceClick}
@@ -88,10 +89,7 @@ const Board = ({
   }
   const rotate = orientation === 'black' ? 'rotate-180' : '';
   return (
-    <div
-      style={{ ...boardStyle, ...basicBoardStyle }}
-      className={clsx(rotate, 'transition-transform duration-1000')}
-    >
+    <div style={{ ...boardStyle, ...basicBoardStyle }} className={clsx(rotate)}>
       {squares}
     </div>
   );

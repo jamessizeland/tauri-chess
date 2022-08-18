@@ -8,6 +8,7 @@ import Board from './Board';
 import CustomDragLayer from './CustomDragLayer';
 
 const ChessBoard = ({
+  className = '',
   id = 0,
   position = {},
   pieces = {},
@@ -61,6 +62,7 @@ const ChessBoard = ({
     <DndProvider backend={HTML5Backend}>
       <div style={containerStyle}>
         <Board
+          className={className}
           orientation={orientation}
           showNotation={showNotation}
           position={position}

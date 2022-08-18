@@ -1,8 +1,9 @@
 import React from 'react';
-import type { Piece } from './types';
+import type { Orientation, Piece } from './types';
 import type { Square } from 'chess.js';
 import pieceSVG from './svg/chesspieces/standard';
 import wKSVG from './svg/whiteKing';
+import clsx from 'clsx';
 
 type PieceProps = {
   piece: Piece | undefined;
@@ -12,6 +13,7 @@ type PieceProps = {
   connectDragSource?: () => void;
   onPieceClick?: (piece: Piece) => void;
   isDragging?: boolean;
+  orientation?: Orientation;
 };
 
 export default function ChessPiece({
@@ -19,9 +21,11 @@ export default function ChessPiece({
   isDragging = false,
   width,
   onPieceClick,
+  orientation = 'white',
 }: PieceProps) {
+  const rotate = orientation === 'black' ? 'rotate-180' : '';
   return (
-    <div className="h-full">
+    <div className={clsx('h-full')}>
       {piece && (
         <svg
           className="mx-auto h-full"

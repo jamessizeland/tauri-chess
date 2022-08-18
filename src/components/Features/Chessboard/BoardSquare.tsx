@@ -70,9 +70,10 @@ export const BoardSquare = ({
   const black = !((col + row) % 2 === 1);
   const backgroundColor = black ? darkSquareStyle : lightSquareStyle;
   const color = black ? 'white' : 'black';
+  const rotate = orientation === 'black' ? 'rotate-180' : '';
   return (
     <div
-      className={clsx('tooltip')}
+      className={clsx('tooltip', rotate)}
       data-tip={`(col ${col}, row ${row}) = ${coordToSquare(col, row)}`}
       onMouseEnter={() => onMouseOverSquare(square)}
       onMouseLeave={() => onMouseOutSquare(square)}

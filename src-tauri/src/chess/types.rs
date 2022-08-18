@@ -14,6 +14,7 @@ pub struct GameMeta {
     pub score: isize,
     pub black_king: KingMeta,
     pub white_king: KingMeta,
+    pub game_over: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -30,9 +31,9 @@ pub struct KingMeta {
 pub trait ModMeta {
     /// run all necessary board state cleanup to start a new turn
     fn new_turn(&mut self, board: &mut BoardState, history: &mut Hist);
-    /// Check if kings are under threat and update their status
+    /// Check if kings are under threat and update their status, return if checkmate occurred
     fn update_king_threat(&mut self, board: &mut BoardState);
-    /// Increment the turn to the next player
+    /// Increment the turn to the next player, check state of both players and return if game end has occurred
     fn update_turn(&mut self);
     /// Set up new game
     fn new_game(&mut self);
@@ -54,15 +55,15 @@ impl ModMeta for GameMeta {
                     .piece
                     .king_threat(&self.white_king.square, board, *self);
                 board[self.white_king.square.0][self.white_king.square.1] = self.white_king.piece;
+                self.game_over = self.white_king.piece.is_king_mate().unwrap()
             }
             Color::Black => {
                 // check black king status
                 self.black_king
                     .piece
                     .king_threat(&self.black_king.square, board, *self);
-                // update kings on the board with the new statuses
-
                 board[self.black_king.square.0][self.black_king.square.1] = self.black_king.piece;
+                self.game_over = self.black_king.piece.is_king_mate().unwrap()
             }
         }
     }
@@ -73,16 +74,17 @@ impl ModMeta for GameMeta {
     fn new_game(&mut self) {
         self.score = 0;
         self.turn = 0;
+        self.game_over = false;
         self.white_king.piece = Piece::King(Color::White, true, false, false);
         self.white_king.square = (4, 0);
         self.black_king.piece = Piece::King(Color::Black, true, false, false);
         self.black_king.square = (4, 7);
     }
     fn new_turn(&mut self, board: &mut BoardState, history: &mut Hist) {
-        self.update_king_threat(board);
-        self.update_turn();
-        self.update_king_threat(board);
-        self.calc_score(board);
+        self.update_king_threat(board); // evaluate at the end of turn
+        self.update_turn(); // toggle who's turn it is to play
+        self.update_king_threat(board); // evaluate again start of next turn
+        self.calc_score(board); // calculate score
         history.score.push(self.score);
     }
     fn calc_score(&mut self, board: &BoardState) {
@@ -107,6 +109,7 @@ impl Default for GameMeta {
         GameMeta {
             turn: 0,
             score: 0,
+            game_over: false,
             white_king: KingMeta {
                 piece: Piece::King(Color::White, true, false, false),
                 square: (4, 0),
