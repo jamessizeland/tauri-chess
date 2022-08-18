@@ -1,4 +1,4 @@
-//! Logic for deciding where chess pieces can go, and moving them
+//! Logic for deciding where chess pieces can go, and moving th&em
 
 use super::pieces::GetState;
 use super::types::{BoardState, Color, MoveList, Piece};
@@ -202,7 +202,7 @@ pub fn king_move(
     sq: (usize, usize),
     color: &Color,
     board: &BoardState,
-    _first_move: bool,
+    first_move: bool,
 ) -> MoveList {
     let mut moves: MoveList = Vec::new(); // start with empty movelist
     const VECTORS: [(i8, i8); 8] = [
@@ -228,6 +228,19 @@ pub fn king_move(
                 moves.push(((col, row), true));
             }
         }
+    }
+    // check if castling available
+    // 1. king hasn't moved && rook hasn't moved
+    dbg!(&sq);
+    if first_move {
+        for col in (0..sq.0).rev() {
+            println!("{:?}", &board[col][sq.1]);
+        }
+        for col in sq.0 + 1..8 {
+            println!("{:?}", &board[col][sq.1]);
+        }
+        // 2. squares between both are clear
+        // 3. none of the squares the king needs to travel through are threatened
     }
     moves
 }
