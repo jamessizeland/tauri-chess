@@ -20,6 +20,8 @@ pub trait GetState {
     ///
     /// https://en.wikipedia.org/wiki/Chess_piece_relative_value
     fn get_value(&self) -> isize;
+    // /// Ask if a piece is of a requested type
+    // fn is_piece_type(&self, piece: Piece) -> bool;
 }
 
 /// Modify state information on a selected piece
@@ -73,6 +75,17 @@ impl GetState for Piece {
             _ => None,
         }
     }
+    // fn is_piece_type(&self, piece: Piece) -> bool {
+    //     match piece {
+    //         Piece::None => self == &Piece::None,
+    //         Piece::Pawn(_, _) => self == &Piece::Pawn(),
+    //         Piece::King(_, _, _, _) => todo!(),
+    //         Piece::Queen(_, _) => todo!(),
+    //         Piece::Bishop(_, _) => todo!(),
+    //         Piece::Knight(_, _) => todo!(),
+    //         Piece::Rook(_, _) => todo!(),
+    //     }
+    // }
     fn is_king_checked(&self) -> Option<bool> {
         match &self {
             Piece::King(_, _, check, _) => Some(*check),

@@ -1,5 +1,6 @@
 //! Logic for the chess board actions
 use super::data::{GameMetaData, HistoryData, PieceLocation, SelectedSquare};
+use super::moves::check_castling_moves;
 use super::pieces::{GetState, ModState};
 use super::types::{BoardState, Color, GameMeta, ModMeta, MoveList, Piece, Square};
 use super::utils::{check_enemy, remove_invalid_moves, square_to_coord, valid_move};
@@ -58,9 +59,9 @@ pub fn new_game(
     board[5][0] = Piece::Knight(Color::White, true);
     board[6][0] = Piece::Bishop(Color::White, true);
     board[7][0] = Piece::Rook(Color::White, true);
-    for col in 0..8 {
-        board[col][1] = Piece::Pawn(Color::White, true);
-    }
+    // for col in 0..8 {
+    //     board[col][1] = Piece::Pawn(Color::White, true);
+    // }
     // set up black pieces
     board[0][7] = Piece::Rook(Color::Black, true);
     board[1][7] = Piece::Knight(Color::Black, true);
@@ -70,9 +71,9 @@ pub fn new_game(
     board[5][7] = Piece::Bishop(Color::Black, true);
     board[6][7] = Piece::Knight(Color::Black, true);
     board[7][7] = Piece::Rook(Color::Black, true);
-    for col in 0..8 {
-        board[col][6] = Piece::Pawn(Color::Black, true);
-    }
+    // for col in 0..8 {
+    //     board[col][6] = Piece::Pawn(Color::Black, true);
+    // }
 
     *board // return dereferenced board state to frontend
 }
@@ -89,12 +90,20 @@ pub fn hover_square(
     let game_meta = meta.0.lock().unwrap();
     let selected = *clicked.0.lock().unwrap();
     let mut coord: Square = square_to_coord(square);
+    let turn: Color = if game_meta.turn % 2 == 0 {
+        Color::White
+    } else {
+        Color::Black
+    };
     // dbg!(selected);
 
     if selected != Option::None {
         coord = selected.unwrap();
     }
     let move_options = board[coord.0][coord.1].get_moves(coord, &board);
+    if &board[coord.0][coord.1].is_king() == &Some(turn) {
+        check_castling_moves(coord, &turn, &board);
+    };
     remove_invalid_moves(move_options, coord, &game_meta, &board)
 }
 

@@ -132,8 +132,18 @@ impl Default for Hist {
 
 /// Square reference in row and column
 pub type Square = (usize, usize);
-pub type IsAttack = bool;
-pub type MoveList = Vec<(Square, IsAttack)>;
+
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq)]
+#[repr(u8)]
+/// Moves can take one of many special types
+pub enum MoveType {
+    Move,
+    Capture,
+    Castle,
+    EnPassant,
+}
+
+pub type MoveList = Vec<(Square, MoveType)>;
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq)]
 pub enum Color {
@@ -146,6 +156,7 @@ pub type Check = bool;
 pub type CheckMate = bool;
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq)]
+#[repr(u8)]
 pub enum Piece {
     None,
     Pawn(Color, FirstMove),
@@ -160,6 +171,12 @@ impl Default for Piece {
         Piece::None
     }
 }
+
+// impl PartialEq for Piece {
+//     fn eq(&self, other: &Self) -> bool {
+//         core::mem::discriminant(self) == core::mem::discriminant(other)
+//     }
+// }
 
 impl Display for Piece {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

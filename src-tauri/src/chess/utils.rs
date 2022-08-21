@@ -98,10 +98,10 @@ pub fn remove_invalid_moves(
             //* Is my king not in check or, am I infact the king and could potentially move? */
             //* Am I preventing check by being where I am? */
             theory_board[my_square.0][my_square.1] = Piece::None;
-            pretty_print_board(&theory_board);
-            println!("{:?}", my_piece.is_king());
+            // pretty_print_board(&theory_board);
+            // println!("{:?}", my_piece.is_king());
             if !under_threat(our_king.square, &our_color, &theory_board) && !i_am_king {
-                println!("king isn't threatened if I'm not there");
+                // println!("king isn't threatened if I'm not there");
                 // doesn't become under threat, allow all moves
                 filtered_moves = moves;
             } else {

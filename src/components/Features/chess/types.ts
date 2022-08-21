@@ -18,7 +18,9 @@ type RustPiece =
   | { Rook: [Color, FirstMove] }
   | { Pawn: [Color, FirstMove] };
 
-type MoveList = [[number, number], boolean][];
+export type MoveType = 'Move' | 'Capture' | 'Castle' | 'EnPassant';
+
+type MoveList = [[number, number], MoveType][];
 
 type MetaGame = {
   score: number;
