@@ -1,10 +1,12 @@
 //! Logic for the chess board actions
 
 use super::data::{GameMetaData, HistoryData, PieceLocation, SelectedSquare};
-use super::moves::check_castling_moves;
+use super::moves::{check_castling_moves, en_passant_move};
 use super::pieces::{GetState, ModState};
 use super::types::{BoardState, Color, GameMeta, ModMeta, MoveList, Piece, Square};
-use super::utils::{check_enemy, remove_invalid_moves, square_to_coord, valid_move};
+use super::utils::{
+    check_enemy, remove_invalid_moves, square_to_coord, turn_into_colour, valid_move,
+};
 
 #[tauri::command]
 /// Get the location of all pieces from global memory
@@ -91,22 +93,22 @@ pub fn hover_square(
     let game_meta = meta.0.lock().unwrap();
     let selected = *clicked.0.lock().unwrap();
     let mut coord: Square = square_to_coord(square);
-    let turn: Color = if game_meta.turn % 2 == 0 {
-        Color::White
-    } else {
-        Color::Black
-    };
-    // dbg!(selected);
-
+    let turn = turn_into_colour(game_meta.turn);
     if selected != Option::None {
         coord = selected.unwrap();
     }
-    let mut move_options = board[coord.0][coord.1].get_moves(coord, &board);
-    if board[coord.0][coord.1].is_king() == Some(turn) {
+    let piece = board[coord.0][coord.1];
+    let mut move_options = piece.get_moves(coord, &board);
+    if piece.is_king() == Some(turn) {
         for castle_move in check_castling_moves(coord, &turn, &board) {
             move_options.push(castle_move);
         }
-    };
+    } else if piece == Piece::Pawn(turn, false) && game_meta.en_passant != None {
+        // does this piece have a valid en passant target?
+        for pawn_move in piece.get_en_passant_moves(coord, game_meta.en_passant.unwrap()) {
+            move_options.push(pawn_move);
+        }
+    }
     remove_invalid_moves(move_options, coord, &game_meta, &board)
 }
 
@@ -139,11 +141,7 @@ pub fn click_square(
     let mut game_meta = meta.0.lock().unwrap();
     let coord = square_to_coord(square);
     let mut move_list: MoveList = Vec::new();
-    let turn: Color = if game_meta.turn % 2 == 0 {
-        Color::White
-    } else {
-        Color::Black
-    };
+    let turn = turn_into_colour(game_meta.turn);
     // only do this if we haven't ended the game already
     if !game_meta.game_over {
         let contains_enemy = check_enemy(&turn, &board[coord.0][coord.1]);
@@ -180,7 +178,7 @@ pub fn click_square(
                     board[coord.0][coord.1] = Piece::None; // empty the destination square
                     board[source.0][source.1] = Piece::None; // take moving out of its square
                     board[coord.0][coord.1] = mover; // place moving in the new square
-
+                    game_meta.en_passant = None; // clear any previous en passant target
                     match move_type {
                         crate::chess::types::MoveType::Castle => {
                             println!("need to move rook too");
@@ -192,7 +190,12 @@ pub fn click_square(
                             board[dest_col][row] = mover; // place castling rook in the new square
                         }
                         crate::chess::types::MoveType::EnPassant => {
-                            println!("need to remove pawn too")
+                            println!("need to remove pawn too");
+                            board[coord.0][source.1] = Piece::None;
+                        }
+                        crate::chess::types::MoveType::Double => {
+                            println!("register an en passant target");
+                            game_meta.en_passant = Some(coord);
                         }
                         _ => {
                             // any normal move or capture

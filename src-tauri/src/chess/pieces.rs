@@ -1,6 +1,6 @@
 //! Chess pieces traits
 
-use super::moves::{bish_move, king_move, knight_move, pawn_move, rook_move};
+use super::moves::{bish_move, en_passant_move, king_move, knight_move, pawn_move, rook_move};
 use super::types::{BoardState, Color, GameMeta, MoveList, Piece, Square};
 use super::utils::{remove_invalid_moves, under_threat};
 
@@ -8,6 +8,8 @@ use super::utils::{remove_invalid_moves, under_threat};
 pub trait GetState {
     /// Return a list of all available moves for this piece
     fn get_moves(&self, square: Square, board: &BoardState) -> MoveList;
+    /// Return if there is an available en passant move for this pawn
+    fn get_en_passant_moves(&self, square: Square, en_passant_target: Square) -> MoveList;
     /// Return this piece's color
     fn get_colour(&self) -> Option<Color>;
     /// If this piece is a king, return its color, otherwise return None
@@ -56,6 +58,13 @@ impl GetState for Piece {
             Piece::Rook(color, _first_move) => rook_move(sq, color, board),
         }
     }
+
+    fn get_en_passant_moves(&self, square: Square, en_passant_target: Square) -> MoveList {
+        match &self {
+            Piece::Pawn(color, _first_move) => en_passant_move(square, color, en_passant_target),
+            _ => panic!("should only be targetting a pawn"),
+        }
+    }
     fn get_colour(&self) -> Option<Color> {
         match &self {
             Piece::None => None,
@@ -73,23 +82,19 @@ impl GetState for Piece {
             _ => None,
         }
     }
-    // fn is_piece_type(&self, piece: Piece) -> bool {
-    //     match piece {
-    //         Piece::None => self == &Piece::None,
-    //         Piece::Pawn(_, _) => self == &Piece::Pawn(),
-    //         Piece::King(_, _, _, _) => todo!(),
-    //         Piece::Queen(_, _) => todo!(),
-    //         Piece::Bishop(_, _) => todo!(),
-    //         Piece::Knight(_, _) => todo!(),
-    //         Piece::Rook(_, _) => todo!(),
-    //     }
-    // }
     fn is_king_checked(&self) -> Option<bool> {
         match &self {
             Piece::King(_, _, check, _) => Some(*check),
             _ => None,
         }
     }
+    fn is_king_mate(&self) -> Option<bool> {
+        match &self {
+            Piece::King(_, _, _, mate) => Some(*mate),
+            _ => None,
+        }
+    }
+
     fn get_value(&self) -> isize {
         match &self {
             Piece::None => 0,
@@ -99,12 +104,6 @@ impl GetState for Piece {
             Piece::Bishop(_, _) => 3,
             Piece::Knight(_, _) => 3,
             Piece::Rook(_, _) => 5,
-        }
-    }
-    fn is_king_mate(&self) -> Option<bool> {
-        match &self {
-            Piece::King(_, _, _, mate) => Some(*mate),
-            _ => None,
         }
     }
 }

@@ -83,6 +83,8 @@ const highlightSquares = (
           return '0 0 8px #ea4c89, inset 0 0 1px 4px #ea4c89';
         case 'Castle':
           return '0 0 8px #11dd71, inset 0 0 1px 4px #11dd71';
+        case 'Double':
+          return '0 0 8px #11dd71, inset 0 0 1px 4px #11dd71';
         case 'EnPassant':
           return '0 0 8px #004d71, inset 0 0 1px 4px #004d71';
         default:
@@ -117,14 +119,14 @@ const AskNewGame = ({
   setPosition: (position: Position) => void;
   setGameMeta: (meta: MetaGame) => void;
   isOpen: boolean;
-  toggle: (open?: boolean) => void;
+  toggle: () => void;
 }): JSX.Element => {
   return (
     <Modal toggle={toggle} isOpen={isOpen} animate position="extraLarge">
       <ModalHeader>Welcome to Tauri Chess</ModalHeader>
       <ModalBody>Do you want to start a new game?</ModalBody>
       <ModalFooter>
-        <Button className="mr-2" onClick={() => toggle(true)}>
+        <Button className="mr-2" onClick={() => toggle()}>
           Cancel
         </Button>
         <Button
@@ -135,7 +137,7 @@ const AskNewGame = ({
               console.log(board);
             });
             invoke<MetaGame>('get_score').then((meta) => setGameMeta(meta));
-            toggle(true);
+            toggle();
           }}
         >
           New

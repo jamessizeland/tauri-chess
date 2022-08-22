@@ -25,7 +25,7 @@ pub fn pawn_move(
                 row = sq.1 as i8 + 2;
                 //* 2. move forward two if hasn't moved and squares are empty
                 if row <= 7 && board[col][row as usize] == Piece::None && *first_move {
-                    moves.push(((col, row as usize), MoveType::Move));
+                    moves.push(((col, row as usize), MoveType::Double));
                 }
             }
             //* 3. potential attacks if target square contains an enemy piece
@@ -51,7 +51,7 @@ pub fn pawn_move(
                 row = sq.1 as i8 - 2;
                 //* 2. move forward two if hasn't moved and squares are empty
                 if row >= 0 && board[col][row as usize] == Piece::None && *first_move {
-                    moves.push(((col, row as usize), MoveType::Move));
+                    moves.push(((col, row as usize), MoveType::Double));
                 }
             }
             //* 3. potential attacks if target square contains an enemy piece
@@ -65,6 +65,47 @@ pub fn pawn_move(
                 let (col, row) = (sq.0 - 1, sq.1 - 1);
                 if board[col][row].get_colour() == Some(Color::White) {
                     moves.push(((col, row), MoveType::Capture))
+                }
+            }
+        }
+    }
+    moves
+}
+
+/// check for en passant special moves available to this pawn
+pub fn en_passant_move(
+    sq: (usize, usize),
+    color: &Color,
+    en_passant_target: (usize, usize),
+) -> MoveList {
+    // fill an array of possible move vectors
+    let mut moves: MoveList = Vec::new(); // start with empty movelist
+    match color {
+        Color::White => {
+            if sq.0 < 7 && sq.1 == 4 {
+                let (col, row) = (sq.0 + 1, sq.1 + 1);
+                if en_passant_target == (col, sq.1) {
+                    moves.push(((col, row), MoveType::EnPassant));
+                }
+            }
+            if sq.0 > 0 && sq.1 == 4 {
+                let (col, row) = (sq.0 - 1, sq.1 + 1);
+                if en_passant_target == (col, sq.1) {
+                    moves.push(((col, row), MoveType::EnPassant));
+                }
+            }
+        }
+        Color::Black => {
+            if sq.0 < 7 && sq.1 == 3 {
+                let (col, row) = (sq.0 + 1, sq.1 - 1);
+                if en_passant_target == (col, sq.1) {
+                    moves.push(((col, row), MoveType::EnPassant));
+                }
+            }
+            if sq.0 > 0 && sq.1 == 3 {
+                let (col, row) = (sq.0 - 1, sq.1 - 1);
+                if en_passant_target == (col, sq.1) {
+                    moves.push(((col, row), MoveType::EnPassant));
                 }
             }
         }

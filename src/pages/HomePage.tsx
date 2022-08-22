@@ -23,7 +23,7 @@ import { useToggle } from 'hooks';
 import clsx from 'clsx';
 
 const HomePage = (): JSX.Element => {
-  const { isOpen, toggle } = useToggle();
+  const [isOpen, toggle] = useToggle(false);
   const [position, setPosition] = useState<Position>({});
   const [newGame, setNewGame] = useState<boolean>(false);
   // const [square, setSquare] = useState(''); // currently clicked square
@@ -57,7 +57,6 @@ const HomePage = (): JSX.Element => {
 
   useEffect(() => {
     // ask if we want to start a new game
-    toggle(false);
     invoke<BoardStateArray>('get_state').then((board) =>
       setPosition(parseBoardState(board)),
     );

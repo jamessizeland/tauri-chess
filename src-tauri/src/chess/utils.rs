@@ -55,6 +55,11 @@ pub fn valid_move(
             move_options.push(castle_move);
         }
     };
+    if piece == &Piece::Pawn(*turn, false) && meta.en_passant != None {
+        for pawn_move in piece.get_en_passant_moves(source, meta.en_passant.unwrap()) {
+            move_options.push(pawn_move);
+        }
+    }
     let filtered_moves = remove_invalid_moves(move_options, source, meta, board);
     filtered_moves
         .iter()
@@ -138,6 +143,17 @@ pub fn remove_invalid_moves(
         }
     }
     filtered_moves
+}
+
+/// convert turn number into the corresponding color
+///
+/// assuming White always goes first
+pub fn turn_into_colour(turn: usize) -> Color {
+    if turn % 2 == 0 {
+        Color::White
+    } else {
+        Color::Black
+    }
 }
 
 /// Print to console the board state from White's perspective, in a neat form

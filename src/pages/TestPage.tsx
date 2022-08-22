@@ -19,12 +19,13 @@ const TestPage = (): JSX.Element => {
   }, []);
 
   const [score, setScore] = useState(0);
-  const { isOpen, toggle } = useToggle();
+  const [isOpen1, toggle1] = useToggle(false);
+  const [isOpen2, toggle2] = useToggle(false);
   return (
     <div className="animate-backInRight animate-fast">
       <h1 className="text-3xl font-bold underline text-center">Test Page</h1>
       <div>
-        <Modal toggle={toggle} isOpen={isOpen} animate position="extraLarge">
+        <Modal toggle={toggle1} isOpen={isOpen1} animate position="extraLarge">
           <ModalHeader>Popup</ModalHeader>
           <ModalBody>
             Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
@@ -33,10 +34,21 @@ const TestPage = (): JSX.Element => {
             aliquip ex ea commodo consequat.
           </ModalBody>
           <ModalFooter>
-            <Button onClick={() => toggle(true)}>Modal</Button>
+            <Button onClick={() => toggle1()}>Modal</Button>
           </ModalFooter>
         </Modal>
-        <Button onClick={() => toggle(false)}>Modal</Button>
+        <Modal toggle={toggle2} isOpen={isOpen2} animate position="extraLarge">
+          <ModalHeader>Popup</ModalHeader>
+          <ModalBody>
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+            eiusmod tempor incididunt ut fdsfasdjkfasdf adsfasdfsdfasdf
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={() => toggle2()}>Modal</Button>
+          </ModalFooter>
+        </Modal>
+        <Button onClick={() => toggle1()}>Modal</Button>
+        <Button onClick={() => toggle2()}>Modal</Button>
         <Button onClick={() => invoke('get_score')}>Trigger Event</Button>
         <p>{score}</p>
       </div>
