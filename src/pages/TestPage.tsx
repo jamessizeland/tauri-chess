@@ -12,9 +12,9 @@ import { listen } from '@tauri-apps/api/event';
 
 const TestPage = (): JSX.Element => {
   useEffect(() => {
-    const unlisten = listen<number>('update_score', (event) => {
+    const unlisten = listen<number>('test', (event) => {
       console.log(event);
-      setScore(event.payload);
+      console.log(event.payload);
     });
   }, []);
 
@@ -49,7 +49,9 @@ const TestPage = (): JSX.Element => {
         </Modal>
         <Button onClick={() => toggle1()}>Modal</Button>
         <Button onClick={() => toggle2()}>Modal</Button>
-        <Button onClick={() => invoke('get_score')}>Trigger Event</Button>
+        <Button onClick={() => invoke('event_tester', { message: 'hello' })}>
+          Trigger Event
+        </Button>
         <p>{score}</p>
       </div>
     </div>

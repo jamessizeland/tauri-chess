@@ -9,6 +9,11 @@ mod utils;
 pub mod data {
     use std::sync::Mutex; // mutual exclusion wrapper
 
+    // the payload type must implement `Serialize` and `Clone`.
+    #[derive(Clone, serde::Serialize, Debug)]
+    pub struct Payload {
+        pub message: String,
+    }
     /// game move history
     pub struct HistoryData(pub Mutex<super::types::Hist>);
 
@@ -20,4 +25,6 @@ pub mod data {
 
     /// Game score stored relative to white
     pub struct GameMetaData(pub Mutex<super::types::GameMeta>);
+    /// queue handler
+    pub struct QueueHandler(pub Mutex<tauri::async_runtime::Sender<Payload>>);
 }

@@ -16,14 +16,17 @@ import type {
   MoveList,
   PositionStyles,
   MetaGame,
+  PieceType,
 } from 'components/Features/chess/types';
 import { checkEnv } from 'utils';
 import Chessboard from 'components/Features/Chessboard';
 import { useToggle } from 'hooks';
 import clsx from 'clsx';
+import Promotions from 'components/Features/chess/promotions';
 
 const HomePage = (): JSX.Element => {
-  const [isOpen, toggle] = useToggle(false);
+  const [newGameisOpen, newGametoggle] = useToggle(true);
+  const [promoterisOpen, promotertoggle] = useToggle(false);
   const [position, setPosition] = useState<Position>({});
   const [newGame, setNewGame] = useState<boolean>(false);
   // const [square, setSquare] = useState(''); // currently clicked square
@@ -49,6 +52,7 @@ const HomePage = (): JSX.Element => {
   const [squareStyles, setSquareStyles] = useState<PositionStyles>();
   const [dragStyles, setDragStyles] = useState<{}>();
   const [whiteTurn, setWhiteTurn] = useState<boolean>(true);
+  const [promotion, setPromotion] = useState<PieceType>();
   const [hoveredSquare, setHoveredSquare] = useState<Square | undefined>(
     undefined,
   );
@@ -70,8 +74,13 @@ const HomePage = (): JSX.Element => {
         <AskNewGame
           setGameMeta={setGameMeta}
           setPosition={setPosition}
-          isOpen={isOpen}
-          toggle={toggle}
+          isOpen={newGameisOpen}
+          toggle={newGametoggle}
+        />
+        <Promotions
+          isOpen={promoterisOpen}
+          toggle={promotertoggle}
+          setPromotion={setPromotion}
         />
         <Chessboard
           orientation={whiteTurn ? 'white' : 'black'}
@@ -111,7 +120,7 @@ const HomePage = (): JSX.Element => {
                     ? setWhiteTurn(true)
                     : setWhiteTurn(false);
                 }
-                if (gameMeta.game_over) toggle(false); // ask if we want to start a new game
+                if (gameMeta.game_over) newGametoggle(); // ask if we want to start a new game
               });
             }
           }}

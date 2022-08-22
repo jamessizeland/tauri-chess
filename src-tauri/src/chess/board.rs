@@ -1,6 +1,8 @@
 //! Logic for the chess board actions
 
-use super::data::{GameMetaData, HistoryData, PieceLocation, SelectedSquare};
+use super::data::{
+    GameMetaData, HistoryData, Payload, PieceLocation, QueueHandler, SelectedSquare,
+};
 use super::moves::check_castling_moves;
 use super::pieces::{GetState, ModState};
 use super::types::{BoardState, Color, GameMeta, ModMeta, MoveList, Piece, Square};
@@ -198,7 +200,9 @@ pub fn click_square(
                             game_meta.en_passant = Some(coord);
                         }
                         _ => {
-                            // any normal move or capture
+                            // normal move or capture
+                            // let window = app.get_window("main").unwrap();
+                            // window.emit("test", coord).unwrap();
                         }
                     }
                     if mover.is_king() == Some(turn) {
@@ -233,4 +237,13 @@ pub fn click_square(
         *clicked.0.lock().unwrap() = selected;
     }
     (move_list, *board, *game_meta)
+}
+
+#[tauri::command]
+pub fn event_tester(message: String, queue: tauri::State<QueueHandler>) {
+    let rx = queue.0.lock().unwrap();
+    rx.blocking_send(Payload {
+        message: "hello".to_owned(),
+    })
+    .unwrap();
 }
