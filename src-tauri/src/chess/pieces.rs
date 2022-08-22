@@ -43,9 +43,7 @@ impl GetState for Piece {
             // what type of piece am I?
             Piece::None => Vec::new(),
             Piece::Pawn(color, first_move) => pawn_move(sq, color, first_move, board),
-            Piece::King(color, first_move, _check, _check_mate) => {
-                king_move(sq, color, board, *first_move)
-            }
+            Piece::King(color, _first_move, _check, _check_mate) => king_move(sq, color, board),
             Piece::Queen(color, _first_move) => {
                 //* move in any direction until either another piece or the edge of the board
                 let mut moves = rook_move(sq, color, board);

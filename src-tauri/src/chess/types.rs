@@ -6,25 +6,35 @@ use serde::{Deserialize, Serialize};
 
 use super::pieces::{GetState, ModState};
 
+/// 8x8 array containing either pieces or nothing
 pub type BoardState = [[Piece; 8]; 8];
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct GameMeta {
+    /// Game turn
     pub turn: usize,
+    /// Game score as a relative sum of piece value
     pub score: isize,
+    /// Register if a pawn that has done a double move in the last turn
+    pub en_passant: Option<Square>,
+    /// Metadata relating to the black King
     pub black_king: KingMeta,
+    /// Metadata relating to the white King
     pub white_king: KingMeta,
+    /// Register if the game is active or ended
     pub game_over: bool,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, Default)]
 pub struct Hist {
     pub score: Vec<isize>,
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct KingMeta {
+    /// Clone of the King's Piece Struct
     pub piece: Piece,
+    /// Current location of the King
     pub square: Square,
 }
 
@@ -109,6 +119,7 @@ impl Default for GameMeta {
         GameMeta {
             turn: 0,
             score: 0,
+            en_passant: None,
             game_over: false,
             white_king: KingMeta {
                 piece: Piece::King(Color::White, true, false, false),
@@ -118,14 +129,6 @@ impl Default for GameMeta {
                 piece: Piece::King(Color::Black, true, false, false),
                 square: (4, 7),
             },
-        }
-    }
-}
-
-impl Default for Hist {
-    fn default() -> Self {
-        Self {
-            score: Default::default(),
         }
     }
 }
@@ -151,8 +154,11 @@ pub enum Color {
     White,
 }
 
+/// Some pieces have special behaviour if they haven't moved yet
 pub type FirstMove = bool;
+/// Is the King in check, meaning we need to consider avaliable moves
 pub type Check = bool;
+/// Is the King in check with no means to get out of check
 pub type CheckMate = bool;
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq)]
@@ -171,12 +177,6 @@ impl Default for Piece {
         Piece::None
     }
 }
-
-// impl PartialEq for Piece {
-//     fn eq(&self, other: &Self) -> bool {
-//         core::mem::discriminant(self) == core::mem::discriminant(other)
-//     }
-// }
 
 impl Display for Piece {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

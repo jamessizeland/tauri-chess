@@ -231,12 +231,7 @@ pub fn knight_move(sq: (usize, usize), color: &Color, board: &BoardState) -> Mov
     moves
 }
 
-pub fn king_move(
-    sq: (usize, usize),
-    color: &Color,
-    board: &BoardState,
-    first_move: bool,
-) -> MoveList {
+pub fn king_move(sq: (usize, usize), color: &Color, board: &BoardState) -> MoveList {
     let mut moves: MoveList = Vec::new(); // start with empty movelist
     const VECTORS: [(i8, i8); 8] = [
         (1, 1),
@@ -275,22 +270,21 @@ pub fn check_castling_moves(sq: (usize, usize), color: &Color, board: &BoardStat
     // dbg!(&sq);
     if first_move {
         // left side castle (ooo)
-        if &board[0][sq.1] == &Piece::Rook(*color, true) {
-            if &board[1][sq.1] == &Piece::None
-                && &board[2][sq.1] == &Piece::None
-                && !under_threat((2, sq.1), color, board)
-                && &board[3][sq.1] == &Piece::None
-                && !under_threat((3, sq.1), color, board)
-            {
-                // println!("ooo valid");
-                moves.push(((2, sq.1), MoveType::Castle));
-            }
+        if board[0][sq.1] == Piece::Rook(*color, true)
+            && board[1][sq.1] == Piece::None
+            && board[2][sq.1] == Piece::None
+            && !under_threat((2, sq.1), color, board)
+            && board[3][sq.1] == Piece::None
+            && !under_threat((3, sq.1), color, board)
+        {
+            // println!("ooo valid");
+            moves.push(((2, sq.1), MoveType::Castle));
         }
         // right side castle (oo)
-        if &board[7][sq.1] == &Piece::Rook(*color, true)
-            && &board[6][sq.1] == &Piece::None
+        if board[7][sq.1] == Piece::Rook(*color, true)
+            && board[6][sq.1] == Piece::None
             && !under_threat((6, sq.1), color, board)
-            && &board[5][sq.1] == &Piece::None
+            && board[5][sq.1] == Piece::None
             && !under_threat((5, sq.1), color, board)
         {
             // println!("ooo valid");

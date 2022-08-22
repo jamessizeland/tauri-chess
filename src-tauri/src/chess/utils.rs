@@ -51,16 +51,15 @@ pub fn valid_move(
     let piece = &board[source.0][source.1];
     let mut move_options = piece.get_moves(source, board);
     if piece.is_king() == Some(*turn) {
-        for castle_move in check_castling_moves(source, &turn, &board) {
+        for castle_move in check_castling_moves(source, turn, board) {
             move_options.push(castle_move);
         }
     };
     let filtered_moves = remove_invalid_moves(move_options, source, meta, board);
-    let index = filtered_moves.iter().position(|&ele| ele.0 == target);
-    match index {
-        Some(i) => Some(filtered_moves[i].1),
-        None => None,
-    }
+    filtered_moves
+        .iter()
+        .position(|&ele| ele.0 == target)
+        .map(|i| filtered_moves[i].1)
 }
 
 /// Check if this square is threatened, by exhaustive search
@@ -142,7 +141,7 @@ pub fn remove_invalid_moves(
 }
 
 /// Print to console the board state from White's perspective, in a neat form
-fn pretty_print_board(board: &BoardState) {
+fn _pretty_print_board(board: &BoardState) {
     for (i, row) in board.iter().enumerate().rev() {
         for (j, _) in row.iter().enumerate() {
             if j < 7 {
