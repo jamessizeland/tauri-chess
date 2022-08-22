@@ -1,7 +1,6 @@
 //! General utility functions for chess
 
 use super::moves::check_castling_moves;
-// use super::data::GameMetaData;
 use super::pieces::GetState;
 use super::types::{BoardState, Color, GameMeta, MoveList, MoveType, Piece, Square};
 

@@ -1,7 +1,7 @@
 //! Logic for the chess board actions
 
 use super::data::{GameMetaData, HistoryData, PieceLocation, SelectedSquare};
-use super::moves::{check_castling_moves, en_passant_move};
+use super::moves::check_castling_moves;
 use super::pieces::{GetState, ModState};
 use super::types::{BoardState, Color, GameMeta, ModMeta, MoveList, Piece, Square};
 use super::utils::{
