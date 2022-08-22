@@ -2,40 +2,34 @@
     all(not(debug_assertions), target_os = "windows"),
     windows_subsystem = "windows"
 )]
-use tauri::Manager;
-// the payload type must implement `Serialize` and `Clone`.
-#[derive(Clone, serde::Serialize)]
-struct Payload {
-    message: String,
-}
+
+use chess::data::Payload;
+use tauri::{async_runtime::channel, Manager};
+
+use std::{sync::Mutex, thread}; // mutual exclusion wrapper
 
 mod chess;
 
 fn main() {
+    let (tx, mut rx) = channel::<Payload>(5);
     tauri::Builder::default()
         .setup(|app| {
-            // listen to the `event-name` (emitted on any window)
-            let id = app.listen_global("event-name", |event| {
-                println!("got event-name with payload {:?}", event.payload());
+            let window = app.get_window("main").unwrap();
+            let _handle = thread::spawn(move || {
+                println!("spawning a new thread");
+                loop {
+                    let payload = rx.blocking_recv().unwrap();
+                    println!("{}", payload.message);
+                    window.emit("event", payload).unwrap();
+                }
             });
-            // unlisten to the event using the `id` returned on the `listen_global` function
-            // an `once_global` API is also exposed on the `App` struct
-            app.unlisten(id);
-
-            // emit the `event-name` event to all webview windows on the frontend
-            app.emit_all(
-                "event-name",
-                Payload {
-                    message: "Tauri is awesome!".into(),
-                },
-            )
-            .unwrap();
             Ok(())
         })
         .manage(chess::data::PieceLocation(Default::default()))
         .manage(chess::data::GameMetaData(Default::default()))
         .manage(chess::data::SelectedSquare(Default::default()))
         .manage(chess::data::HistoryData(Default::default()))
+        .manage(chess::data::QueueHandler(Mutex::new(tx)))
         .invoke_handler(tauri::generate_handler![
             chess::board::new_game,
             chess::board::get_state,
@@ -44,6 +38,7 @@ fn main() {
             chess::board::unhover_square,
             chess::board::drop_square,
             chess::board::click_square,
+            chess::board::event_tester,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
