@@ -18,7 +18,7 @@ type RustPiece =
   | { Rook: [Color, FirstMove] }
   | { Pawn: [Color, FirstMove] };
 
-export type MoveType = 'Move' | 'Capture' | 'Castle' | 'EnPassant';
+export type MoveType = 'Move' | 'Capture' | 'Castle' | 'EnPassant' | 'Double';
 
 type MoveList = [[number, number], MoveType][];
 
@@ -26,6 +26,7 @@ type MetaGame = {
   score: number;
   turn: number;
   game_over: boolean;
+  en_passant: [number, number] | null;
   black_king: {
     piece: { King: [Color, FirstMove, Check, CheckMate] };
     square: [number, number];

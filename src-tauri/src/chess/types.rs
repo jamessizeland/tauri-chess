@@ -144,6 +144,7 @@ pub enum MoveType {
     Capture,
     Castle,
     EnPassant,
+    Double,
 }
 
 pub type MoveList = Vec<(Square, MoveType)>;

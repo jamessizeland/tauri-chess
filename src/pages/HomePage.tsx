@@ -32,6 +32,7 @@ const HomePage = (): JSX.Element => {
     score: 0,
     turn: 0,
     game_over: false,
+    en_passant: null,
     white_king: {
       piece: {
         King: ['White', true, false, false],
