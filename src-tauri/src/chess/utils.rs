@@ -1,8 +1,9 @@
 //! General utility functions for chess
 
+use super::moves::check_castling_moves;
 // use super::data::GameMetaData;
 use super::pieces::GetState;
-use super::types::{BoardState, Color, GameMeta, MoveList, Piece, Square};
+use super::types::{BoardState, Color, GameMeta, MoveList, MoveType, Piece, Square};
 
 /// Convert letters a-h to a row index from a standard chessboard
 pub fn letter_to_row(letter: char) -> usize {
@@ -39,15 +40,27 @@ pub fn square_to_coord(square: &str) -> (usize, usize) {
     }
 }
 
-/// Check if the square we clicked on is a valid move of the currently selected piece
-pub fn valid_move(source: Square, target: Square, board: &BoardState, meta: &GameMeta) -> bool {
-    // println!("checking if valid");
-    let move_options = board[source.0][source.1].get_moves(source, board);
-
+/// Check if the square we clicked on is a valid move of the currently selected piece, and what type
+pub fn valid_move(
+    source: Square,
+    target: Square,
+    board: &BoardState,
+    meta: &GameMeta,
+    turn: &Color,
+) -> Option<MoveType> {
+    let piece = &board[source.0][source.1];
+    let mut move_options = piece.get_moves(source, board);
+    if piece.is_king() == Some(*turn) {
+        for castle_move in check_castling_moves(source, &turn, &board) {
+            move_options.push(castle_move);
+        }
+    };
     let filtered_moves = remove_invalid_moves(move_options, source, meta, board);
-
-    // dbg!(&source, &target);
-    filtered_moves.iter().any(|&ele| ele.0 == target)
+    let index = filtered_moves.iter().position(|&ele| ele.0 == target);
+    match index {
+        Some(i) => Some(filtered_moves[i].1),
+        None => None,
+    }
 }
 
 /// Check if this square is threatened, by exhaustive search

@@ -271,53 +271,31 @@ pub fn check_castling_moves(sq: (usize, usize), color: &Color, board: &BoardStat
     }
     let mut moves: MoveList = Vec::new();
     let first_move = board[sq.0][sq.1] == Piece::King(*color, true, false, false);
-    // start with empty movelist
     // check if castling available
-    // 1. king hasn't moved && rook hasn't moved
-    // 2. squares between both are clear
-    // 3. none of the squares the king needs to travel through are threatened
-    dbg!(&sq);
+    // dbg!(&sq);
     if first_move {
-        let (mut ooo, mut oo) = (false, false);
-        for (col, distance) in (0..sq.0).enumerate().rev() {
-            let eval = &board[col][sq.1];
-            // println!("{:?} col{} dist{}", eval, col, sq.0 - distance);
-            if col == 0 && eval != &Piece::Rook(*color, true) {
-                // no good
-                println!("didn't find rook");
-                break;
-            } else if col != 0 && eval != &Piece::None {
-                // no good
-                println!("{} piece in the way", &eval);
-                break;
-            } else if distance <= 3 && under_threat((sq.0 - distance, sq.1), color, board) {
-                // no good
-                println!("{} threatened", distance);
-                break;
+        // left side castle (ooo)
+        if &board[0][sq.1] == &Piece::Rook(*color, true) {
+            if &board[1][sq.1] == &Piece::None
+                && &board[2][sq.1] == &Piece::None
+                && !under_threat((2, sq.1), color, board)
+                && &board[3][sq.1] == &Piece::None
+                && !under_threat((3, sq.1), color, board)
+            {
+                // println!("ooo valid");
+                moves.push(((2, sq.1), MoveType::Castle));
             }
-            ooo = true;
-            moves.push(((1, sq.1), MoveType::Move));
         }
-
-        for (col, distance) in (sq.0 + 1..8).enumerate() {
-            let eval = &board[col][sq.1];
-            // println!("{:?} col{} dist{}", eval, col, distance - sq.0);
-            if col == 7 && eval != &Piece::Rook(*color, true) {
-                // no good
-                println!("didn't find rook");
-                break;
-            } else if col != 7 && eval != &Piece::None {
-                // no good
-                println!("{} piece in the way", &eval);
-                break;
-            } else if distance <= 2 && under_threat((distance - sq.0, sq.1), color, board) {
-                // no good
-                println!("{} threatened", distance);
-                break;
-            }
-            oo = true;
+        // right side castle (oo)
+        if &board[7][sq.1] == &Piece::Rook(*color, true)
+            && &board[6][sq.1] == &Piece::None
+            && !under_threat((6, sq.1), color, board)
+            && &board[5][sq.1] == &Piece::None
+            && !under_threat((5, sq.1), color, board)
+        {
+            // println!("ooo valid");
+            moves.push(((6, sq.1), MoveType::Castle));
         }
-        dbg!(ooo, oo);
     }
     moves
 }
