@@ -12,7 +12,8 @@ pub mod data {
     // the payload type must implement `Serialize` and `Clone`.
     #[derive(Clone, serde::Serialize, Debug)]
     pub struct Payload {
-        pub message: String,
+        pub event: String,
+        pub payload: String,
     }
     /// game move history
     pub struct HistoryData(pub Mutex<super::types::Hist>);

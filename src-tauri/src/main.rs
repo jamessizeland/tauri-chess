@@ -16,11 +16,11 @@ fn main() {
         .setup(|app| {
             let window = app.get_window("main").unwrap();
             let _handle = thread::spawn(move || {
-                println!("spawning a new thread");
+                println!("spawning a new thread to handle unprompted events from Rust to the UI");
                 loop {
                     let payload = rx.blocking_recv().unwrap();
-                    println!("{}", payload.message);
-                    window.emit("event", payload).unwrap();
+                    println!("{}, {}", payload.event, payload.payload);
+                    window.emit(&payload.event, payload.payload).unwrap();
                 }
             });
             Ok(())

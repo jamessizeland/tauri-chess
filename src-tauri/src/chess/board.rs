@@ -240,10 +240,11 @@ pub fn click_square(
 }
 
 #[tauri::command]
-pub fn event_tester(message: String, queue: tauri::State<QueueHandler>) {
+pub fn event_tester(queue: tauri::State<QueueHandler>) {
     let rx = queue.0.lock().unwrap();
     rx.blocking_send(Payload {
-        message: "hello".to_owned(),
+        event: "test".to_owned(),
+        payload: "hello from Rust".to_owned(),
     })
     .unwrap();
 }

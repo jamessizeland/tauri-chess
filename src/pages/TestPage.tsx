@@ -8,14 +8,16 @@ import {
 } from 'components/Elements';
 import { useToggle } from 'hooks';
 import { invoke } from '@tauri-apps/api/tauri';
-import { listen } from '@tauri-apps/api/event';
+import { listen, UnlistenFn } from '@tauri-apps/api/event';
 
 const TestPage = (): JSX.Element => {
   useEffect(() => {
-    const unlisten = listen<number>('test', (event) => {
+    const unlisten = listen<string>('test', (event) => {
       console.log(event);
-      console.log(event.payload);
     });
+    return () => {
+      unlisten.then((f) => f());
+    };
   }, []);
 
   const [score, setScore] = useState(0);
