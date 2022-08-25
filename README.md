@@ -33,3 +33,9 @@ Use these steps to run and see the magic for yourself!
 ## Checking
 
 ![Check and Mate](./img/check_mate_logic.gif)
+
+## Special Moves
+
+### Enpassant, Promoting & Castling
+
+![Enpassand Promoting and Castling](./img/enpassant-promote-castle.gif)
