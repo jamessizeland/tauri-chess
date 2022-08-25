@@ -35,4 +35,18 @@ mod tests {
         }
         assert!(true);
     }
+    // #[test]
+    // /// put all piece types in all squares and see if get moves doesn't panic
+    // fn castling_works() {
+    //     let board: BoardState = Default::default();
+    //     board[0][0] = Piece::Rook(Color::White, true);
+    //     // board[1][0] = Piece::Bishop(Color::White, true);
+    //     // board[2][0] = Piece::Knight(Color::White, true);
+    //     // board[3][0] = Piece::Queen(Color::White, true);
+    //     board[4][0] = Piece::King(Color::White, true, false, false);
+    //     // board[5][0] = Piece::Knight(Color::White, true);
+    //     // board[6][0] = Piece::Bishop(Color::White, true);
+    //     board[7][0] = Piece::Rook(Color::White, true);
+
+    // }
 }

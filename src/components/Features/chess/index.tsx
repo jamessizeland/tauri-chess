@@ -3,13 +3,14 @@ import { Position, Piece } from '../Chessboard/types';
 import { Square } from 'chess.js';
 import { notify } from 'services/notifications';
 import { invoke } from '@tauri-apps/api/tauri';
-import type {
+import {
   BoardStateArray,
   RustPiece,
   PieceType,
   PositionStyles,
   MoveList,
   MetaGame,
+  MoveType,
 } from './types';
 import {
   Button,
@@ -72,12 +73,27 @@ const highlightSquares = (
 ): PositionStyles => {
   // turn this array of squares into an object with cssProperties defined
   const props = moveOptions.reduce<PositionStyles>((result, move, index) => {
-    const [isAttack, col, row] = [move[1], move[0][0], move[0][1]];
+    const [moveType, col, row] = [move[1], move[0][0], move[0][1]];
+    const highlightColour = (moveType: MoveType) => {
+      console.log(moveType);
+      switch (moveType) {
+        case 'Move':
+          return '0 0 8px #a5eed9, inset 0 0 1px 4px #a5eed9';
+        case 'Capture':
+          return '0 0 8px #ea4c89, inset 0 0 1px 4px #ea4c89';
+        case 'Castle':
+          return '0 0 8px #11dd71, inset 0 0 1px 4px #11dd71';
+        case 'Double':
+          return '0 0 8px #11dd71, inset 0 0 1px 4px #11dd71';
+        case 'EnPassant':
+          return '0 0 8px #004d71, inset 0 0 1px 4px #004d71';
+        default:
+          return '0 0 8px black, inset 0 1px 4px black';
+      }
+    };
 
     result[coordToSquare(col, row)] = {
-      boxShadow: isAttack
-        ? '0 0 8px #ea4c89, inset 0 0 8px #ea4c89'
-        : '0 0 8px rgb(255, 255, 0), inset 0 0 1px 4px rgb(255, 255, 0)',
+      boxShadow: highlightColour(moveType),
       width: '100%',
       height: '100%',
     };
@@ -103,14 +119,14 @@ const AskNewGame = ({
   setPosition: (position: Position) => void;
   setGameMeta: (meta: MetaGame) => void;
   isOpen: boolean;
-  toggle: (open?: boolean) => void;
+  toggle: () => void;
 }): JSX.Element => {
   return (
     <Modal toggle={toggle} isOpen={isOpen} animate position="extraLarge">
       <ModalHeader>Welcome to Tauri Chess</ModalHeader>
       <ModalBody>Do you want to start a new game?</ModalBody>
       <ModalFooter>
-        <Button className="mr-2" onClick={() => toggle(true)}>
+        <Button className="mr-2" onClick={() => toggle()}>
           Cancel
         </Button>
         <Button
@@ -121,7 +137,7 @@ const AskNewGame = ({
               console.log(board);
             });
             invoke<MetaGame>('get_score').then((meta) => setGameMeta(meta));
-            toggle(true);
+            toggle();
           }}
         >
           New

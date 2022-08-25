@@ -14,6 +14,7 @@ type PieceProps = {
   onPieceClick?: (piece: Piece) => void;
   isDragging?: boolean;
   orientation?: Orientation;
+  className?: string;
 };
 
 export default function ChessPiece({
@@ -22,10 +23,11 @@ export default function ChessPiece({
   width,
   onPieceClick,
   orientation = 'white',
+  className = '',
 }: PieceProps) {
   const rotate = orientation === 'black' ? 'rotate-180' : '';
   return (
-    <div className={clsx('h-full')}>
+    <div className={clsx('h-full', className)}>
       {piece && (
         <svg
           className="mx-auto h-full"

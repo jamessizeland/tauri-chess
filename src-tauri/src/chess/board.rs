@@ -1,8 +1,16 @@
 //! Logic for the chess board actions
-use super::data::{GameMetaData, HistoryData, PieceLocation, SelectedSquare};
+
+use serde_json::json;
+
+use super::data::{
+    GameMetaData, HistoryData, Payload, PieceLocation, QueueHandler, SelectedSquare,
+};
+use super::moves::check_castling_moves;
 use super::pieces::{GetState, ModState};
 use super::types::{BoardState, Color, GameMeta, ModMeta, MoveList, Piece, Square};
-use super::utils::{check_enemy, remove_invalid_moves, square_to_coord, valid_move};
+use super::utils::{
+    check_enemy, remove_invalid_moves, square_to_coord, turn_into_colour, valid_move,
+};
 
 #[tauri::command]
 /// Get the location of all pieces from global memory
@@ -89,12 +97,22 @@ pub fn hover_square(
     let game_meta = meta.0.lock().unwrap();
     let selected = *clicked.0.lock().unwrap();
     let mut coord: Square = square_to_coord(square);
-    // dbg!(selected);
-
+    let turn = turn_into_colour(game_meta.turn);
     if selected != Option::None {
         coord = selected.unwrap();
     }
-    let move_options = board[coord.0][coord.1].get_moves(coord, &board);
+    let piece = board[coord.0][coord.1];
+    let mut move_options = piece.get_moves(coord, &board);
+    if piece.is_king() == Some(turn) {
+        for castle_move in check_castling_moves(coord, &turn, &board) {
+            move_options.push(castle_move);
+        }
+    } else if piece == Piece::Pawn(turn, false) && game_meta.en_passant != None {
+        // does this piece have a valid en passant target?
+        for pawn_move in piece.get_en_passant_moves(coord, game_meta.en_passant.unwrap()) {
+            move_options.push(pawn_move);
+        }
+    }
     remove_invalid_moves(move_options, coord, &game_meta, &board)
 }
 
@@ -121,24 +139,30 @@ pub fn click_square(
     clicked: tauri::State<SelectedSquare>,
     meta: tauri::State<GameMetaData>,
     history_data: tauri::State<HistoryData>,
+    queue: tauri::State<QueueHandler>,
 ) -> (MoveList, BoardState, GameMeta) {
+    // acquire control of global data
     let mut selected = *clicked.0.lock().unwrap();
     let mut board = state.0.lock().unwrap();
     let mut game_meta = meta.0.lock().unwrap();
+    let rx = queue.0.lock().unwrap();
+
     let coord = square_to_coord(square);
     let mut move_list: MoveList = Vec::new();
-    let turn: Color = if game_meta.turn % 2 == 0 {
-        Color::White
-    } else {
-        Color::Black
-    };
-    // only do this if we haven't ended the game already
+    let turn = turn_into_colour(game_meta.turn);
+
     if !game_meta.game_over {
+        // only do this if we haven't ended the game already
         let contains_enemy = check_enemy(&turn, &board[coord.0][coord.1]);
         if selected == Option::None {
-            //* 1.if we have nothing selected and the new coordinate doesn't contain an enemy piece, select it!
+            // 1.if we have nothing selected and the new coordinate doesn't contain an enemy piece, select it!
             if !contains_enemy {
                 move_list = board[coord.0][coord.1].get_moves(coord, &board);
+                if board[coord.0][coord.1].is_king() == Some(turn) {
+                    for castle_move in check_castling_moves(coord, &turn, &board) {
+                        move_list.push(castle_move);
+                    }
+                };
                 move_list = remove_invalid_moves(move_list.clone(), coord, &game_meta, &board);
                 if move_list.is_empty() {
                     selected = Option::None;
@@ -147,46 +171,118 @@ pub fn click_square(
                 }
             }
         } else if selected == Some(coord) {
-            //* 2. if we have clicked on the same square again, unselect it
-            selected = Option::None;
-        } else if valid_move(selected.unwrap(), coord, &board, &game_meta) {
-            //* 3. if we have clicked a valid move of selected, do move
-            println!("valid move");
-            let source = selected.unwrap();
-            let attacker = board[source.0][source.1].clone().has_moved();
-            board[coord.0][coord.1] = Piece::None; // remove attacked piece
-            board[source.0][source.1] = Piece::None; // take attacked out of its square
-            board[coord.0][coord.1] = attacker; // place attacker in the new square
-            if attacker.is_king() == Some(turn) {
-                match turn {
-                    Color::Black => {
-                        game_meta.black_king.piece = attacker;
-                        game_meta.black_king.square = coord;
-                    }
-                    Color::White => {
-                        game_meta.white_king.piece = attacker;
-                        game_meta.white_king.square = coord;
-                    }
-                }
-            }
-            selected = Option::None;
-            //* 4. update the meta only if something has changed
-            let mut history = history_data.0.lock().unwrap();
-            game_meta.new_turn(&mut board, &mut history);
-            println!("score history: {:?}", history.score);
-        } else if board[coord.0][coord.1] == Piece::None || contains_enemy {
-            //* 4. Selected an empty or enemy square which isn't a valid move, unselect
+            // 2. if we have clicked on the same square again, unselect it
             selected = Option::None;
         } else {
-            //* 5. select the new square
-            selected = Some(coord);
-            move_list = board[coord.0][coord.1].get_moves(coord, &board);
-            move_list = remove_invalid_moves(move_list.clone(), coord, &game_meta, &board);
-            if move_list.is_empty() {
-                selected = Option::None;
+            println!("possible valid move, check");
+            match valid_move(selected.unwrap(), coord, &board, &game_meta, &turn) {
+                Some(move_type) => {
+                    // 4. if we have clicked a valid move of selected, do move
+                    println!("valid move");
+                    let source = selected.unwrap();
+                    let mover = board[source.0][source.1].clone().has_moved();
+                    board[coord.0][coord.1] = Piece::None; // empty the destination square
+                    board[source.0][source.1] = Piece::None; // take moving out of its square
+                    board[coord.0][coord.1] = mover; // place moving in the new square
+                    game_meta.en_passant = None; // clear any previous en passant target
+                    match move_type {
+                        crate::chess::types::MoveType::Castle => {
+                            println!("need to move rook too");
+                            let start_col = if coord.0 > 4 { 7 } else { 0 };
+                            let dest_col = if coord.0 > 4 { 5 } else { 3 };
+                            let row = coord.1;
+                            let mover = board[start_col][row].clone().has_moved();
+                            board[start_col][row] = Piece::None; // take castling rook out of its square
+                            board[dest_col][row] = mover; // place castling rook in the new square
+                        }
+                        crate::chess::types::MoveType::EnPassant => {
+                            println!("need to remove pawn too");
+                            board[coord.0][source.1] = Piece::None;
+                        }
+                        crate::chess::types::MoveType::Double => {
+                            println!("register an en passant target");
+                            game_meta.en_passant = Some(coord);
+                        }
+                        _ => {
+                            // normal move or capture
+                            if mover.is_promotable_pawn(coord) {
+                                game_meta.promotable_pawn = Some(coord);
+                                rx.blocking_send(Payload {
+                                    event: "promotion".to_owned(),
+                                    payload: json!(coord).to_string(),
+                                })
+                                .unwrap();
+                            }
+                        }
+                    }
+                    if mover.is_king() == Some(turn) {
+                        match turn {
+                            Color::Black => {
+                                game_meta.black_king.piece = mover;
+                                game_meta.black_king.square = coord;
+                            }
+                            Color::White => {
+                                game_meta.white_king.piece = mover;
+                                game_meta.white_king.square = coord;
+                            }
+                        }
+                    }
+                    selected = Option::None;
+                    // 5. update the meta only if something has changed
+                    let mut history = history_data.0.lock().unwrap();
+                    game_meta.new_turn(&mut board, &mut history);
+                    println!("score history: {:?}", history.score);
+                }
+                None => {
+                    // 6. select the new square as this isn't a valid move
+                    selected = Some(coord);
+                    move_list = board[coord.0][coord.1].get_moves(coord, &board);
+                    move_list = remove_invalid_moves(move_list.clone(), coord, &game_meta, &board);
+                    if move_list.is_empty() {
+                        selected = Option::None;
+                    }
+                }
             }
         }
         *clicked.0.lock().unwrap() = selected;
     }
     (move_list, *board, *game_meta)
+}
+
+#[tauri::command]
+/// User has selected a piece type for the promotion of a valid pawn
+pub fn promote(
+    choice: char,
+    state: tauri::State<PieceLocation>,
+    meta: tauri::State<GameMetaData>,
+    queue: tauri::State<QueueHandler>,
+) {
+    let mut board = state.0.lock().unwrap();
+    let mut game_meta = meta.0.lock().unwrap();
+    let rx = queue.0.lock().unwrap();
+    let colour = turn_into_colour(game_meta.turn + 1);
+    let coord = game_meta.promotable_pawn.unwrap();
+    game_meta.promotable_pawn = None;
+    match choice {
+        'Q' => board[coord.0][coord.1] = Piece::Queen(colour, false),
+        'K' => board[coord.0][coord.1] = Piece::Knight(colour, false),
+        'R' => board[coord.0][coord.1] = Piece::Rook(colour, false),
+        'B' => board[coord.0][coord.1] = Piece::Bishop(colour, false),
+        _ => panic!("unexpected piece type requested"),
+    }
+    rx.blocking_send(Payload {
+        event: "board".to_owned(),
+        payload: json!(*board).to_string(),
+    })
+    .unwrap()
+}
+
+#[tauri::command]
+pub fn event_tester(queue: tauri::State<QueueHandler>) {
+    let rx = queue.0.lock().unwrap();
+    rx.blocking_send(Payload {
+        event: "test".to_owned(),
+        payload: "hello from Rust".to_owned(),
+    })
+    .unwrap();
 }

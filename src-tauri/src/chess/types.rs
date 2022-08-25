@@ -6,25 +6,37 @@ use serde::{Deserialize, Serialize};
 
 use super::pieces::{GetState, ModState};
 
+/// 8x8 array containing either pieces or nothing
 pub type BoardState = [[Piece; 8]; 8];
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct GameMeta {
+    /// Game turn
     pub turn: usize,
+    /// Game score as a relative sum of piece value
     pub score: isize,
+    /// Register if a pawn that has done a double move in the last turn
+    pub en_passant: Option<Square>,
+    /// Register if a pawn is awaiting a promotion
+    pub promotable_pawn: Option<Square>,
+    /// Metadata relating to the black King
     pub black_king: KingMeta,
+    /// Metadata relating to the white King
     pub white_king: KingMeta,
+    /// Register if the game is active or ended
     pub game_over: bool,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, Default)]
 pub struct Hist {
     pub score: Vec<isize>,
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct KingMeta {
+    /// Clone of the King's Piece Struct
     pub piece: Piece,
+    /// Current location of the King
     pub square: Square,
 }
 
@@ -109,6 +121,8 @@ impl Default for GameMeta {
         GameMeta {
             turn: 0,
             score: 0,
+            en_passant: None,
+            promotable_pawn: None,
             game_over: false,
             white_king: KingMeta {
                 piece: Piece::King(Color::White, true, false, false),
@@ -122,18 +136,21 @@ impl Default for GameMeta {
     }
 }
 
-impl Default for Hist {
-    fn default() -> Self {
-        Self {
-            score: Default::default(),
-        }
-    }
-}
-
 /// Square reference in row and column
 pub type Square = (usize, usize);
-pub type IsAttack = bool;
-pub type MoveList = Vec<(Square, IsAttack)>;
+
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq)]
+#[repr(u8)]
+/// Moves can take one of many special types
+pub enum MoveType {
+    Move,
+    Capture,
+    Castle,
+    EnPassant,
+    Double,
+}
+
+pub type MoveList = Vec<(Square, MoveType)>;
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq)]
 pub enum Color {
@@ -141,11 +158,15 @@ pub enum Color {
     White,
 }
 
+/// Some pieces have special behaviour if they haven't moved yet
 pub type FirstMove = bool;
+/// Is the King in check, meaning we need to consider avaliable moves
 pub type Check = bool;
+/// Is the King in check with no means to get out of check
 pub type CheckMate = bool;
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq)]
+#[repr(u8)]
 pub enum Piece {
     None,
     Pawn(Color, FirstMove),

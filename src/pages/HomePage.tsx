@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import type { Position } from 'components/Features/Chessboard/types';
 import { Square } from 'chess.js';
 import { invoke } from '@tauri-apps/api/tauri';
-// import { listen } from '@tauri-apps/api/event';
 import { Button } from 'components/Elements';
 import {
   coordToSquare,
@@ -21,17 +20,20 @@ import { checkEnv } from 'utils';
 import Chessboard from 'components/Features/Chessboard';
 import { useToggle } from 'hooks';
 import clsx from 'clsx';
+import Promotions from 'components/Features/chess/promotions';
+import { listen } from '@tauri-apps/api/event';
 
 const HomePage = (): JSX.Element => {
-  const { isOpen, toggle } = useToggle();
+  const [newGameisOpen, newGametoggle] = useToggle(true);
+  const [promoterisOpen, promotertoggle] = useToggle(false);
   const [position, setPosition] = useState<Position>({});
   const [newGame, setNewGame] = useState<boolean>(false);
-  // const [square, setSquare] = useState(''); // currently clicked square
-  // const [history, setHistory] = useState<string[]>([]);
   const [gameMeta, setGameMeta] = useState<MetaGame>({
     score: 0,
     turn: 0,
     game_over: false,
+    en_passant: null,
+    promotable_pawn: null,
     white_king: {
       piece: {
         King: ['White', true, false, false],
@@ -51,16 +53,27 @@ const HomePage = (): JSX.Element => {
   const [hoveredSquare, setHoveredSquare] = useState<Square | undefined>(
     undefined,
   );
-  const [notation, setNotation] = useState(true);
   const [rotation, setRotation] = useState(false);
 
   useEffect(() => {
     // ask if we want to start a new game
-    toggle(false);
     invoke<BoardStateArray>('get_state').then((board) =>
       setPosition(parseBoardState(board)),
     );
     invoke<MetaGame>('get_score').then((meta) => setGameMeta(meta));
+    // listen for promotion requests
+    const promRef = listen<string>('promotion', (event) => {
+      promotertoggle();
+    });
+    // listen for unexpected board state updates
+    const boardRef = listen<BoardStateArray>('board', (event) => {
+      console.log('Rust requests a boardstate update');
+      setPosition(parseBoardState(event.payload));
+    });
+    return () => {
+      promRef.then((f) => f());
+      boardRef.then((f) => f());
+    };
   }, []);
 
   return (
@@ -70,15 +83,16 @@ const HomePage = (): JSX.Element => {
         <AskNewGame
           setGameMeta={setGameMeta}
           setPosition={setPosition}
-          isOpen={isOpen}
-          toggle={toggle}
+          isOpen={newGameisOpen}
+          toggle={newGametoggle}
         />
+        <Promotions isOpen={promoterisOpen} toggle={promotertoggle} />
         <Chessboard
           orientation={whiteTurn ? 'white' : 'black'}
           draggable={false}
           id="testBoard"
           width={400}
-          showNotation={notation}
+          showNotation
           position={position}
           onMouseOverSquare={(square) => {
             // stop unnecessary repeats of this function call
@@ -102,16 +116,13 @@ const HomePage = (): JSX.Element => {
               }).then(([sq, board, gameMeta]) => {
                 setSquareStyles(highlightSquares(sq, square));
                 setPosition(parseBoardState(board));
-                console.log(gameMeta);
-                console.log(gameMeta.white_king.piece.King);
-                console.log(gameMeta.black_king.piece.King);
                 setGameMeta(gameMeta);
                 if (rotation) {
                   gameMeta.turn % 2 == 0
                     ? setWhiteTurn(true)
                     : setWhiteTurn(false);
                 }
-                if (gameMeta.game_over) toggle(false); // ask if we want to start a new game
+                if (gameMeta.game_over) newGametoggle(); // ask if we want to start a new game
               });
             }
           }}
