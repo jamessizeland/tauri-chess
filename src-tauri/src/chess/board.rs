@@ -1,5 +1,7 @@
 //! Logic for the chess board actions
 
+use serde_json::json;
+
 use super::data::{
     GameMetaData, HistoryData, Payload, PieceLocation, QueueHandler, SelectedSquare,
 };
@@ -137,21 +139,24 @@ pub fn click_square(
     clicked: tauri::State<SelectedSquare>,
     meta: tauri::State<GameMetaData>,
     history_data: tauri::State<HistoryData>,
+    queue: tauri::State<QueueHandler>,
 ) -> (MoveList, BoardState, GameMeta) {
+    // acquire control of global data
     let mut selected = *clicked.0.lock().unwrap();
     let mut board = state.0.lock().unwrap();
     let mut game_meta = meta.0.lock().unwrap();
+    let rx = queue.0.lock().unwrap();
+
     let coord = square_to_coord(square);
     let mut move_list: MoveList = Vec::new();
     let turn = turn_into_colour(game_meta.turn);
-    // only do this if we haven't ended the game already
+
     if !game_meta.game_over {
+        // only do this if we haven't ended the game already
         let contains_enemy = check_enemy(&turn, &board[coord.0][coord.1]);
         if selected == Option::None {
-            // println!("Nothing selected");
             // 1.if we have nothing selected and the new coordinate doesn't contain an enemy piece, select it!
             if !contains_enemy {
-                // println!("...and not an enemy, get moves");
                 move_list = board[coord.0][coord.1].get_moves(coord, &board);
                 if board[coord.0][coord.1].is_king() == Some(turn) {
                     for castle_move in check_castling_moves(coord, &turn, &board) {
@@ -167,7 +172,6 @@ pub fn click_square(
             }
         } else if selected == Some(coord) {
             // 2. if we have clicked on the same square again, unselect it
-            // println!("Selected the same square again, deselect");
             selected = Option::None;
         } else {
             println!("possible valid move, check");
@@ -201,8 +205,14 @@ pub fn click_square(
                         }
                         _ => {
                             // normal move or capture
-                            // let window = app.get_window("main").unwrap();
-                            // window.emit("test", coord).unwrap();
+                            if mover.is_promotable_pawn(coord) {
+                                game_meta.promotable_pawn = Some(coord);
+                                rx.blocking_send(Payload {
+                                    event: "promotion".to_owned(),
+                                    payload: json!(coord).to_string(),
+                                })
+                                .unwrap();
+                            }
                         }
                     }
                     if mover.is_king() == Some(turn) {
@@ -237,6 +247,34 @@ pub fn click_square(
         *clicked.0.lock().unwrap() = selected;
     }
     (move_list, *board, *game_meta)
+}
+
+#[tauri::command]
+/// User has selected a piece type for the promotion of a valid pawn
+pub fn promote(
+    choice: char,
+    state: tauri::State<PieceLocation>,
+    meta: tauri::State<GameMetaData>,
+    queue: tauri::State<QueueHandler>,
+) {
+    let mut board = state.0.lock().unwrap();
+    let mut game_meta = meta.0.lock().unwrap();
+    let rx = queue.0.lock().unwrap();
+    let colour = turn_into_colour(game_meta.turn + 1);
+    let coord = game_meta.promotable_pawn.unwrap();
+    game_meta.promotable_pawn = None;
+    match choice {
+        'Q' => board[coord.0][coord.1] = Piece::Queen(colour, false),
+        'K' => board[coord.0][coord.1] = Piece::Knight(colour, false),
+        'R' => board[coord.0][coord.1] = Piece::Rook(colour, false),
+        'B' => board[coord.0][coord.1] = Piece::Bishop(colour, false),
+        _ => panic!("unexpected piece type requested"),
+    }
+    rx.blocking_send(Payload {
+        event: "board".to_owned(),
+        payload: json!(*board).to_string(),
+    })
+    .unwrap()
 }
 
 #[tauri::command]

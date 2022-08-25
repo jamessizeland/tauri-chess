@@ -27,6 +27,7 @@ type MetaGame = {
   turn: number;
   game_over: boolean;
   en_passant: [number, number] | null;
+  promotable_pawn: [number, number] | null;
   black_king: {
     piece: { King: [Color, FirstMove, Check, CheckMate] };
     square: [number, number];

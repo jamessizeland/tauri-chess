@@ -3,6 +3,7 @@
     windows_subsystem = "windows"
 )]
 
+use chess::data::queue_handler;
 use chess::data::Payload;
 use tauri::{async_runtime::channel, Manager};
 
@@ -18,9 +19,7 @@ fn main() {
             let _handle = thread::spawn(move || {
                 println!("spawning a new thread to handle unprompted events from Rust to the UI");
                 loop {
-                    let payload = rx.blocking_recv().unwrap();
-                    println!("{}, {}", payload.event, payload.payload);
-                    window.emit(&payload.event, payload.payload).unwrap();
+                    queue_handler(&window, &mut rx);
                 }
             });
             Ok(())
@@ -38,6 +37,7 @@ fn main() {
             chess::board::unhover_square,
             chess::board::drop_square,
             chess::board::click_square,
+            chess::board::promote,
             chess::board::event_tester,
         ])
         .run(tauri::generate_context!())

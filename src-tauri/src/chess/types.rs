@@ -17,6 +17,8 @@ pub struct GameMeta {
     pub score: isize,
     /// Register if a pawn that has done a double move in the last turn
     pub en_passant: Option<Square>,
+    /// Register if a pawn is awaiting a promotion
+    pub promotable_pawn: Option<Square>,
     /// Metadata relating to the black King
     pub black_king: KingMeta,
     /// Metadata relating to the white King
@@ -120,6 +122,7 @@ impl Default for GameMeta {
             turn: 0,
             score: 0,
             en_passant: None,
+            promotable_pawn: None,
             game_over: false,
             white_king: KingMeta {
                 piece: Piece::King(Color::White, true, false, false),

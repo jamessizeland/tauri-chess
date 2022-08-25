@@ -8,7 +8,7 @@ import {
 } from 'components/Elements';
 import { useToggle } from 'hooks';
 import { invoke } from '@tauri-apps/api/tauri';
-import { listen, UnlistenFn } from '@tauri-apps/api/event';
+import { listen } from '@tauri-apps/api/event';
 
 const TestPage = (): JSX.Element => {
   useEffect(() => {

@@ -22,8 +22,8 @@ pub trait GetState {
     ///
     /// https://en.wikipedia.org/wiki/Chess_piece_relative_value
     fn get_value(&self) -> isize;
-    // /// Ask if a piece is of a requested type
-    // fn is_piece_type(&self, piece: Piece) -> bool;
+    /// Ask if this piece is a promotable pawn
+    fn is_promotable_pawn(&self, square: Square) -> bool;
 }
 
 /// Modify state information on a selected piece
@@ -104,6 +104,17 @@ impl GetState for Piece {
             Piece::Bishop(_, _) => 3,
             Piece::Knight(_, _) => 3,
             Piece::Rook(_, _) => 5,
+        }
+    }
+
+    fn is_promotable_pawn(&self, square: Square) -> bool {
+        match &self {
+            Piece::Pawn(color, _first_move) => match color {
+                // check if the pawn has reached the other side of the board
+                Color::Black => square.1 == 0,
+                Color::White => square.1 == 7,
+            },
+            _ => false,
         }
     }
 }
