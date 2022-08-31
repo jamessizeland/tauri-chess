@@ -59,7 +59,8 @@
         "height": 800,
         "resizable": false,
         "title": "Chess",
-        "width": 800
+        "width": 800,
+        "center": true
       }
     ]
   }
