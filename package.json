@@ -1,7 +1,7 @@
 {
   "name": "chess-tauri",
   "private": true,
-  "version": "1.9.0",
+  "version": "1.10.0",
   "type": "module",
   "author": {
     "name": "James Sizeland"
@@ -34,11 +34,8 @@
     "@tauri-apps/cli": "*",
     "@types/chess.js": "^0.13.1",
     "@types/debounce": "^1.2.1",
-    "@types/deep-diff": "^1.0.1",
-    "@types/lodash.isequal": "^4.5.6",
     "@types/node": "^17.0.41",
     "@types/react": "^18.0.0",
-    "@types/react-color": "^3.0.6",
     "@types/react-dom": "^18.0.0",
     "@typescript-eslint/eslint-plugin": "^5.27.1",
     "@typescript-eslint/parser": "^5.27.1",
