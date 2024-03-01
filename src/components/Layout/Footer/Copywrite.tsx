@@ -26,7 +26,7 @@ export default function Copywrite({
 }: CopywriteProps) {
   return (
     <div className={clsx('p-6 bg-gray-200 flex justify-between', className)}>
-      <span>2022, {owner ? owner : author?.name}</span>
+      <span>2024, {owner ? owner : author?.name}</span>
       <a className="text-gray-600 font-semibold" href={repo}>
         Sourcecode
       </a>
