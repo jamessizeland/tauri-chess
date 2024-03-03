@@ -46,17 +46,6 @@ pub fn new_game(
             board[col][row] = Piece::None
         }
     }
-    // DEBUG PIECES
-    // board[3][0] = Piece::Queen(Color::White, true);
-    // board[4][0] = Piece::King(Color::White, true, false, false);
-    // board[3][1] = Piece::Pawn(Color::White, true);
-    // board[4][1] = Piece::Pawn(Color::White, true);
-    // board[5][1] = Piece::Pawn(Color::White, true);
-    // board[3][7] = Piece::Queen(Color::Black, true);
-    // board[4][7] = Piece::King(Color::Black, true, false, false);
-    // board[3][6] = Piece::Pawn(Color::Black, true);
-    // board[4][6] = Piece::Pawn(Color::Black, true);
-    // board[5][6] = Piece::Pawn(Color::Black, true);
     // set up white pieces
     board[0][0] = Piece::Rook(Color::White, true);
     board[1][0] = Piece::Bishop(Color::White, true);
