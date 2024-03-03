@@ -1,5 +1,6 @@
 import React from 'react';
-import clsx from 'clsx';
+import { Link } from 'react-router-dom';
+import { cn } from 'utils';
 
 interface Props {
   children: React.ReactNode;
@@ -23,7 +24,7 @@ interface HamburgerTogglerProps {
   toggle: () => void;
 }
 
-const style = {
+const ngClass = {
   nav: `block pl-0 mb-0`,
   hamburger: `font-light shadow py-2 px-4`,
   collapse: `transition-height ease duration-300`,
@@ -34,14 +35,14 @@ const style = {
 
 function HamburgerMenu({ children, bgColor, textColor }: HamburgerMenuProps) {
   return (
-    <nav className={clsx(bgColor, textColor, style.hamburger)}>{children}</nav>
+    <nav className={cn(bgColor, textColor, ngClass.hamburger)}>{children}</nav>
   );
 }
 
 /* You can wrap the a tag with Link and pass href to Link if you are using either Create-React-App, Next.js or Gatsby */
 function HamburgerMenuBrand({ children, href }: LinkProps) {
   return (
-    <a href={href} className={style.brand}>
+    <a href={href} className={ngClass.brand}>
       <strong>{children}</strong>
     </a>
   );
@@ -53,7 +54,7 @@ function HamburgerMenuToggler({ toggle }: HamburgerTogglerProps) {
       type="button"
       aria-expanded="false"
       aria-label="Toggle navigation"
-      className={style.toggler}
+      className={ngClass.toggler}
       onClick={toggle}
     >
       &#8801;
@@ -69,14 +70,14 @@ function HamburgerMenuCollapse({ open, children }: HamburgerCollapseProps) {
     : { height: 0, visibility: 'hidden', opacity: 0 };
 
   return (
-    <div className={style.collapse} style={inlineStyle} ref={ref}>
+    <div className={ngClass.collapse} style={inlineStyle} ref={ref}>
       {children}
     </div>
   );
 }
 
 function HamburgerMenuNav({ children }: Props) {
-  return <ul className={style.nav}>{children}</ul>;
+  return <ul className={ngClass.nav}>{children}</ul>;
 }
 
 function HamburgerMenuItem({ children }: Props) {
@@ -86,9 +87,9 @@ function HamburgerMenuItem({ children }: Props) {
 /* You can wrap the a tag with Link and pass href to Link if you are using either Create-React-App, Next.js or Gatsby */
 function HamburgerMenuLink({ children, href }: LinkProps) {
   return (
-    <a href={href} className={style.link}>
+    <Link to={href} className={ngClass.link}>
       {children}
-    </a>
+    </Link>
   );
 }
 

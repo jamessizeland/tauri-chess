@@ -1,14 +1,13 @@
-import React from 'react';
-import clsx from 'clsx';
+import { cn } from 'utils';
 import Copywrite from './Copywrite';
 
 import pjson from '../../../../package.json';
-const { author, repository, version } = pjson;
+const { author, repository } = pjson;
 
-export default function Footer() {
+export default function Footer({ version }: { version: string }) {
   return (
     <footer
-      className={clsx('text-center lg:text-left bg-gray-100 text-gray-600')}
+      className={cn('text-center lg:text-left bg-gray-100 text-gray-600')}
     >
       <Copywrite
         className="bg-secondary"

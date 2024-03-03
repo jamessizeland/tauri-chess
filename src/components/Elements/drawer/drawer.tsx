@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import Portal from '@reach/portal';
-import clsx from 'clsx';
+import { createPortal } from 'react-dom';
+import { cn } from 'utils';
 
 interface Props {
   children: React.ReactNode;
@@ -12,7 +12,7 @@ interface DrawerProps extends Props {
   toggle: (isOpen?: boolean) => void;
 }
 
-const style = {
+const ngClass = {
   body: `flex-shrink flex-grow p-4`,
   headerTitle: `text-2xl md:text-3xl font-light`,
   content: `relative flex flex-col bg-white pointer-events-auto w-full`,
@@ -84,43 +84,48 @@ function Drawer({ children, isOpen, toggle, position = 'left' }: DrawerProps) {
   }, [isOpen]);
 
   return (
-    <Portal>
-      {isOpen && (
-        <>
-          <div className={style.overlay} />
-          <div className={style.container}>
-            <div
-              ref={ref}
-              tabIndex={-1}
-              role="alertdialog"
-              aria-modal={true}
-              className={style.orientation[position]}
-            >
-              <div className={clsx(style.animation[position], style.content)}>
-                {children}
+    <>
+      {createPortal(
+        isOpen && (
+          <>
+            <div className={ngClass.overlay} />
+            <div className={ngClass.container}>
+              <div
+                ref={ref}
+                tabIndex={-1}
+                role="alertdialog"
+                aria-modal={true}
+                className={ngClass.orientation[position]}
+              >
+                <div
+                  className={cn(ngClass.animation[position], ngClass.content)}
+                >
+                  {children}
+                </div>
               </div>
             </div>
-          </div>
-        </>
+          </>
+        ),
+        document.body,
       )}
-    </Portal>
+    </>
   );
 }
 
 function DrawerHeader({ children }: Props) {
   return (
-    <div className={style.header}>
-      <h4 className={style.headerTitle}>{children}</h4>
+    <div className={ngClass.header}>
+      <h4 className={ngClass.headerTitle}>{children}</h4>
     </div>
   );
 }
 
 function DrawerBody({ children }: Props) {
-  return <div className={style.body}>{children}</div>;
+  return <div className={ngClass.body}>{children}</div>;
 }
 
 function DrawerFooter({ children }: Props) {
-  return <div className={style.footer}>{children}</div>;
+  return <div className={ngClass.footer}>{children}</div>;
 }
 
 export { Drawer, DrawerHeader, DrawerBody, DrawerFooter };

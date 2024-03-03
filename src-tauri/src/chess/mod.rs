@@ -1,4 +1,4 @@
-pub mod board;
+pub mod api;
 mod moves;
 mod pieces;
 mod types;

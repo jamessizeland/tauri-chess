@@ -1,18 +1,20 @@
 {
-  "$schema": "..\\node_modules/@tauri-apps/cli\\schema.json",
   "build": {
     "beforeBuildCommand": "yarn build",
     "beforeDevCommand": "yarn dev",
-    "devPath": "http://localhost:3000",
+    "devPath": "http://localhost:1420",
     "distDir": "../dist"
   },
   "package": {
-    "productName": "chess-tauri",
-    "version": "0.1.0"
+    "productName": "chess-tauri"
   },
   "tauri": {
     "allowlist": {
-      "all": true
+      "all": false,
+      "shell": {
+        "all": false,
+        "open": true
+      }
     },
     "bundle": {
       "active": true,
@@ -59,7 +61,8 @@
         "height": 800,
         "resizable": false,
         "title": "Chess",
-        "width": 800
+        "width": 800,
+        "center": true
       }
     ]
   }

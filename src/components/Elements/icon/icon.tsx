@@ -1,5 +1,5 @@
-import React, { ReactNode } from 'react';
-import clsx from 'clsx';
+import { ReactNode } from 'react';
+import { cn } from 'utils';
 
 interface Props {
   className?: string;
@@ -13,7 +13,7 @@ interface IconProps extends Props {
 const Icon = ({ className, viewBox, children }: IconProps) => (
   <div>
     <svg
-      className={clsx(className, 'flex-no-shrink fill-current')}
+      className={cn(className, 'flex-no-shrink fill-current')}
       stroke="currentColor"
       fill="currentColor"
       strokeWidth="0"

@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import clsx from 'clsx';
+import { useEffect } from 'react';
+import { cn } from 'utils';
 import debounce from 'debounce';
 import {
   Navbar,
@@ -14,7 +14,11 @@ import Logo from '../Logo';
 import { routes } from 'routes';
 import { useScrollDirection } from 'hooks';
 
-function Header(): JSX.Element {
+type HeaderProps = {
+  appName?: string;
+};
+
+function Header({ appName }: HeaderProps): JSX.Element {
   const { toggle } = useToggle();
   const scrollDirection = useScrollDirection({
     initialDirection: 'up', // this is so the navbar is present on page load
@@ -27,14 +31,14 @@ function Header(): JSX.Element {
 
   return (
     <header
-      className={clsx(
+      className={cn(
         scrollDirection === 'up' ? 'translate-y-0' : '-translate-y-20',
         'transition ease-in-out duration-500',
         'z fixed z-10 top-0 w-full font-inter bg-white lg:fixed lg:px-container',
         'shadow-sm shadow-slate-500',
       )}
     >
-      <Navbar className={clsx('bg-gradient-to-r from-blue-500 to-primary')}>
+      <Navbar className={cn('bg-gradient-to-r from-blue-500 to-primary pr-2')}>
         <NavbarBrand href="/">
           <Logo />
         </NavbarBrand>

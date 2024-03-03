@@ -3,20 +3,19 @@
     windows_subsystem = "windows"
 )]
 
-use chess::data::queue_handler;
-use chess::data::Payload;
-use tauri::{async_runtime::channel, Manager};
-
-use std::{sync::Mutex, thread}; // mutual exclusion wrapper
-
+mod api;
 mod chess;
+
+use chess::data::{queue_handler, Payload};
+use std::{sync::Mutex, thread};
+use tauri::{async_runtime::channel, Manager};
 
 fn main() {
     let (tx, mut rx) = channel::<Payload>(5);
     tauri::Builder::default()
         .setup(|app| {
             let window = app.get_window("main").unwrap();
-            let _handle = thread::spawn(move || {
+            thread::spawn(move || {
                 println!("spawning a new thread to handle unprompted events from Rust to the UI");
                 loop {
                     queue_handler(&window, &mut rx);
@@ -30,15 +29,16 @@ fn main() {
         .manage(chess::data::HistoryData(Default::default()))
         .manage(chess::data::QueueHandler(Mutex::new(tx)))
         .invoke_handler(tauri::generate_handler![
-            chess::board::new_game,
-            chess::board::get_state,
-            chess::board::get_score,
-            chess::board::hover_square,
-            chess::board::unhover_square,
-            chess::board::drop_square,
-            chess::board::click_square,
-            chess::board::promote,
-            chess::board::event_tester,
+            chess::api::new_game,
+            chess::api::get_state,
+            chess::api::get_score,
+            chess::api::hover_square,
+            chess::api::unhover_square,
+            chess::api::drop_square,
+            chess::api::click_square,
+            chess::api::promote,
+            chess::api::event_tester,
+            api::get_version
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

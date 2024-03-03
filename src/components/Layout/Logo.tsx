@@ -1,6 +1,5 @@
-import React from 'react';
+import { cn } from 'utils';
 import logo from 'assets/tauri.svg';
-import clsx from 'clsx';
 
 interface Props {
   className?: string;
@@ -17,7 +16,7 @@ const Logo = ({
 }: Props): JSX.Element => {
   return (
     <img
-      className={clsx(
+      className={cn(
         'hover:animate-twSpin hover:animate-infinite hover:animate-slow',
         'mx-2',
         className,
@@ -25,7 +24,6 @@ const Logo = ({
       src={logo}
       height={height}
       width={width}
-      placeholder="blur"
       // objectFit="cover"
       alt={altText}
     />

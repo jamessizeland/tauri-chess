@@ -1,9 +1,7 @@
-import React from 'react';
 import type { Orientation, Piece } from './types';
 import type { Square } from 'chess.js';
 import pieceSVG from './svg/chesspieces/standard';
-import wKSVG from './svg/whiteKing';
-import clsx from 'clsx';
+import { cn } from 'utils';
 
 type PieceProps = {
   piece: Piece | undefined;
@@ -27,7 +25,7 @@ export default function ChessPiece({
 }: PieceProps) {
   const rotate = orientation === 'black' ? 'rotate-180' : '';
   return (
-    <div className={clsx('h-full', className)}>
+    <div className={cn('h-full', className)}>
       {piece && (
         <svg
           className="mx-auto h-full"
