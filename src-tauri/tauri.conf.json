@@ -6,8 +6,7 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "chess-tauri",
-    "version": "1.10.0"
+    "productName": "chess-tauri"
   },
   "tauri": {
     "allowlist": {

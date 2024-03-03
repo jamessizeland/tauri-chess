@@ -1,7 +1,7 @@
 [package]
 name = "tauri-chess"
-version = "0.1.0"
-description = "A Tauri App"
+version = "1.10.0"
+description = "A Tauri App for playing chess"
 authors = ["James Sizeland"]
 edition = "2021"
 
