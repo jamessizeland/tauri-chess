@@ -1,6 +1,6 @@
-import React, { useEffect, ReactNode, useRef } from 'react';
-import Portal from '@reach/portal';
-import clsx from 'clsx';
+import { useEffect, ReactNode, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import { cn } from 'utils';
 
 interface Props {
   children: ReactNode;
@@ -14,8 +14,8 @@ interface ModalProps extends Props {
   animate?: boolean;
 }
 
-const style = {
-  animate: 'animate-modal',
+const ngClass = {
+  animate: 'animate-backInDown',
   body: `flex-shrink flex-grow p-4`,
   headerTitle: `text-2xl md:text-3xl font-light`,
   header: `items-start justify-between p-4 border-b border-gray-300`,
@@ -23,15 +23,15 @@ const style = {
   overlay: `fixed top-0 left-0 z-30 w-screen h-screen backdrop-blur-sm`,
   footer: `flex flex-wrap items-center justify-end p-3 border-t border-gray-300`,
   content: {
-    default: `relative flex flex-col bg-white pointer-events-auto`,
+    default: `relative flex flex-col bg-white pointer-events-auto shadow-primary shadow-md`,
   },
   orientation: {
     default:
-      'mt-24 mx-8 pb-0 md:m-auto md:w-6/12 lg:w-4/12 md:pt-0 focus:outline-none rounded-lg',
+      'mt-5 mx-8 pb-0 md:m-auto md:w-6/12 lg:w-4/12 md:pt-0 focus:outline-none rounded-lg',
     large:
-      'mt-24 mx-8 pb-0 md:m-auto md:w-8/12 lg:w-8/12 md:pt-0 focus:outline-none rounded-lg',
+      'mt-5 mx-8 pb-0 md:m-auto md:w-8/12 lg:w-8/12 md:pt-0 focus:outline-none rounded-lg',
     extraLarge:
-      'mt-24 mx-8 pb-0 md:w-12/12 md:pt-0 focus:outline-none rounded-lg',
+      'mt-5 mx-8 pb-0 md:w-12/12 md:pt-0 focus:outline-none rounded-lg',
   },
 };
 
@@ -88,48 +88,51 @@ function Modal({
   }, [isOpen]);
 
   return (
-    <Portal>
-      {isOpen && (
-        <>
-          <div className={style.overlay} />
-          <div className={clsx(style.container)}>
-            <div
-              className={style.orientation[position]}
-              ref={closeOnClickOutside ? ref : null}
-              role="dialogue"
-              aria-modal={true}
-            >
+    <>
+      {createPortal(
+        isOpen && (
+          <>
+            <div className={ngClass.overlay} />
+            <div className={cn(ngClass.container)}>
               <div
-                className={clsx(
-                  style.orientation[position],
-                  style.content.default,
-                  animate ? style.animate : '',
-                )}
+                className={ngClass.orientation[position]}
+                ref={closeOnClickOutside ? ref : null}
+                role="alertdialog"
+                aria-modal={true}
               >
-                {children}
+                <div
+                  className={cn(
+                    ngClass.orientation[position],
+                    ngClass.content.default,
+                    animate ? ngClass.animate : '',
+                  )}
+                >
+                  {children}
+                </div>
               </div>
             </div>
-          </div>
-        </>
+          </>
+        ),
+        document.body,
       )}
-    </Portal>
+    </>
   );
 }
 
 function ModalHeader({ children }: Props) {
   return (
-    <div className={style.header}>
-      <h4 className={style.headerTitle}>{children}</h4>
+    <div className={ngClass.header}>
+      <h4 className={ngClass.headerTitle}>{children}</h4>
     </div>
   );
 }
 
 function ModalBody({ children }: Props) {
-  return <div className={style.body}>{children}</div>;
+  return <div className={ngClass.body}>{children}</div>;
 }
 
 function ModalFooter({ children }: Props) {
-  return <div className={style.footer}>{children}</div>;
+  return <div className={ngClass.footer}>{children}</div>;
 }
 
 export { Modal, ModalHeader, ModalBody, ModalFooter };

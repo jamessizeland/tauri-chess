@@ -1,5 +1,5 @@
-import React, { ReactNode, useEffect, useRef } from 'react';
-import clsx from 'clsx';
+import { ReactNode, useEffect, useRef } from 'react';
+import { cn } from 'utils';
 
 interface Props {
   children: ReactNode;
@@ -15,7 +15,7 @@ interface SidenavProps extends Props {
   closeOnClickOutside?: boolean;
 }
 
-const style = {
+const ngClass = {
   item: `flex justify-start cursor-pointer font-medium hover:text-gray-400 ml-8 mb-10`,
   closeIcon: `absolute top-1 focus:outline-none right-3 text-3xl text-white cursor-pointer`,
   position: {
@@ -55,13 +55,15 @@ function Sidenav({
 
   return (
     <aside
-      className={clsx(
-        style.position[position].default,
-        open ? style.position[position].open : style.position[position].close,
+      className={cn(
+        ngClass.position[position].default,
+        open
+          ? ngClass.position[position].open
+          : ngClass.position[position].close,
       )}
       ref={ref}
     >
-      <button aria-label="Close" className={style.closeIcon} onClick={toggle}>
+      <button aria-label="Close" className={ngClass.closeIcon} onClick={toggle}>
         &times;
       </button>
       <div className="mt-12">{children}</div>
@@ -72,7 +74,7 @@ function Sidenav({
 /* You can wrap the a tag with Link and pass href to Link if you are using either Create-React-App, Next.js or Gatsby */
 function SidenavItem({ children, href }: LinkProps) {
   return (
-    <a href={href} className={style.item}>
+    <a href={href} className={ngClass.item}>
       {children}
     </a>
   );

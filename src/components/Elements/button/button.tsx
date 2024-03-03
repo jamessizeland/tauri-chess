@@ -1,5 +1,5 @@
 import React from 'react';
-import clsx from 'clsx';
+import { cn } from 'utils';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface BtnPropsWithChildren {}
@@ -20,7 +20,7 @@ interface BtnProps
 
 type ButtonRef = React.ForwardedRef<HTMLButtonElement>;
 
-const style = {
+const ngClass = {
   rounded: `rounded-full`,
   block: `flex justify-center w-full`,
   default: `text-white focus:outline-none shadow font-medium transition ease-in duration-200`,
@@ -59,12 +59,12 @@ const style = {
 };
 
 const colors = (outline: boolean) => ({
-  primary: outline ? style.color.primary.outline : style.color.primary.bg,
-  success: outline ? style.color.success.outline : style.color.success.bg,
-  danger: outline ? style.color.danger.outline : style.color.danger.bg,
-  dark: outline ? style.color.dark.outline : style.color.dark.bg,
-  warning: outline ? style.color.warning.outline : style.color.warning.bg,
-  indigo: outline ? style.color.indigo.outline : style.color.indigo.bg,
+  primary: outline ? ngClass.color.primary.outline : ngClass.color.primary.bg,
+  success: outline ? ngClass.color.success.outline : ngClass.color.success.bg,
+  danger: outline ? ngClass.color.danger.outline : ngClass.color.danger.bg,
+  dark: outline ? ngClass.color.dark.outline : ngClass.color.dark.bg,
+  warning: outline ? ngClass.color.warning.outline : ngClass.color.warning.bg,
+  indigo: outline ? ngClass.color.indigo.outline : ngClass.color.indigo.bg,
 });
 
 const Button = React.forwardRef(
@@ -88,13 +88,13 @@ const Button = React.forwardRef(
       {...props}
       type={submit ? 'submit' : 'button'}
       disabled={disabled}
-      className={clsx(
+      className={cn(
         className,
-        block ? style.block : '',
-        disabled ? style.disabled : '',
-        style.sizes[size],
-        style.default,
-        rounded ? style.rounded : 'rounded',
+        block ? ngClass.block : '',
+        disabled ? ngClass.disabled : '',
+        ngClass.sizes[size],
+        ngClass.default,
+        rounded ? ngClass.rounded : 'rounded',
         color ? colors(outline)[color] : colors(outline).dark,
       )}
     >
