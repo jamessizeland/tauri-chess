@@ -1,8 +1,7 @@
 import { Square } from 'chess.js';
-import clsx from 'clsx';
+import { cn } from 'utils';
 import type { CSSProperties } from 'react';
 import { coordToSquare } from '../chess';
-import type { PositionStyles } from '../chess/types';
 import { BoardSquare } from './BoardSquare';
 import Notation from './Notation';
 import type { ChessboardProps, Position } from './types';
@@ -89,7 +88,7 @@ const Board = ({
   }
   const rotate = orientation === 'black' ? 'rotate-180' : '';
   return (
-    <div style={{ ...boardStyle, ...basicBoardStyle }} className={clsx(rotate)}>
+    <div style={{ ...boardStyle, ...basicBoardStyle }} className={cn(rotate)}>
       {squares}
     </div>
   );

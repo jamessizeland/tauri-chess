@@ -1,5 +1,4 @@
-import clsx from 'clsx';
-import React from 'react';
+import { cn } from 'utils';
 
 interface User {
   name: string;
@@ -25,7 +24,7 @@ export default function Copywrite({
   repo = '/',
 }: CopywriteProps) {
   return (
-    <div className={clsx('p-6 bg-gray-200 flex justify-between', className)}>
+    <div className={cn('p-6 bg-gray-200 flex justify-between', className)}>
       <span>2024, {owner ? owner : author?.name}</span>
       <a className="text-gray-600 font-semibold" href={repo}>
         Sourcecode

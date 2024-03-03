@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@headlessui/react": "^1.6.4",
-    "@reach/portal": "^0.17.0",
     "@tauri-apps/api": "^1.5.3",
     "chess.js": "^0.13.2",
     "clsx": "^2.1.0",
@@ -28,7 +27,8 @@
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.3.0",
-    "react-toastify": "^9.0.4"
+    "react-toastify": "^10.0.4",
+    "tailwind-merge": "^2.2.1"
   },
   "devDependencies": {
     "@tauri-apps/cli": "*",

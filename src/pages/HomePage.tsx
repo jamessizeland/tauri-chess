@@ -5,7 +5,6 @@ import { invoke } from '@tauri-apps/api/tauri';
 import { Button } from 'components/Elements';
 import {
   coordToSquare,
-  getGameState,
   highlightSquares,
   parseBoardState,
   AskNewGame,
@@ -16,10 +15,9 @@ import type {
   PositionStyles,
   MetaGame,
 } from 'components/Features/chess/types';
-import { checkEnv } from 'utils';
 import Chessboard from 'components/Features/Chessboard';
 import { useToggle } from 'hooks';
-import clsx from 'clsx';
+import { cn } from 'utils';
 import Promotions from 'components/Features/chess/promotions';
 import { listen } from '@tauri-apps/api/event';
 
@@ -131,7 +129,7 @@ const HomePage = (): JSX.Element => {
       {/* Game State Row */}
       <div className="pt-5 w-full flex">
         <p
-          className={clsx(
+          className={cn(
             'inline border border-black rounded-sm px-6 py-3 text-sm mr-1',
             gameMeta.white_king.piece.King[2] ? 'bg-yellow-500' : '',
             gameMeta.white_king.piece.King[3] ? 'bg-red-800' : '',
@@ -144,7 +142,7 @@ const HomePage = (): JSX.Element => {
           )}
         </p>
         <p
-          className={clsx(
+          className={cn(
             'inline border border-black rounded-sm px-6 py-3 text-sm mr-1',
             gameMeta.black_king.piece.King[2] ? 'bg-yellow-500' : '',
             gameMeta.black_king.piece.King[3] ? 'bg-red-800' : '',

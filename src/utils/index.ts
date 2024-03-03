@@ -1,5 +1,7 @@
 // Check if the app is being run from a specified environment, or just return the running environment (dev, prod, test)
+import clsx, { ClassValue } from 'clsx';
 import { default as dayjs } from 'dayjs';
+import { twMerge } from 'tailwind-merge';
 
 type Env = typeof process.env.NODE_ENV;
 
@@ -25,3 +27,11 @@ export const formatTime = (time_s: number) => {
     ? `${days}days ${hours}hrs ${mins}mins ${seconds}secs`
     : `${hours}hrs ${mins}mins ${seconds}secs`;
 };
+
+/**Combine tailwind-merge and clsx.
+ *
+ * Makes composition of tailwind classes, on the fly, more predictable.
+ */
+export function cn(...classes: ClassValue[]) {
+  return twMerge(clsx(...classes));
+}

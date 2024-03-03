@@ -1,5 +1,5 @@
 import { Square } from 'chess.js';
-import clsx from 'clsx';
+import { cn } from 'utils';
 import type { CSSProperties, ReactNode } from 'react';
 import React from 'react';
 import { useDrop } from 'react-dnd';
@@ -73,7 +73,7 @@ export const BoardSquare = ({
   const rotate = orientation === 'black' ? 'rotate-180' : '';
   return (
     <div
-      className={clsx('tooltip', rotate)}
+      className={cn('tooltip', rotate)}
       data-tip={`(col ${col}, row ${row}) = ${coordToSquare(col, row)}`}
       onMouseEnter={() => onMouseOverSquare(square)}
       onMouseLeave={() => onMouseOutSquare(square)}
