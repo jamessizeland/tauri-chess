@@ -27,7 +27,7 @@ export function Layout({ children }: LayoutProps): JSX.Element {
         <SideNav version={version} />
         <div className="flex flex-col pl-0 w-full h-screen justify-between">
           <main className="pt-24 pb-1 md:px-4 lg:px-6 lg:pl-2">{children}</main>
-          <Footer />
+          <Footer version={version} />
         </div>
       </div>
     </LayoutProvider>
