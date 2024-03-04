@@ -4,8 +4,6 @@ use std::fmt::Display;
 
 use serde::{Deserialize, Serialize};
 
-use super::pieces::{GetState, ModState};
-
 /// 8x8 array containing either pieces or nothing
 pub type BoardState = [[Piece; 8]; 8];
 
@@ -40,21 +38,9 @@ pub struct KingMeta {
     pub square: Square,
 }
 
-pub trait ModMeta {
-    /// run all necessary board state cleanup to start a new turn
-    fn new_turn(&mut self, board: &mut BoardState, history: &mut Hist);
+impl GameMeta {
     /// Check if kings are under threat and update their status, return if checkmate occurred
-    fn update_king_threat(&mut self, board: &mut BoardState);
-    /// Increment the turn to the next player, check state of both players and return if game end has occurred
-    fn update_turn(&mut self);
-    /// Set up new game
-    fn new_game(&mut self);
-    /// Update score based on value of pieces on the board
-    fn calc_score(&mut self, board: &BoardState);
-}
-
-impl ModMeta for GameMeta {
-    fn update_king_threat(&mut self, board: &mut BoardState) {
+    pub fn update_king_threat(&mut self, board: &mut BoardState) {
         let turn: Color = if self.turn % 2 == 0 {
             Color::White
         } else {
@@ -79,11 +65,13 @@ impl ModMeta for GameMeta {
             }
         }
     }
-    fn update_turn(&mut self) {
+    /// Increment the turn to the next player, check state of both players and return if game end has occurred
+    pub fn update_turn(&mut self) {
         self.turn += 1;
         println!("turn {}", self.turn)
     }
-    fn new_game(&mut self) {
+    /// Set up new game
+    pub fn new_game(&mut self) {
         self.score = 0;
         self.turn = 0;
         self.game_over = false;
@@ -92,23 +80,24 @@ impl ModMeta for GameMeta {
         self.black_king.piece = Piece::King(Color::Black, true, false, false);
         self.black_king.square = (4, 7);
     }
-    fn new_turn(&mut self, board: &mut BoardState, history: &mut Hist) {
+    /// run all necessary board state cleanup to start a new turn
+    pub fn new_turn(&mut self, board: &mut BoardState, history: &mut Hist) {
         self.update_king_threat(board); // evaluate at the end of turn
         self.update_turn(); // toggle who's turn it is to play
         self.update_king_threat(board); // evaluate again start of next turn
         self.calc_score(board); // calculate score
         history.score.push(self.score);
     }
-    fn calc_score(&mut self, board: &BoardState) {
+    /// Update score based on value of pieces on the board
+    pub fn calc_score(&mut self, board: &BoardState) {
         let (mut white, mut black) = (0, 0);
         for col in board.iter() {
             for piece in col {
-                match piece.get_colour() {
-                    Some(color) => match color {
+                if let Some(color) = piece.get_colour() {
+                    match color {
                         Color::Black => black += piece.get_value(),
                         Color::White => white += piece.get_value(),
-                    },
-                    None => (),
+                    }
                 }
             }
         }
@@ -165,9 +154,10 @@ pub type Check = bool;
 /// Is the King in check with no means to get out of check
 pub type CheckMate = bool;
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Default)]
 #[repr(u8)]
 pub enum Piece {
+    #[default]
     None,
     Pawn(Color, FirstMove),
     King(Color, FirstMove, Check, CheckMate),
@@ -176,52 +166,47 @@ pub enum Piece {
     Knight(Color, FirstMove),
     Rook(Color, FirstMove),
 }
-impl Default for Piece {
-    fn default() -> Self {
-        Piece::None
-    }
-}
 
 impl Display for Piece {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let code = match *self {
             Piece::None => "__",
-            Piece::Pawn(color, _) => {
+            Piece::Pawn(color, ..) => {
                 if color == Color::White {
                     "wP"
                 } else {
                     "bP"
                 }
             }
-            Piece::King(color, _, _, _) => {
+            Piece::King(color, ..) => {
                 if color == Color::White {
                     "wK"
                 } else {
                     "bK"
                 }
             }
-            Piece::Queen(color, _) => {
+            Piece::Queen(color, ..) => {
                 if color == Color::White {
                     "wQ"
                 } else {
                     "bQ"
                 }
             }
-            Piece::Bishop(color, _) => {
+            Piece::Bishop(color, ..) => {
                 if color == Color::White {
                     "wB"
                 } else {
                     "bB"
                 }
             }
-            Piece::Knight(color, _) => {
+            Piece::Knight(color, ..) => {
                 if color == Color::White {
                     "wN"
                 } else {
                     "bN"
                 }
             }
-            Piece::Rook(color, _) => {
+            Piece::Rook(color, ..) => {
                 if color == Color::White {
                     "wR"
                 } else {

@@ -1,12 +1,12 @@
 //! General utility functions for chess
 
 use super::moves::check_castling_moves;
-use super::pieces::GetState;
 use super::types::{BoardState, Color, GameMeta, MoveList, MoveType, Piece, Square};
+use anyhow::{anyhow, Result as AppResult};
 
 /// Convert letters a-h to a row index from a standard chessboard
-pub fn letter_to_row(letter: char) -> usize {
-    match letter {
+pub fn letter_to_row(letter: char) -> AppResult<usize> {
+    Ok(match letter {
         'a' => 0,
         'b' => 1,
         'c' => 2,
@@ -15,27 +15,28 @@ pub fn letter_to_row(letter: char) -> usize {
         'f' => 5,
         'g' => 6,
         'h' => 7,
-        _ => panic!(),
-    }
+        _ => return Err(anyhow!("invalid letter")),
+    })
 }
 
 /// check if the piece we are looking is of the opposite colour to us
-pub fn check_enemy(our_color: &Color, considered_piece: &Piece) -> bool {
-    (considered_piece.get_colour() == Some(Color::Black) && *our_color == Color::White)
-        || (considered_piece.get_colour() == Some(Color::White) && *our_color == Color::Black)
+pub fn check_enemy(our_color: Color, considered_piece: &Piece) -> bool {
+    (considered_piece.get_colour() == Some(Color::Black) && our_color == Color::White)
+        || (considered_piece.get_colour() == Some(Color::White) && our_color == Color::Black)
 }
 
 /// convert a square string to a coordinate tuple i.e. b3 = (2,1)
 /// col (letter) followed by row (number)
-pub fn square_to_coord(square: &str) -> (usize, usize) {
+pub fn square_to_coord(square: &str) -> AppResult<(usize, usize)> {
     let sq_vec: Vec<char> = square.chars().collect();
-    if sq_vec.len() != 2 {
-        panic!("square string wasn't 2 characters");
-    } else {
-        (
-            letter_to_row(sq_vec[0]),
-            (sq_vec[1].to_digit(10).unwrap() - 1) as usize,
-        )
+    match sq_vec.len() {
+        2 => {
+            let Some(digit) = sq_vec[1].to_digit(10) else {
+                return Err(anyhow!("couldn't convert digit to number"));
+            };
+            Ok((letter_to_row(sq_vec[0])?, (digit - 1) as usize))
+        }
+        _ => Err(anyhow!("square string wasn't 2 characters")),
     }
 }
 
@@ -45,16 +46,16 @@ pub fn valid_move(
     target: Square,
     board: &BoardState,
     meta: &GameMeta,
-    turn: &Color,
+    turn: Color,
 ) -> Option<MoveType> {
     let piece = &board[source.0][source.1];
     let mut move_options = piece.get_moves(source, board);
-    if piece.is_king() == Some(*turn) {
+    if piece.is_king(turn) {
         for castle_move in check_castling_moves(source, turn, board) {
             move_options.push(castle_move);
         }
     };
-    if piece == &Piece::Pawn(*turn, false) && meta.en_passant != None {
+    if piece == &Piece::Pawn(turn, false) && meta.en_passant.is_some() {
         for pawn_move in piece.get_en_passant_moves(source, meta.en_passant.unwrap()) {
             move_options.push(pawn_move);
         }
@@ -62,12 +63,12 @@ pub fn valid_move(
     let filtered_moves = remove_invalid_moves(move_options, source, meta, board);
     filtered_moves
         .iter()
-        .position(|&ele| ele.0 == target)
+        .position(|(sq, _)| sq == &target)
         .map(|i| filtered_moves[i].1)
 }
 
 /// Check if this square is threatened, by exhaustive search
-pub fn under_threat(square: Square, our_color: &Color, board: &BoardState) -> bool {
+pub fn under_threat(square: Square, our_color: Color, board: &BoardState) -> bool {
     let mut threatened = false;
     // println!("checking threat");
     'outer: for col in 0..8 {
@@ -99,24 +100,19 @@ pub fn remove_invalid_moves(
     if my_piece != Piece::None {
         // only do this if we're looking at a non-empty square
         let our_color = my_piece.get_colour().expect("square has a color");
-        let i_am_king: bool = my_piece.is_king() == Some(our_color);
-        if (meta.turn % 2 == 0 && our_color == Color::White)
-            || (meta.turn % 2 != 0 && our_color == Color::Black)
-        {
+        let i_am_king: bool = my_piece.is_king(our_color);
+        if turn_into_colour(meta.turn) == our_color {
             // our turn
             let mut theory_board: BoardState = *board;
-            let our_king = if our_color == Color::White {
-                meta.white_king
-            } else {
-                meta.black_king
+            let our_king = match our_color {
+                Color::White => meta.white_king,
+                Color::Black => meta.black_king,
             };
-            // println!("{:?}, {:?}, {:?}", our_color, our_king, my_piece);
-            //* Is my king not in check or, am I infact the king and could potentially move? */
-            //* Am I preventing check by being where I am? */
+            // Is my king not in check or, am I infact the king and could potentially move?
+            // Am I preventing check by being where I am?
             theory_board[my_square.0][my_square.1] = Piece::None;
-            pretty_print_board(&theory_board);
             // println!("{:?}", my_piece.is_king());
-            if !under_threat(our_king.square, &our_color, &theory_board) && !i_am_king {
+            if !under_threat(our_king.square, our_color, &theory_board) && !i_am_king {
                 // println!("king isn't threatened if I'm not there");
                 // doesn't become under threat, allow all moves
                 filtered_moves = moves;
@@ -132,13 +128,11 @@ pub fn remove_invalid_moves(
                     } else {
                         our_king.square
                     };
-                    if under_threat(king_square, &our_color, &theory_board) {
-                    } else {
+                    if !under_threat(king_square, our_color, &theory_board) {
                         filtered_moves.push(m);
                     }
                 }
             }
-            //* If in check, does moving to any of the spaces listed remove check?  */
         }
     }
     filtered_moves
@@ -155,6 +149,7 @@ pub fn turn_into_colour(turn: usize) -> Color {
     }
 }
 
+#[allow(dead_code)]
 /// Print to console the board state from White's perspective, in a neat form
 fn pretty_print_board(board: &BoardState) {
     for (i, row) in board.iter().enumerate().rev() {

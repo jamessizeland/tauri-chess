@@ -13,7 +13,7 @@
       "all": false,
       "shell": {
         "all": false,
-        "open": true
+        "open": false
       }
     },
     "bundle": {
@@ -53,7 +53,13 @@
       "csp": null
     },
     "updater": {
-      "active": false
+      "active": true,
+      "dialog": true,
+      "endpoints": [],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDNEREQ0QkZBNTVDRTZCOTkKUldTWmE4NVYra3ZkUFRLZ3hvUFF3RmdDYm5TdHNFem4wT1hJdW13cWo3Z09Oa29ubmtiWWFFeWUK",
+      "windows": {
+        "installMode": "passive"
+      }
     },
     "windows": [
       {

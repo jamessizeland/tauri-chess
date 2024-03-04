@@ -6,7 +6,7 @@ import Overlay from './helpers/overlay';
 import SideNav from './Sidebar/sideNavbar';
 import { ToastContainer } from 'react-toastify';
 import { useEffect, useState } from 'react';
-import { invoke } from '@tauri-apps/api';
+import { getVersion } from '@tauri-apps/api/app';
 
 type LayoutProps = {
   children: JSX.Element;
@@ -14,7 +14,7 @@ type LayoutProps = {
 
 export function Layout({ children }: LayoutProps): JSX.Element {
   useEffect(() => {
-    invoke<string>('get_version').then((version) => setVersion(version));
+    getVersion().then((version) => setVersion(version));
   }, []);
 
   const [version, setVersion] = useState<string>('');

@@ -5,160 +5,126 @@ use super::types::{BoardState, Color, GameMeta, MoveList, Piece, Square};
 use super::utils::{remove_invalid_moves, under_threat};
 
 /// Request state information from a selected piece
-pub trait GetState {
+impl Piece {
     /// Return a list of all available moves for this piece
-    fn get_moves(&self, square: Square, board: &BoardState) -> MoveList;
-    /// Return if there is an available en passant move for this pawn
-    fn get_en_passant_moves(&self, square: Square, en_passant_target: Square) -> MoveList;
-    /// Return this piece's color
-    fn get_colour(&self) -> Option<Color>;
-    /// If this piece is a king, return its color, otherwise return None
-    fn is_king(&self) -> Option<Color>;
-    /// If this piece is a king, is it in check?
-    fn is_king_checked(&self) -> Option<bool>;
-    /// If this piece is a king, is it in checkmate?
-    fn is_king_mate(&self) -> Option<bool>;
-    /// Return the relative weighting value of this piece based on its type
-    ///
-    /// https://en.wikipedia.org/wiki/Chess_piece_relative_value
-    fn get_value(&self) -> isize;
-    /// Ask if this piece is a promotable pawn
-    fn is_promotable_pawn(&self, square: Square) -> bool;
-}
-
-/// Modify state information on a selected piece
-pub trait ModState {
-    /// This piece has been moved, so update its First Move status to false
-    ///
-    /// Return modified piece
-    fn has_moved(&self) -> Self;
-    /// If this piece is a king, update its check and checkmate states
-    ///
-    /// Modifies piece in place
-    fn king_threat(&mut self, location: &Square, board: &BoardState, meta: GameMeta);
-}
-
-impl GetState for Piece {
-    fn get_moves(&self, sq: Square, board: &BoardState) -> MoveList {
+    pub fn get_moves(&self, sq: Square, board: &BoardState) -> MoveList {
         //* For each actual piece we need to work out what moves it could do on an empty board, then remove moves that are blocked by other pieces
-        match &self {
+        match self {
             // what type of piece am I?
             Piece::None => Vec::new(),
-            Piece::Pawn(color, first_move) => pawn_move(sq, color, first_move, board),
-            Piece::King(color, _first_move, _check, _check_mate) => king_move(sq, color, board),
-            Piece::Queen(color, _first_move) => {
+            Piece::Pawn(color, first_move) => pawn_move(sq, *color, *first_move, board),
+            Piece::King(color, ..) => king_move(sq, *color, board),
+            Piece::Queen(color, ..) => {
                 //* move in any direction until either another piece or the edge of the board
-                let mut moves = rook_move(sq, color, board);
-                let mut diag_moves = bish_move(sq, color, board);
+                let mut moves = rook_move(sq, *color, board);
+                let mut diag_moves = bish_move(sq, *color, board);
                 moves.append(&mut diag_moves);
                 moves
             }
-            Piece::Bishop(color, _first_move) => bish_move(sq, color, board),
-            Piece::Knight(color, _first_move) => knight_move(sq, color, board),
-            Piece::Rook(color, _first_move) => rook_move(sq, color, board),
+            Piece::Bishop(color, ..) => bish_move(sq, *color, board),
+            Piece::Knight(color, ..) => knight_move(sq, *color, board),
+            Piece::Rook(color, ..) => rook_move(sq, *color, board),
         }
     }
-
-    fn get_en_passant_moves(&self, square: Square, en_passant_target: Square) -> MoveList {
-        match &self {
-            Piece::Pawn(color, _first_move) => en_passant_move(square, color, en_passant_target),
-            _ => panic!("should only be targetting a pawn"),
+    /// Return if there is an available en passant move for this pawn
+    pub fn get_en_passant_moves(&self, square: Square, en_passant_target: Square) -> MoveList {
+        if let Piece::Pawn(color, ..) = self {
+            en_passant_move(square, *color, en_passant_target)
+        } else {
+            panic!("should only be targetting a pawn")
         }
     }
-    fn get_colour(&self) -> Option<Color> {
-        match &self {
+    /// Return this piece's color
+    pub fn get_colour(&self) -> Option<Color> {
+        match self {
             Piece::None => None,
-            Piece::Pawn(color, _) => Some(*color),
-            Piece::King(color, _, _, _) => Some(*color),
-            Piece::Queen(color, _) => Some(*color),
-            Piece::Bishop(color, _) => Some(*color),
-            Piece::Knight(color, _) => Some(*color),
-            Piece::Rook(color, _) => Some(*color),
+            Piece::Pawn(color, ..) => Some(*color),
+            Piece::King(color, ..) => Some(*color),
+            Piece::Queen(color, ..) => Some(*color),
+            Piece::Bishop(color, ..) => Some(*color),
+            Piece::Knight(color, ..) => Some(*color),
+            Piece::Rook(color, ..) => Some(*color),
         }
     }
-    fn is_king(&self) -> Option<Color> {
-        match &self {
-            Piece::King(color, _, _, _) => Some(*color),
-            _ => None,
-        }
-    }
-    fn is_king_checked(&self) -> Option<bool> {
-        match &self {
-            Piece::King(_, _, check, _) => Some(*check),
-            _ => None,
-        }
-    }
-    fn is_king_mate(&self) -> Option<bool> {
-        match &self {
-            Piece::King(_, _, _, mate) => Some(*mate),
-            _ => None,
-        }
-    }
-
-    fn get_value(&self) -> isize {
-        match &self {
-            Piece::None => 0,
-            Piece::Pawn(_, _) => 1,
-            Piece::King(_, _, _, _) => 0,
-            Piece::Queen(_, _) => 9,
-            Piece::Bishop(_, _) => 3,
-            Piece::Knight(_, _) => 3,
-            Piece::Rook(_, _) => 5,
-        }
-    }
-
-    fn is_promotable_pawn(&self, square: Square) -> bool {
-        match &self {
-            Piece::Pawn(color, _first_move) => match color {
-                // check if the pawn has reached the other side of the board
-                Color::Black => square.1 == 0,
-                Color::White => square.1 == 7,
-            },
+    /// Check if this piece is a king of a certain color
+    pub fn is_king(&self, color: Color) -> bool {
+        match self {
+            Piece::King(my_color, ..) => my_color == &color,
             _ => false,
         }
     }
-}
-
-impl ModState for Piece {
-    fn has_moved(&self) -> Self {
-        match &self {
-            Piece::None => Self::None,
-            Piece::Pawn(color, _) => Self::Pawn(*color, false),
-            Piece::King(color, _, check, mate) => Piece::King(*color, false, *check, *mate),
-            Piece::Queen(color, _) => Self::Queen(*color, false),
-            Piece::Bishop(color, _) => Self::Bishop(*color, false),
-            Piece::Knight(color, _) => Self::Knight(*color, false),
-            Piece::Rook(color, _) => Self::Rook(*color, false),
+    /// If this piece is a king, is it in checkmate?
+    pub fn is_king_mate(&self) -> Option<bool> {
+        if let Piece::King(.., mate) = self {
+            Some(*mate)
+        } else {
+            None
         }
     }
-    fn king_threat(&mut self, location: &Square, board: &BoardState, meta: GameMeta) {
-        *self = match *self {
-            Piece::King(color, first_move, _, _) => {
-                let check = under_threat(*location, &color, board);
-                let mut team_moves: usize = 0;
-                for col in 0..8 {
-                    for row in 0..8 {
-                        let piece = board[col][row];
-                        if piece.get_colour() == Some(color) {
-                            let no_moves = remove_invalid_moves(
-                                piece.get_moves((col, row), board),
-                                (col, row),
-                                &meta,
-                                board,
-                            )
-                            .len();
-                            team_moves += no_moves;
-                            // println!(
-                            //     "friendly piece {:?} at ({},{} - {} moves)",
-                            //     piece, col, row, no_moves
-                            // );
-                        }
+    /// Return the relative weighting value of this piece based on its type
+    ///
+    /// https://en.wikipedia.org/wiki/Chess_piece_relative_value
+    pub fn get_value(&self) -> isize {
+        match &self {
+            Piece::None => 0,
+            Piece::Pawn(..) => 1,
+            Piece::King(..) => 0,
+            Piece::Queen(..) => 9,
+            Piece::Bishop(..) => 3,
+            Piece::Knight(..) => 3,
+            Piece::Rook(..) => 5,
+        }
+    }
+    /// Ask if this piece is a promotable pawn
+    pub fn is_promotable_pawn(&self, square: Square) -> bool {
+        if let Piece::Pawn(color, ..) = self {
+            match color {
+                // check if the pawn has reached the other side of the board
+                Color::Black => square.1 == 0,
+                Color::White => square.1 == 7,
+            }
+        } else {
+            false
+        }
+    }
+    /// This piece has been moved, so update its First Move status to false
+    ///
+    /// Return modified piece
+    pub fn has_moved(&self) -> Self {
+        match &self {
+            Piece::None => Self::None,
+            Piece::Pawn(color, ..) => Self::Pawn(*color, false),
+            Piece::King(color, _, check, mate) => Piece::King(*color, false, *check, *mate),
+            Piece::Queen(color, ..) => Self::Queen(*color, false),
+            Piece::Bishop(color, ..) => Self::Bishop(*color, false),
+            Piece::Knight(color, ..) => Self::Knight(*color, false),
+            Piece::Rook(color, ..) => Self::Rook(*color, false),
+        }
+    }
+    /// If this piece is a king, update its check and checkmate states
+    ///
+    /// Modifies piece in place
+    pub fn king_threat(&mut self, location: &Square, board: &BoardState, meta: GameMeta) {
+        if let Piece::King(color, first_move, ..) = self {
+            let check = under_threat(*location, *color, board);
+            let mut team_moves: usize = 0;
+            for col in 0..8 {
+                for row in 0..8 {
+                    let piece = board[col][row];
+                    if piece.get_colour() == Some(*color) {
+                        let no_moves = remove_invalid_moves(
+                            piece.get_moves((col, row), board),
+                            (col, row),
+                            &meta,
+                            board,
+                        )
+                        .len();
+                        team_moves += no_moves;
                     }
                 }
-                let mate = check && (team_moves == 0);
-                Self::King(color, first_move, check, mate)
             }
-            _ => *self,
+            let mate = check && (team_moves == 0);
+            *self = Piece::King(*color, *first_move, check, mate);
         }
     }
 }
