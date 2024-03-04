@@ -1,4 +1,3 @@
-import react from 'React';
 import { Position, Piece } from '../Chessboard/types';
 import { Square } from 'chess.js';
 import { notify } from 'services/notifications';

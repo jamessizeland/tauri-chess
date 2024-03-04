@@ -1,59 +1,8 @@
-import { diff } from 'deep-diff';
 import type { Square } from 'chess.js';
 import type { FENpiece, Piece, Position } from './types';
 
 export const ItemTypes = { PIECE: 'piece' };
 export const COLUMNS = 'abcdefgh'.split('');
-
-export const constructPositionAttributes = (from: Position, to: Position) => {
-  type PosChange = {
-    from: Square;
-    to: Square;
-    piece: Piece;
-    type: 'move' | 'attack' | 'promotion';
-  };
-  let changesArr: PosChange[] = [];
-  const change = diff(from, to); // change in board states between turns
-  if (change) {
-    // something has changed, filter to collect New, Edited and Deleted elements
-    change.forEach((element) => {
-      if (element.kind === 'D') {
-        // Delete (piece removed from square)
-        const i = changesArr.findIndex((e) => element.lhs === e.piece);
-        if (i != -1 && element.path) {
-          // found where this piece has gone, add to this move obj
-          changesArr[i].from = element.path[0];
-        } else if (element.path) {
-          changesArr.push({
-            to: element.path[0],
-            from: element.path[0],
-            piece: element.lhs as Piece,
-            type: 'move',
-          });
-        }
-      } else if (element.kind === 'E' || element.kind === 'N') {
-        // Edit (piece replaced with another) or New (piece moved to a previously empty square)
-        const i = changesArr.findIndex((e) => element.rhs === e.piece);
-        if (i != -1 && element.path) {
-          // found where this piece has come from, add to this move obj
-          changesArr[i].to = element.path[0];
-        } else if (element.path) {
-          changesArr.push({
-            to: element.path[0],
-            from: element.path[0],
-            piece: element.rhs as Piece,
-            type: element.kind === 'E' ? 'attack' : 'move',
-          });
-        }
-      }
-    });
-  }
-  changesArr = changesArr.map((element) => {
-    if (element.from === element.to) element.type = 'promotion';
-    return element;
-  });
-  return changesArr;
-};
 
 function isString(s: any): boolean {
   return typeof s === 'string';
