@@ -3,22 +3,25 @@
     windows_subsystem = "windows"
 )]
 
-mod api;
 mod chess;
 
 use chess::data::{queue_handler, Payload};
 use std::{sync::Mutex, thread};
 use tauri::{async_runtime::channel, Manager};
 
-fn main() {
+fn main() -> Result<(), anyhow::Error> {
     let (tx, mut rx) = channel::<Payload>(5);
     tauri::Builder::default()
         .setup(|app| {
-            let window = app.get_window("main").unwrap();
+            let window = app
+                .get_window("main")
+                .ok_or_else(|| anyhow::anyhow!("Failed to get the window"))?;
             thread::spawn(move || {
                 println!("spawning a new thread to handle unprompted events from Rust to the UI");
                 loop {
-                    queue_handler(&window, &mut rx);
+                    if let Err(error) = queue_handler(&window, &mut rx) {
+                        break eprintln!("error while handling queue: {:?}", error);
+                    }
                 }
             });
             Ok(())
@@ -38,8 +41,8 @@ fn main() {
             chess::api::click_square,
             chess::api::promote,
             chess::api::event_tester,
-            api::get_version
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+    Ok(())
 }
