@@ -1,12 +1,8 @@
 {
   "recommendations": [
     "dbaeumer.vscode-eslint",
-    "wix.vscode-import-cost",
-    "esbenp.prettier-vscode",
-    "formulahendry.auto-rename-tag",
-    "tamasfe.even-better-toml",
-    "rust-lang.rust-analyzer",
     "tauri-apps.tauri-vscode",
-    "serayuzgur.crates"
+    "rust-lang.rust-analyzer",
+    "fill-labs.dependi"
   ]
 }
