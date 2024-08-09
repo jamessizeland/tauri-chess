@@ -1,9 +1,7 @@
-import React, { Component, CSSProperties } from 'react';
+import { CSSProperties } from 'react';
 import type { XYCoord } from 'react-dnd';
 import { useDragLayer } from 'react-dnd';
-// import { renderChessPiece } from './Piece';
-import { CustomPieces } from './types';
-import { Square } from 'chess.js';
+import type { CustomPieces, Square } from 'types';
 
 type Props = {
   width: number;
@@ -35,21 +33,19 @@ const getItemStyle = (
 };
 
 const CustomDragLayer = ({
-  id,
-  pieces,
-  sourceSquare,
+  // id,
+  // pieces,
+  // sourceSquare,
+  // width,
   wasPieceTouched,
-  width,
 }: Props) => {
-  const { itemType, isDragging, item, currentOffset } = useDragLayer(
-    (monitor) => ({
-      item: monitor.getItem(),
-      itemType: monitor.getItemType(),
-      // initialOffset: monitor.getInitialSourceClientOffset(),
-      currentOffset: monitor.getSourceClientOffset(),
-      isDragging: monitor.isDragging(),
-    }),
-  );
+  const { isDragging, currentOffset } = useDragLayer((monitor) => ({
+    item: monitor.getItem(),
+    itemType: monitor.getItemType(),
+    // initialOffset: monitor.getInitialSourceClientOffset(),
+    currentOffset: monitor.getSourceClientOffset(),
+    isDragging: monitor.isDragging(),
+  }));
 
   return isDragging ? (
     <div style={layerStyles}>

@@ -1,31 +1,30 @@
 import { useState, useEffect } from 'react';
-import type { Position } from 'components/Features/Chessboard/types';
-import { Square } from 'chess.js';
-import { invoke } from '@tauri-apps/api/tauri';
+import type {
+  Position,
+  Square,
+  BoardStateArray,
+  MoveList,
+  PositionStyles,
+  MetaGame,
+} from 'types';
 import { Button } from 'components/Elements';
 import {
   coordToSquare,
   highlightSquares,
   parseBoardState,
   AskNewGame,
-} from 'components/Features/chess/index';
-import type {
-  BoardStateArray,
-  MoveList,
-  PositionStyles,
-  MetaGame,
-} from 'components/Features/chess/types';
+} from 'components/Features/chess';
 import Chessboard from 'components/Features/Chessboard';
 import { useToggle } from 'hooks';
 import { cn } from 'utils';
 import Promotions from 'components/Features/chess/promotions';
+import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 
 const HomePage = (): JSX.Element => {
   const [newGameisOpen, newGametoggle] = useToggle(true);
   const [promoterisOpen, promotertoggle] = useToggle(false);
   const [position, setPosition] = useState<Position>({});
-  const [newGame, setNewGame] = useState<boolean>(false);
   const [gameMeta, setGameMeta] = useState<MetaGame>({
     score: 0,
     turn: 0,
@@ -46,11 +45,9 @@ const HomePage = (): JSX.Element => {
     },
   });
   const [squareStyles, setSquareStyles] = useState<PositionStyles>();
-  const [dragStyles, setDragStyles] = useState<{}>();
+  // const [dragStyles, setDragStyles] = useState<{}>();
   const [whiteTurn, setWhiteTurn] = useState<boolean>(true);
-  const [hoveredSquare, setHoveredSquare] = useState<Square | undefined>(
-    undefined,
-  );
+  const [hoveredSquare, setHoveredSquare] = useState<Square>();
   const [rotation, setRotation] = useState(false);
 
   useEffect(() => {
@@ -60,9 +57,7 @@ const HomePage = (): JSX.Element => {
     );
     invoke<MetaGame>('get_score').then((meta) => setGameMeta(meta));
     // listen for promotion requests
-    const promRef = listen<string>('promotion', (event) => {
-      promotertoggle();
-    });
+    const promRef = listen<string>('promotion', () => promotertoggle());
     // listen for unexpected board state updates
     const boardRef = listen<BoardStateArray>('board', (event) => {
       console.log('Rust requests a boardstate update');
@@ -106,7 +101,7 @@ const HomePage = (): JSX.Element => {
             boxShadow: `0 5px 15px rgba(0,0,0,0.5)`,
           }}
           squareStyles={squareStyles}
-          dropSquareStyle={dragStyles}
+          dropSquareStyle={undefined}
           onSquareClick={(square) => {
             if (!gameMeta.game_over) {
               invoke<[MoveList, BoardStateArray, MetaGame]>('click_square', {

@@ -1,7 +1,5 @@
-import { Position, Piece } from '../Chessboard/types';
-import { Square } from 'chess.js';
 import { notify } from 'services/notifications';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import {
   BoardStateArray,
   RustPiece,
@@ -10,7 +8,10 @@ import {
   MoveList,
   MetaGame,
   MoveType,
-} from './types';
+  Square,
+  Position,
+  Piece,
+} from 'types';
 import {
   Button,
   Modal,
@@ -71,7 +72,7 @@ const highlightSquares = (
   square?: Square,
 ): PositionStyles => {
   // turn this array of squares into an object with cssProperties defined
-  const props = moveOptions.reduce<PositionStyles>((result, move, index) => {
+  const props = moveOptions.reduce<PositionStyles>((result, move) => {
     const [moveType, col, row] = [move[1], move[0][0], move[0][1]];
     const highlightColour = (moveType: MoveType) => {
       console.log(moveType);

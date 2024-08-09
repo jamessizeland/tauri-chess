@@ -1,5 +1,5 @@
-import React, { Fragment, CSSProperties } from 'react';
-import { Orientation } from './types';
+import { Fragment, CSSProperties } from 'react';
+import { Orientation } from 'types';
 import { COLUMNS } from './helpers';
 import { Property } from 'csstype';
 
@@ -68,7 +68,6 @@ const renderLetters = ({
   whiteColor,
   blackColor,
 }: Omit<SquareProps, 'row'> & WhiteColor & BlackColor) => {
-  const rotate = orientation === 'black' ? 'rotate-180' : '';
   return (
     <div
       data-testid={`column-${getColumn(orientation, col)}`}
@@ -154,8 +153,8 @@ const rowStyle = ({
           ? blackColor
           : whiteColor
         : isRow && !isBottomLeftSquare && row % 2 !== 0
-        ? blackColor
-        : whiteColor,
+          ? blackColor
+          : whiteColor,
   };
 };
 
