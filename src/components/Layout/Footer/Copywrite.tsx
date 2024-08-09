@@ -24,7 +24,7 @@ export default function Copywrite({
   return (
     <div className={cn('p-6 bg-gray-200 flex justify-between', className)}>
       <span>2024, {owner ? owner : author?.name}</span>
-      <a className="text-gray-600 font-semibold" href={repo}>
+      <a className="text-gray-600 font-semibold" href={repo} target="_blank">
         Sourcecode
       </a>
       <span>version: {version}</span>
