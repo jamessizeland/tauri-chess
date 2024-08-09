@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import {
   Button,
   Modal,
@@ -7,8 +7,8 @@ import {
   ModalFooter,
 } from 'components/Elements';
 import { useToggle } from 'hooks';
-import { invoke } from '@tauri-apps/api/tauri';
 import { listen } from '@tauri-apps/api/event';
+import { invoke } from '@tauri-apps/api/core';
 
 const TestPage = (): JSX.Element => {
   useEffect(() => {
@@ -20,7 +20,7 @@ const TestPage = (): JSX.Element => {
     };
   }, []);
 
-  const [score, setScore] = useState(0);
+  // const [score, setScore] = useState(0);
   const [isOpen1, toggle1] = useToggle(false);
   const [isOpen2, toggle2] = useToggle(false);
   return (
@@ -54,7 +54,7 @@ const TestPage = (): JSX.Element => {
         <Button onClick={() => invoke('event_tester', { message: 'hello' })}>
           Trigger Event
         </Button>
-        <p>{score}</p>
+        {/* <p>{score}</p> */}
       </div>
     </div>
   );
