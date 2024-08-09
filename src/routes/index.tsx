@@ -1,4 +1,3 @@
-import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { HomePage, AboutPage, TestPage } from 'pages';
 import { checkEnv } from 'utils';

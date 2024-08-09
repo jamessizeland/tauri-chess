@@ -1,4 +1,4 @@
-import React, {
+import {
   useEffect,
   useRef,
   useContext,
@@ -30,13 +30,6 @@ function LayoutProvider({ children }: { children: ReactNode }) {
 
     setOpen(!open);
   }, [open]);
-
-  // close side navigation when you click on a sidenav item. it's triggered when viewport is less than 1024px
-  const closeSidenav = () => {
-    if (window.innerWidth < 1024) {
-      setOpen(false);
-    }
-  };
 
   // close side navigation on click outside when viewport is less than 1024px
   useEffect(() => {
