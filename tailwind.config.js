@@ -162,10 +162,6 @@ module.exports = withAnimations({
           '100%': { bottom: '0' },
         },
       },
-      fontFamily: {
-        inter: ['Inter'],
-        body: ['Open Sans'],
-      },
     },
   },
   variants: {},
