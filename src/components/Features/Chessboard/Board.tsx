@@ -1,10 +1,9 @@
-import { Square } from 'chess.js';
 import { cn } from 'utils';
 import type { CSSProperties } from 'react';
 import { coordToSquare } from '../chess';
 import { BoardSquare } from './BoardSquare';
 import Notation from './Notation';
-import type { ChessboardProps, Position } from './types';
+import type { ChessboardProps, Position, Square } from 'types';
 import ChessPiece from './Piece';
 
 /** Styling properties applied to the board element */
@@ -27,12 +26,13 @@ const Board = ({
   boardStyle,
   onPieceClick,
   onDragOverSquare,
-  onDrop,
+  // onDrop,
+  // onSquareRightClick,
+  // width,
   onMouseOutSquare,
   onMouseOverSquare,
   onSquareClick,
   squareStyles,
-  onSquareRightClick,
 }: ChessboardProps): JSX.Element => {
   const squares = [];
 

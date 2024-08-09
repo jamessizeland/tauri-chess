@@ -1,11 +1,9 @@
-import { Square } from 'chess.js';
 import { cn } from 'utils';
 import type { CSSProperties, ReactNode } from 'react';
-import React from 'react';
 import { useDrop } from 'react-dnd';
 import { coordToSquare } from '../chess';
 import { ItemTypes } from './helpers';
-import type { Orientation } from './types';
+import type { Orientation, Square } from 'types';
 
 export interface BoardSquareProps {
   col: number;
@@ -35,16 +33,16 @@ export const BoardSquare = ({
   lightSquareStyle = { backgroundColor: 'rgb(240, 217, 181)' },
   darkSquareStyle = { backgroundColor: 'rgb(181, 136, 99)' },
   customSquareStyle,
-  onMouseOverSquare = (square: Square) => null,
-  onMouseOutSquare = (square: Square) => null,
-  onDragOverSquare = (square: Square) => null,
-  onDrop = (square: Square) => null,
-  onSquareClick = (square: Square) => null,
-  onSquareRightClick = (square: Square) => null,
+  onMouseOverSquare = () => null,
+  onMouseOutSquare = () => null,
+  onSquareClick = () => null,
+  // onDragOverSquare = () => null,
+  // onDrop = () => null,
+  // onSquareRightClick = () => null,
   children,
 }: BoardSquareProps): JSX.Element => {
   const square = coordToSquare(col, row);
-  const [{ isOver, canDrop }, drop] = useDrop(
+  const [, drop] = useDrop(
     () => ({
       accept: ItemTypes.PIECE,
       //   canDrop: () => game.canMoveKnight(x, y),

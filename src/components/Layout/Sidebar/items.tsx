@@ -1,4 +1,3 @@
-import React from 'react';
 import { routes } from 'routes';
 import { NavbarLink, NavbarItem } from 'components/Elements';
 

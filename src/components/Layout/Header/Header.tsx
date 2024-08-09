@@ -18,7 +18,7 @@ type HeaderProps = {
   appName?: string;
 };
 
-function Header({ appName }: HeaderProps): JSX.Element {
+function Header({}: HeaderProps): JSX.Element {
   const { toggle } = useToggle();
   const scrollDirection = useScrollDirection({
     initialDirection: 'up', // this is so the navbar is present on page load

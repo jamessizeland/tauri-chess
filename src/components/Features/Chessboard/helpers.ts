@@ -1,5 +1,4 @@
-import type { Square } from 'chess.js';
-import type { FENpiece, Piece, Position } from './types';
+import type { FENpiece, Piece, Position, Square } from 'types';
 
 export const ItemTypes = { PIECE: 'piece' };
 export const COLUMNS = 'abcdefgh'.split('');

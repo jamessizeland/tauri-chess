@@ -10,7 +10,6 @@ interface CopywriteProps {
   className?: string;
   version?: string;
   author?: User;
-  title?: string;
   owner?: string;
   repo?: string;
 }
@@ -19,7 +18,6 @@ export default function Copywrite({
   className,
   version,
   author,
-  title,
   owner,
   repo = '/',
 }: CopywriteProps) {

@@ -91,7 +91,7 @@ impl Piece {
     ///
     /// Return modified piece
     pub fn has_moved(&self) -> Self {
-        match &self {
+        match self {
             Piece::None => Self::None,
             Piece::Pawn(color, ..) => Self::Pawn(*color, false),
             Piece::King(color, _, check, mate) => Piece::King(*color, false, *check, *mate),

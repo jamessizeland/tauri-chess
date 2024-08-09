@@ -1,25 +1,28 @@
 [package]
 name = "tauri-chess"
-version = "1.10.0"
+version = "2.0.0"
 description = "A Tauri App for playing chess"
 authors = ["James Sizeland"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[lib]
+name = "tauri_chess_lib"
+crate-type = ["lib", "cdylib", "staticlib"]
+
 [build-dependencies]
-tauri-build = { version = "^1.5.1", features = [] }
+tauri-build = { version = "2.0.0-rc", features = [] }
 
 [dependencies]
-serde_json = "1.0.114"
-serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.6.1", features = ["updater"] }
+tauri = { version = "2.0.0-rc", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
 rand = { version = "0.8.5" }
 anyhow = "1.0.80"
 
-[features]
-# This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!
-custom-protocol = ["tauri/custom-protocol"]
+# Tauri Plugins
+tauri-plugin-shell = "2.0.0-rc"
 
 [profile.release]
 panic = "abort"   # Strip expensive panic clean-up logic

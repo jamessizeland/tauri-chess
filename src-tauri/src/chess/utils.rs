@@ -2,10 +2,10 @@
 
 use super::moves::check_castling_moves;
 use super::types::{BoardState, Color, GameMeta, MoveList, MoveType, Piece, Square};
-use anyhow::{anyhow, Result as AppResult};
+use anyhow::{anyhow, Result};
 
 /// Convert letters a-h to a row index from a standard chessboard
-pub fn letter_to_row(letter: char) -> AppResult<usize> {
+pub fn letter_to_row(letter: char) -> Result<usize> {
     Ok(match letter {
         'a' => 0,
         'b' => 1,
@@ -27,7 +27,7 @@ pub fn check_enemy(our_color: Color, considered_piece: &Piece) -> bool {
 
 /// convert a square string to a coordinate tuple i.e. b3 = (2,1)
 /// col (letter) followed by row (number)
-pub fn square_to_coord(square: &str) -> AppResult<(usize, usize)> {
+pub fn square_to_coord(square: &str) -> Result<(usize, usize)> {
     let sq_vec: Vec<char> = square.chars().collect();
     match sq_vec.len() {
         2 => {
@@ -48,16 +48,18 @@ pub fn valid_move(
     meta: &GameMeta,
     turn: Color,
 ) -> Option<MoveType> {
-    let piece = &board[source.0][source.1];
+    let piece = board[source.0][source.1];
     let mut move_options = piece.get_moves(source, board);
     if piece.is_king(turn) {
         for castle_move in check_castling_moves(source, turn, board) {
             move_options.push(castle_move);
         }
     };
-    if piece == &Piece::Pawn(turn, false) && meta.en_passant.is_some() {
-        for pawn_move in piece.get_en_passant_moves(source, meta.en_passant.unwrap()) {
-            move_options.push(pawn_move);
+    if piece == Piece::Pawn(turn, false) {
+        if let Some(en_passant_target) = meta.en_passant {
+            for pawn_move in piece.get_en_passant_moves(source, en_passant_target) {
+                move_options.push(pawn_move);
+            }
         }
     }
     let filtered_moves = remove_invalid_moves(move_options, source, meta, board);
@@ -95,12 +97,12 @@ pub fn remove_invalid_moves(
     board: &BoardState,
 ) -> MoveList {
     // println!("removing invalid moves");
-    let mut filtered_moves: MoveList = vec![];
+    let mut filtered_moves = MoveList::new();
     let my_piece = board[my_square.0][my_square.1];
     if my_piece != Piece::None {
         // only do this if we're looking at a non-empty square
         let our_color = my_piece.get_colour().expect("square has a color");
-        let i_am_king: bool = my_piece.is_king(our_color);
+        let i_am_king = my_piece.is_king(our_color);
         if turn_into_colour(meta.turn) == our_color {
             // our turn
             let mut theory_board: BoardState = *board;
@@ -117,19 +119,17 @@ pub fn remove_invalid_moves(
                 // doesn't become under threat, allow all moves
                 filtered_moves = moves;
             } else {
-                for m in moves {
+                for (coord, move_type) in moves {
                     // check if any of the potential moves cause my king to go into check
                     theory_board = *board; // reset the board
                     theory_board[my_square.0][my_square.1] = Piece::None; // remove my piece
-                    theory_board[m.0 .0][m.0 .1] = my_piece; // place it in a potential move spot
-                    let king_square = if i_am_king {
-                        // println!("your majesty");
-                        m.0
-                    } else {
-                        our_king.square
+                    theory_board[coord.0][coord.1] = my_piece; // place it in a potential move spot
+                    let king_square = match i_am_king {
+                        true => coord,
+                        false => our_king.square,
                     };
                     if !under_threat(king_square, our_color, &theory_board) {
-                        filtered_moves.push(m);
+                        filtered_moves.push((coord, move_type));
                     }
                 }
             }

@@ -1,5 +1,4 @@
-import type { Orientation, Piece } from './types';
-import type { Square } from 'chess.js';
+import type { Orientation, Piece, Square } from 'types';
 import pieceSVG from './svg/chesspieces/standard';
 import { cn } from 'utils';
 
@@ -17,13 +16,11 @@ type PieceProps = {
 
 export default function ChessPiece({
   piece,
-  isDragging = false,
+  // isDragging = false,
   width,
   onPieceClick,
-  orientation = 'white',
   className = '',
 }: PieceProps) {
-  const rotate = orientation === 'black' ? 'rotate-180' : '';
   return (
     <div className={cn('h-full', className)}>
       {piece && (

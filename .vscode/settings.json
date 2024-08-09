@@ -1,11 +1,4 @@
 {
-  "files.associations": {
-    ".babelrc": "jsonc",
-    ".eslintrc": "js",
-    ".prettierrc": "jsonc",
-    ".eslintignore": "ignore"
-  },
-
   "javascript.validate.enable": false,
   "javascript.format.enable": false,
   "typescript.format.enable": false,
@@ -20,12 +13,11 @@
     "node_modules": true,
     "npm-debug.log.*": true,
     "test/**/__snapshots__": true,
-    "yarn.lock": true,
+    "*.lock": true,
+    "*.lockb":true,
     "*.{css,sass,scss}.d.ts": true
   },
   // force format on save to be enabled for this project
   "editor.formatOnSave": true,
   "editor.formatOnSaveMode": "file"
-
-  // "typescript.tsdk": "node_modules\\typescript\\lib"
 }

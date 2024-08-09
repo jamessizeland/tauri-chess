@@ -1,5 +1,5 @@
 import { Button, Modal, ModalBody, ModalHeader } from 'components/Elements';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 
 type PromotionProps = {
   toggle: (isOpen?: boolean | undefined) => void;

@@ -1,32 +1,29 @@
-import React, { useState, useEffect, CSSProperties } from 'react';
-import type { ChessboardProps } from './types';
-import defaultPieces from './svg/chesspieces/standard';
-import whiteKing from './svg/whiteKing';
+import { useState, useEffect, CSSProperties } from 'react';
+import type { ChessboardProps } from 'types';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import Board from './Board';
-import CustomDragLayer from './CustomDragLayer';
 
 const ChessBoard = ({
   className = '',
-  id = 0,
+  // id = 0,
   position = {},
-  pieces = {},
+  // pieces = {},
   width = 560,
   orientation = 'white',
   showNotation = true,
-  sparePieces = false,
-  draggable = true,
-  undo = false,
-  dropOffBoard = 'snapback',
-  transitionDuration = 300,
+  // sparePieces = false,
+  // draggable = true,
+  // undo = false,
+  // dropOffBoard = "snapback",
+  // transitionDuration = 300,
   boardStyle = {},
   lightSquareStyle = { backgroundColor: 'rgb(240, 217, 181)' },
   darkSquareStyle = { backgroundColor: 'rgb(181, 136, 99)' },
-  dropSquareStyle = { boxShadow: 'inset 0 0 1px 4px yellow' },
-  allowDrag = () => true,
-  calcWidth,
-  getPosition,
+  // dropSquareStyle = { boxShadow: "inset 0 0 1px 4px yellow" },
+  // allowDrag = () => true,
+  // calcWidth,
+  // getPosition,
   onDragOverSquare,
   onDrop,
   onMouseOutSquare,
@@ -34,16 +31,15 @@ const ChessBoard = ({
   onPieceClick,
   onSquareClick,
   onSquareRightClick,
-  roughSquare,
+  // roughSquare,
   squareStyles,
 }: ChessboardProps): JSX.Element => {
   const [screenWidth, setScreenWidth] = useState(width);
-  const [screenHeight, setScreenHeight] = useState(width);
+  // const [screenHeight, setScreenHeight] = useState(width);
 
   useEffect(() => {
     const updateWindowDimensions = () => {
       setScreenWidth(window.innerWidth);
-      setScreenHeight(window.innerHeight);
     };
     updateWindowDimensions();
     window.addEventListener('resize', updateWindowDimensions);
@@ -62,6 +58,7 @@ const ChessBoard = ({
     <DndProvider backend={HTML5Backend}>
       <div style={containerStyle}>
         <Board
+          width={screenWidth}
           className={className}
           orientation={orientation}
           showNotation={showNotation}
