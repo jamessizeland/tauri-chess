@@ -1,6 +1,9 @@
 #[cfg(test)]
 mod tests {
-    use crate::chess::types::{BoardState, Color, Piece};
+    use crate::chess::{
+        board::BoardState,
+        types::{Color, Piece},
+    };
 
     #[test]
     /// put all piece types in all squares and see if get moves doesn't panic

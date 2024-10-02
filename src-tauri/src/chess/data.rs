@@ -1,5 +1,5 @@
 use super::types;
-use crate::chess::types::BoardState;
+use crate::chess::board::BoardState;
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
@@ -40,7 +40,7 @@ pub fn queue_handler(window: &WebviewWindow, rx: &mut Receiver<Message>) -> Resu
 pub type HistoryData = Mutex<types::Hist>;
 
 /// Game state 8x8 board, filled with empty space or Pieces
-pub type PieceLocation = Mutex<types::BoardState>;
+pub type PieceLocation = Mutex<BoardState>;
 
 /// Track which square has been selected in the UI
 pub type SelectedSquare = Mutex<Option<types::Square>>;
