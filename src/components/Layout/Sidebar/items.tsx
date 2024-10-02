@@ -1,27 +1,19 @@
 import { routes } from 'routes';
 import { NavbarLink, NavbarItem } from 'components/Elements';
-
-// const style = {
-//   link: `flex font-medium items-center justify-start my-1 p-3 text-sm w-full lg:hover:text-purple-800`,
-//   active: `text-purple-800 lg:hover:text-purple-800`,
-//   inactive: `text-gray-900 lg:hover:text-black`,
-//   section: `font-bold pl-6 pb-3 text-gray-500 uppercase`,
-// };
+import { useLocation } from 'react-router-dom';
 
 const SidenavItems = () => {
-  // const { asPath } = useRouter();
+  const { pathname } = useLocation();
   return (
-    <ul>
-      {/* {routes.map(({ title, path }) => (
-        <a href={path} key={title} className={style.link}>
-          <span className="mx-4">{title}</span>
-        </a>
-      ))} */}
+    <ul className="md:pl-6 flex flex-col">
       {routes.map(({ title, path }) => {
         return (
           <NavbarItem key={title + path}>
-            <NavbarLink href={path}>
-              <span className="pl-1">{title}</span>
+            <NavbarLink
+              href={path}
+              className={`btn mb-4 ${pathname === path ? 'btn-primary' : 'btn-outline'}`}
+            >
+              <span className="pl-1 text-black">{title}</span>
             </NavbarLink>
           </NavbarItem>
         );

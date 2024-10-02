@@ -1,6 +1,6 @@
 [package]
 name = "tauri-chess"
-version = "2.0.0"
+version = "2.1.0"
 description = "A Tauri App for playing chess"
 authors = ["James Sizeland"]
 edition = "2021"
@@ -8,21 +8,25 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
+# The `_lib` suffix may seem redundant but it is necessary
+# to make the lib name unique and wouldn't conflict with the bin name.
+# This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
 name = "tauri_chess_lib"
-crate-type = ["lib", "cdylib", "staticlib"]
+crate-type = ["rlib", "cdylib", "staticlib"]
 
 [build-dependencies]
-tauri-build = { version = "2.0.0-rc", features = [] }
+tauri-build = { version = "^2.0.0", features = [] }
 
 [dependencies]
-tauri = { version = "2.0.0-rc", features = [] }
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+tauri = { version = "^2.0.0", features = [] }
+serde = { version = "^1", features = ["derive"] }
+serde_json = "^1"
 rand = { version = "0.8.5" }
-anyhow = "1.0.80"
+anyhow = "^1.0.80"
 
 # Tauri Plugins
-tauri-plugin-shell = "2.0.0-rc"
+############################################
+tauri-plugin-shell = "^2.0.0"
 
 [profile.release]
 panic = "abort"   # Strip expensive panic clean-up logic

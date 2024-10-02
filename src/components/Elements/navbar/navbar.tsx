@@ -69,8 +69,8 @@ function NavbarNav({ children, position = 'right' }: INavbarNavProps) {
   return <ul className={ngClass.position[position]}>{children}</ul>;
 }
 
-function NavbarItem({ children }: Props) {
-  return <li>{children}</li>;
+function NavbarItem({ children, className }: INavbarProps) {
+  return <li className={className}>{children}</li>;
 }
 
 function NavbarLink({

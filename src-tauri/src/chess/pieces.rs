@@ -1,7 +1,8 @@
 //! Chess pieces traits
 
+use super::board::BoardState;
 use super::moves::{bish_move, en_passant_move, king_move, knight_move, pawn_move, rook_move};
-use super::types::{BoardState, Color, GameMeta, MoveList, Piece, Square};
+use super::types::{Color, GameMeta, MoveList, Piece, Square};
 use super::utils::{remove_invalid_moves, under_threat};
 
 /// Request state information from a selected piece
@@ -64,15 +65,15 @@ impl Piece {
     /// Return the relative weighting value of this piece based on its type
     ///
     /// https://en.wikipedia.org/wiki/Chess_piece_relative_value
-    pub fn get_value(&self) -> isize {
+    pub fn get_value(&self) -> Option<isize> {
         match &self {
-            Piece::None => 0,
-            Piece::Pawn(..) => 1,
-            Piece::King(..) => 0,
-            Piece::Queen(..) => 9,
-            Piece::Bishop(..) => 3,
-            Piece::Knight(..) => 3,
-            Piece::Rook(..) => 5,
+            Piece::None => None,
+            Piece::Pawn(..) => Some(100),
+            Piece::King(..) => None,
+            Piece::Queen(..) => Some(929),
+            Piece::Bishop(..) => Some(320),
+            Piece::Knight(..) => Some(280),
+            Piece::Rook(..) => Some(479),
         }
     }
     /// Ask if this piece is a promotable pawn
@@ -110,7 +111,7 @@ impl Piece {
             let mut team_moves: usize = 0;
             for col in 0..8 {
                 for row in 0..8 {
-                    let piece = board[col][row];
+                    let piece = board.get((col, row));
                     if piece.get_colour() == Some(*color) {
                         let no_moves = remove_invalid_moves(
                             piece.get_moves((col, row), board),

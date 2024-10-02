@@ -1,8 +1,6 @@
 import { cn } from 'utils';
 import type { CSSProperties, ReactNode } from 'react';
-import { useDrop } from 'react-dnd';
 import { coordToSquare } from '../chess';
-import { ItemTypes } from './helpers';
 import type { Orientation, Square } from 'types';
 
 export interface BoardSquareProps {
@@ -36,33 +34,17 @@ export const BoardSquare = ({
   onMouseOverSquare = () => null,
   onMouseOutSquare = () => null,
   onSquareClick = () => null,
-  // onDragOverSquare = () => null,
-  // onDrop = () => null,
-  // onSquareRightClick = () => null,
   children,
 }: BoardSquareProps): JSX.Element => {
   const square = coordToSquare(col, row);
-  const [, drop] = useDrop(
-    () => ({
-      accept: ItemTypes.PIECE,
-      //   canDrop: () => game.canMoveKnight(x, y),
-      //   drop: () => game.moveKnight(x, y),
-      collect: (monitor) => ({
-        isOver: !!monitor.isOver(),
-        canDrop: !!monitor.canDrop(),
-      }),
-    }),
-    [],
-  );
   /** Handles right and left clicks on a board square */
   const handleClick = (event: React.MouseEvent) => {
-    const square = coordToSquare(col, row);
     if (event.type === 'click') {
-      console.log(`clicked on ${coordToSquare(col, row)} ${col},${row}`);
+      console.log(`clicked on ${square} ${col},${row}`);
       onSquareClick(square);
     } else if (event.type === 'contextmenu') {
       event.preventDefault();
-      console.log(`right-clicked on ${coordToSquare(col, row)} ${col},${row}`);
+      console.log(`right-clicked on ${square} ${col},${row}`);
     }
   };
   const black = !((col + row) % 2 === 1);
@@ -72,12 +54,11 @@ export const BoardSquare = ({
   return (
     <div
       className={cn('tooltip', rotate)}
-      data-tip={`(col ${col}, row ${row}) = ${coordToSquare(col, row)}`}
+      data-tip={`(col ${col}, row ${row}) = ${square}`}
       onMouseEnter={() => onMouseOverSquare(square)}
       onMouseLeave={() => onMouseOutSquare(square)}
       onClick={handleClick}
       onContextMenu={handleClick}
-      ref={drop}
       role="Space"
       data-testid={`(${col},${row})`}
       style={{

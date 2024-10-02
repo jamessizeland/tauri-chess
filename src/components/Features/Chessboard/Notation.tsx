@@ -26,7 +26,7 @@ const getRow = (orientation: Orientation, row: number) =>
 
 /** Get Column as a letter */
 const getColumn = (orientation: Orientation, col: number) =>
-  orientation === 'white' ? COLUMNS[7 - col] : COLUMNS[col];
+  orientation === 'white' ? COLUMNS[col] : COLUMNS[7 - col];
 
 const renderBottomLeft = ({
   orientation = 'white',
