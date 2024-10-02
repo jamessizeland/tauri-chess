@@ -12,6 +12,8 @@ dist
 dist-ssr
 *.local
 bun.lockb
+package-lock.json
+yarn.lock
 
 # Editor directories and files
 .idea
