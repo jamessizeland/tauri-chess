@@ -19,9 +19,7 @@ const SideNavigation = ({ version }: { version: string }) => {
         <p className="inline">Chess</p>
       </DrawerHeader>
       <DrawerBody>
-        <ul className="md:pl-6">
-          <SidenavItems />
-        </ul>
+        <SidenavItems />
       </DrawerBody>
       <DrawerFooter>Version: {version}</DrawerFooter>
     </Drawer>

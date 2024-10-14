@@ -1,11 +1,8 @@
 //! Specific Types useful for a chess game
 
-use std::fmt::Display;
-
+use super::board::BoardState;
 use serde::{Deserialize, Serialize};
-
-/// 8x8 array containing either pieces or nothing
-pub type BoardState = [[Piece; 8]; 8];
+use std::fmt::Display;
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct GameMeta {
@@ -52,7 +49,7 @@ impl GameMeta {
                 self.white_king
                     .piece
                     .king_threat(&self.white_king.square, board, *self);
-                board[self.white_king.square.0][self.white_king.square.1] = self.white_king.piece;
+                board.set(self.white_king.square, self.white_king.piece);
                 self.game_over = self.white_king.piece.is_king_mate().unwrap()
             }
             Color::Black => {
@@ -60,7 +57,7 @@ impl GameMeta {
                 self.black_king
                     .piece
                     .king_threat(&self.black_king.square, board, *self);
-                board[self.black_king.square.0][self.black_king.square.1] = self.black_king.piece;
+                board.set(self.black_king.square, self.black_king.piece);
                 self.game_over = self.black_king.piece.is_king_mate().unwrap()
             }
         }
@@ -95,8 +92,8 @@ impl GameMeta {
             for piece in col {
                 if let Some(color) = piece.get_colour() {
                     match color {
-                        Color::Black => black += piece.get_value(),
-                        Color::White => white += piece.get_value(),
+                        Color::Black => black += piece.get_value().unwrap_or(0),
+                        Color::White => white += piece.get_value().unwrap_or(0),
                     }
                 }
             }
@@ -125,7 +122,7 @@ impl Default for GameMeta {
     }
 }
 
-/// Square reference in row and column
+/// Square reference in column and row
 pub type Square = (usize, usize);
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq)]
@@ -171,48 +168,18 @@ impl Display for Piece {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let code = match *self {
             Piece::None => "__",
-            Piece::Pawn(color, ..) => {
-                if color == Color::White {
-                    "wP"
-                } else {
-                    "bP"
-                }
-            }
-            Piece::King(color, ..) => {
-                if color == Color::White {
-                    "wK"
-                } else {
-                    "bK"
-                }
-            }
-            Piece::Queen(color, ..) => {
-                if color == Color::White {
-                    "wQ"
-                } else {
-                    "bQ"
-                }
-            }
-            Piece::Bishop(color, ..) => {
-                if color == Color::White {
-                    "wB"
-                } else {
-                    "bB"
-                }
-            }
-            Piece::Knight(color, ..) => {
-                if color == Color::White {
-                    "wN"
-                } else {
-                    "bN"
-                }
-            }
-            Piece::Rook(color, ..) => {
-                if color == Color::White {
-                    "wR"
-                } else {
-                    "bR"
-                }
-            }
+            Piece::Pawn(Color::White, ..) => "wP",
+            Piece::Pawn(Color::Black, ..) => "bP",
+            Piece::King(Color::White, ..) => "wK",
+            Piece::King(Color::Black, ..) => "bK",
+            Piece::Queen(Color::White, ..) => "wQ",
+            Piece::Queen(Color::Black, ..) => "bQ",
+            Piece::Bishop(Color::White, ..) => "wB",
+            Piece::Bishop(Color::Black, ..) => "bB",
+            Piece::Knight(Color::White, ..) => "wN",
+            Piece::Knight(Color::Black, ..) => "bN",
+            Piece::Rook(Color::White, ..) => "wR",
+            Piece::Rook(Color::Black, ..) => "bR",
         };
         write!(f, "{}", code)
     }

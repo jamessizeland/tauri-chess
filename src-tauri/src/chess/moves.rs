@@ -1,6 +1,7 @@
 //! Logic for deciding where chess pieces can go, and moving th&em
 
-use super::types::{BoardState, Color, MoveList, MoveType, Piece};
+use super::board::BoardState;
+use super::types::{Color, MoveList, MoveType, Piece};
 use super::utils::check_enemy;
 use crate::chess::utils::under_threat;
 
@@ -18,24 +19,24 @@ pub fn pawn_move(
             let col = sq.0;
             let mut row: i8 = sq.1 as i8 + 1;
             //* 1. move forward one if square is empty
-            if row <= 7 && board[col][row as usize] == Piece::None {
+            if row <= 7 && board.get((col, row as usize)) == Piece::None {
                 moves.push(((col, row as usize), MoveType::Move));
                 row = sq.1 as i8 + 2;
                 //* 2. move forward two if hasn't moved and squares are empty
-                if row <= 7 && board[col][row as usize] == Piece::None && first_move {
+                if row <= 7 && board.get((col, row as usize)) == Piece::None && first_move {
                     moves.push(((col, row as usize), MoveType::Double));
                 }
             }
             //* 3. potential attacks if target square contains an enemy piece
             if sq.0 < 7 && sq.1 < 7 {
                 let (col, row) = (sq.0 + 1, sq.1 + 1);
-                if board[col][row].get_colour() == Some(Color::Black) {
+                if board.get((col, row)).get_colour() == Some(Color::Black) {
                     moves.push(((col, row), MoveType::Capture))
                 }
             }
             if sq.0 > 0 && sq.1 < 7 {
                 let (col, row) = (sq.0 - 1, sq.1 + 1);
-                if board[col][row].get_colour() == Some(Color::Black) {
+                if board.get((col, row)).get_colour() == Some(Color::Black) {
                     moves.push(((col, row), MoveType::Capture))
                 }
             }
@@ -44,24 +45,24 @@ pub fn pawn_move(
             let col = sq.0;
             let mut row: i8 = sq.1 as i8 - 1;
             //* 1. move forward one if square is empty
-            if row >= 0 && board[col][row as usize] == Piece::None {
+            if row >= 0 && board.get((col, row as usize)) == Piece::None {
                 moves.push(((col, row as usize), MoveType::Move));
                 row = sq.1 as i8 - 2;
                 //* 2. move forward two if hasn't moved and squares are empty
-                if row >= 0 && board[col][row as usize] == Piece::None && first_move {
+                if row >= 0 && board.get((col, row as usize)) == Piece::None && first_move {
                     moves.push(((col, row as usize), MoveType::Double));
                 }
             }
             //* 3. potential attacks if target square contains an enemy piece
             if sq.0 < 7 && sq.1 > 0 {
                 let (col, row) = (sq.0 + 1, sq.1 - 1);
-                if board[col][row].get_colour() == Some(Color::White) {
+                if board.get((col, row)).get_colour() == Some(Color::White) {
                     moves.push(((col, row), MoveType::Capture))
                 }
             }
             if sq.0 > 0 && sq.1 > 0 {
                 let (col, row) = (sq.0 - 1, sq.1 - 1);
-                if board[col][row].get_colour() == Some(Color::White) {
+                if board.get((col, row)).get_colour() == Some(Color::White) {
                     moves.push(((col, row), MoveType::Capture))
                 }
             }
@@ -119,8 +120,8 @@ pub fn rook_move(sq: (usize, usize), color: Color, board: &BoardState) -> MoveLi
         if col > 7 {
             break; // out of bounds, stop
         }
-        if board[col][row] != Piece::None {
-            if check_enemy(color, &board[col][row]) {
+        if board.get((col, row)) != Piece::None {
+            if check_enemy(color, &board.get((col, row))) {
                 moves.push(((col, row), MoveType::Capture));
             }
             break; // stop
@@ -134,8 +135,8 @@ pub fn rook_move(sq: (usize, usize), color: Color, board: &BoardState) -> MoveLi
             break; // out of bounds
         }
         let col = col as usize; // recast back to usize now we know it's >= 0
-        if board[col][row] != Piece::None {
-            if check_enemy(color, &board[col][row]) {
+        if board.get((col, row)) != Piece::None {
+            if check_enemy(color, &board.get((col, row))) {
                 moves.push(((col, row), MoveType::Capture));
             }
             break;
@@ -148,8 +149,8 @@ pub fn rook_move(sq: (usize, usize), color: Color, board: &BoardState) -> MoveLi
         if row > 7 {
             break; // out of bounds, stop
         }
-        if board[col][row] != Piece::None {
-            if check_enemy(color, &board[col][row]) {
+        if board.get((col, row)) != Piece::None {
+            if check_enemy(color, &board.get((col, row))) {
                 moves.push(((col, row), MoveType::Capture));
             }
             break; // stop
@@ -163,8 +164,8 @@ pub fn rook_move(sq: (usize, usize), color: Color, board: &BoardState) -> MoveLi
             break; // out of bounds
         }
         let row = row as usize; // recast back to usize now we know it's >= 0
-        if board[col][row] != Piece::None {
-            if check_enemy(color, &board[col][row]) {
+        if board.get((col, row)) != Piece::None {
+            if check_enemy(color, &board.get((col, row))) {
                 moves.push(((col, row), MoveType::Capture));
             }
             break;
@@ -182,8 +183,8 @@ pub fn bish_move(sq: (usize, usize), color: Color, board: &BoardState) -> MoveLi
         if col > 7 || row > 7 {
             break; // out of bounds, stop
         }
-        if board[col][row] != Piece::None {
-            if check_enemy(color, &board[col][row]) {
+        if board.get((col, row)) != Piece::None {
+            if check_enemy(color, &board.get((col, row))) {
                 moves.push(((col, row), MoveType::Capture));
             }
             break; // stop
@@ -197,8 +198,8 @@ pub fn bish_move(sq: (usize, usize), color: Color, board: &BoardState) -> MoveLi
             break; // out of bounds
         }
         let (col, row) = (col as usize, row as usize); // recast back to usize
-        if board[col][row] != Piece::None {
-            if check_enemy(color, &board[col][row]) {
+        if board.get((col, row)) != Piece::None {
+            if check_enemy(color, &board.get((col, row))) {
                 moves.push(((col, row), MoveType::Capture));
             }
             break;
@@ -212,8 +213,8 @@ pub fn bish_move(sq: (usize, usize), color: Color, board: &BoardState) -> MoveLi
             break; // out of bounds, stop
         }
         let (col, row) = (col as usize, row as usize); // recast back to usize
-        if board[col][row] != Piece::None {
-            if check_enemy(color, &board[col][row]) {
+        if board.get((col, row)) != Piece::None {
+            if check_enemy(color, &board.get((col, row))) {
                 moves.push(((col, row), MoveType::Capture));
             }
             break; // stop
@@ -227,8 +228,8 @@ pub fn bish_move(sq: (usize, usize), color: Color, board: &BoardState) -> MoveLi
             break; // out of bounds
         }
         let (col, row) = (col as usize, row as usize); // recast back to usize
-        if board[col][row] != Piece::None {
-            if check_enemy(color, &board[col][row]) {
+        if board.get((col, row)) != Piece::None {
+            if check_enemy(color, &board.get((col, row))) {
                 moves.push(((col, row), MoveType::Capture));
             }
             break;
@@ -241,16 +242,10 @@ pub fn bish_move(sq: (usize, usize), color: Color, board: &BoardState) -> MoveLi
 
 pub fn knight_move(sq: (usize, usize), color: Color, board: &BoardState) -> MoveList {
     let mut moves: MoveList = Vec::new(); // start with empty movelist
-                                          //* list all possible vectors for a knight to move
+                                          // list all possible vectors for a knight to move
+    #[rustfmt::skip]
     const VECTORS: [(i8, i8); 8] = [
-        (2, 1),
-        (2, -1),
-        (1, 2),
-        (1, -2),
-        (-2, 1),
-        (-2, -1),
-        (-1, 2),
-        (-1, -2),
+        (2, 1),(2, -1),(1, 2),(1, -2),(-2, 1),(-2, -1),(-1, 2),(-1, -2),
     ];
     for vector in VECTORS {
         let col = sq.0 as i8 + vector.0;
@@ -258,10 +253,10 @@ pub fn knight_move(sq: (usize, usize), color: Color, board: &BoardState) -> Move
         if (0..8).contains(&col) && (0..8).contains(&row) {
             // valid square
             let (col, row) = (col as usize, row as usize);
-            // let target_colour = board[col][row].get_colour();
-            if board[col][row] == Piece::None {
+            // let target_colour = board.get((col,row)).get_colour();
+            if board.get((col, row)) == Piece::None {
                 moves.push(((col, row), MoveType::Move));
-            } else if check_enemy(color, &board[col][row]) {
+            } else if check_enemy(color, &board.get((col, row))) {
                 moves.push(((col, row), MoveType::Capture));
             }
         }
@@ -272,15 +267,9 @@ pub fn knight_move(sq: (usize, usize), color: Color, board: &BoardState) -> Move
 
 pub fn king_move(sq: (usize, usize), color: Color, board: &BoardState) -> MoveList {
     let mut moves: MoveList = Vec::new(); // start with empty movelist
+    #[rustfmt::skip]
     const VECTORS: [(i8, i8); 8] = [
-        (1, 1),
-        (1, -1),
-        (-1, 1),
-        (-1, -1),
-        (0, 1),
-        (1, 0),
-        (-1, 0),
-        (0, -1),
+        (1, 1),(1, -1),(-1, 1),(-1, -1),(0, 1),(1, 0),(-1, 0),(0, -1),
     ];
     for vector in VECTORS {
         let col = sq.0 as i8 + vector.0;
@@ -288,7 +277,7 @@ pub fn king_move(sq: (usize, usize), color: Color, board: &BoardState) -> MoveLi
         if (0..8).contains(&col) && (0..8).contains(&row) {
             // valid square
             let (col, row) = (col as usize, row as usize);
-            let potential_move = board[col][row];
+            let potential_move = board.get((col, row));
             if potential_move == Piece::None {
                 moves.push(((col, row), MoveType::Move));
             } else if check_enemy(color, &potential_move) {
@@ -300,28 +289,28 @@ pub fn king_move(sq: (usize, usize), color: Color, board: &BoardState) -> MoveLi
 }
 
 pub fn check_castling_moves(sq: (usize, usize), color: Color, board: &BoardState) -> MoveList {
-    if !board[sq.0][sq.1].is_king(color) {
+    if !board.get(sq).is_king(color) {
         panic!("Wrong piece found when checking for king");
     }
     let mut moves: MoveList = Vec::new();
-    let first_move = board[sq.0][sq.1] == Piece::King(color, true, false, false);
+    let first_move = board.get(sq) == Piece::King(color, true, false, false);
     // check if castling available
     if first_move {
         // left side castle (ooo)
-        if board[0][sq.1] == Piece::Rook(color, true)
-            && board[1][sq.1] == Piece::None
-            && board[2][sq.1] == Piece::None
+        if board.get((0, sq.1)) == Piece::Rook(color, true)
+            && board.get((1, sq.1)) == Piece::None
+            && board.get((2, sq.1)) == Piece::None
             && !under_threat((2, sq.1), color, board)
-            && board[3][sq.1] == Piece::None
+            && board.get((3, sq.1)) == Piece::None
             && !under_threat((3, sq.1), color, board)
         {
             moves.push(((2, sq.1), MoveType::Castle));
         }
         // right side castle (oo)
-        if board[7][sq.1] == Piece::Rook(color, true)
-            && board[6][sq.1] == Piece::None
+        if board.get((7, sq.1)) == Piece::Rook(color, true)
+            && board.get((6, sq.1)) == Piece::None
             && !under_threat((6, sq.1), color, board)
-            && board[5][sq.1] == Piece::None
+            && board.get((5, sq.1)) == Piece::None
             && !under_threat((5, sq.1), color, board)
         {
             moves.push(((6, sq.1), MoveType::Castle));

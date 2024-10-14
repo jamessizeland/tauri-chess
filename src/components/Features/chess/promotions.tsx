@@ -13,8 +13,8 @@ export default function Promotions({ toggle, isOpen }: PromotionProps) {
       <ModalHeader>Pick Promotion</ModalHeader>
       <ModalBody>
         <div className="flex justify-evenly">
-          {promotions.map((promotion) => (
-            <div className="hover:animate-heartBeat">
+          {promotions.map((promotion, index) => (
+            <div className="hover:animate-heartBeat" key={promotion + index}>
               <Button
                 color="primary"
                 key={promotion}
