@@ -3,9 +3,9 @@
   "productName": "tauri-chess",
   "identifier": "com.chess.app",
   "build": {
-    "beforeDevCommand": "npm run dev",
+    "beforeDevCommand": "bun run dev",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "npm run build",
+    "beforeBuildCommand": "bun run build",
     "frontendDist": "../dist"
   },
   "app": {
@@ -14,7 +14,7 @@
         "title": "tauri-chess",
         "width": 800,
         "height": 800,
-        "resizable": false,
+        "resizable": true,
         "center": true,
         "fullscreen": false
       }

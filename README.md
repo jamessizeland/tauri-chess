@@ -2,21 +2,17 @@
 
 Experiment with tauri passing data from rust to javascript, by creating a chess app where all of the logic is done in Rust and just the frontend is done in TypeScript React.
 
-## Try It Out!
+## Getting Started
 
-**Requirements**
+Check prerequisites:
 
-- [git](https://git-scm.com/)
-- [rust](https://www.rust-lang.org/)
-- [node](https://nodejs.org/)
-- [yarn](https://yarnpkg.com/getting-started/install)
-
-Use these steps to run and see the magic for yourself!
+- <https://v2.tauri.app/start/prerequisites/>
+- <https://bun.sh/docs/installation>
 
 1. `git clone https://github.com/jamessizeland/tauri-chess.git`
 2. `cd tauri-chess`
-3. `yarn`
-4. `yarn tauri dev`
+3. `bun install`
+4. `bun run tauri dev`
 
 ## UI Basics
 
@@ -39,3 +35,13 @@ Use these steps to run and see the magic for yourself!
 ### Enpassant, Promoting & Castling
 
 ![Enpassand Promoting and Castling](./img/enpassant-promote-castle.gif)
+
+---
+
+## Mobile Support
+
+Set up to run on Android too.
+
+`bun run tauri android dev`
+
+![android](./img/tauri-chess-android.gif)

@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">tauri-chess</string>
+    <string name="main_activity_title">tauri-chess</string>
+</resources>
