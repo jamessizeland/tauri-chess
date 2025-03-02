@@ -12,7 +12,8 @@ on:
 
 jobs:
   publish-tauri:
-    if: ${{ github.event.pull_request.merged }} && github.repository_owner == 'YOUR_ORG_OR_USERNAME'# Only run on merged PRs.
+    if: ${{ github.event.pull_request.merged }} && github.repository_owner == 'jamessizeland' # This is to ensure that only the owner can publish the app.
+    name: 'Publish Tauri App'
     permissions:
       contents: write
     strategy:
@@ -27,6 +28,8 @@ jobs:
             args: ''
           - platform: 'windows-latest'
             args: ''
+          - platform: 'ubuntu-22.04-android'
+            args: '--target aarch64-linux-android'
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -50,6 +53,15 @@ jobs:
           sudo apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
         # webkitgtk 4.0 is for Tauri v1 - webkitgtk 4.1 is for Tauri v2.
         # You can remove the one that doesn't apply to your app to speed up the workflow a bit.
+
+      - name: setup Android signing
+        if: matrix.platform == 'ubuntu-22.04-android'
+        run: |
+          cd src-tauri/gen/android
+          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" > keystore.properties
+          echo "password=${{ secrets.ANDROID_KEY_PASSWORD }}" >> keystore.properties
+          base64 -d <<< "${{ secrets.ANDROID_KEY_BASE64 }}" > $RUNNER_TEMP/keystore.jks
+          echo "storeFile=$RUNNER_TEMP/keystore.jks" >> keystore.properties
 
       - name: install frontend dependencies
         run: bun install # change this to npm, pnpm or bun depending on which one you use.
