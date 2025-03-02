@@ -12,7 +12,7 @@ on:
 
 jobs:
   publish-tauri:
-    if: ${{ github.event.pull_request.merged }} # Only run on merged PRs.
+    if: ${{ github.event.pull_request.merged }} && github.repository_owner == 'YOUR_ORG_OR_USERNAME'# Only run on merged PRs.
     permissions:
       contents: write
     strategy:
