@@ -56,6 +56,10 @@ jobs:
 
       - name: setup Android signing
         if: matrix.platform == 'ubuntu-22.04-android'
+        uses: android-actions/setup-android@v2
+        with:
+          api-level: 30
+          ndk-version: 21.4.7075529
         run: |
           cd src-tauri/gen/android
           echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" > keystore.properties
