@@ -1,5 +1,9 @@
 # Tauri Chess App
 
+[![publish android](https://github.com/jamessizeland/tauri-chess/actions/workflows/build-android.yml/badge.svg)](https://github.com/jamessizeland/tauri-chess/actions/workflows/build-android.yml)
+[![publish desktop](https://github.com/jamessizeland/tauri-chess/actions/workflows/build.yml/badge.svg)](https://github.com/jamessizeland/tauri-chess/actions/workflows/build.yml)
+![MIT/Apache-2.0 licensed](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue?labelColor=1C2C2E&style=flat-square)
+
 Experiment with tauri passing data from rust to javascript, by creating a chess app where all of the logic is done in Rust and just the frontend is done in TypeScript React.
 
 ## Getting Started
