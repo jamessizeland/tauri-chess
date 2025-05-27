@@ -1,0 +1,109 @@
+name: "publish android"
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+env:
+  APP_NAME: "peer-to-peer"
+  GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+
+jobs:
+  publish-android:
+    if: ${{ github.event.pull_request.merged }} && github.repository_owner == 'jamessizeland' # This is to ensure that only the owner can publish the app.
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: setup bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "zulu"
+          java-version: "17"
+
+      - name: Cache NDK
+        id: cache-ndk
+        uses: actions/cache@v4
+        with:
+          # Path where NDK version 27.0.11902837 is expected to be installed by setup-android
+          path: /usr/local/lib/android/sdk/ndk/27.0.11902837
+          key: ndk-${{ runner.os }}-27.0.11902837
+
+      - name: Setup Android SDK and NDK
+        uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: 12266719 # v16
+
+      - name: Install NDK
+        run: sdkmanager "ndk;27.0.11902837"
+
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+
+      - name: Cache Rust dependencies
+        uses: swatinem/rust-cache@v2
+      #   - name: Configure Cargo and Environment for Android
+      #     env:
+      #       # ANDROID_NDK_HOME is set by `android-actions/setup-android`
+      #       ANDROID_NDK_ROOT: ${{ env.ANDROID_NDK_HOME }} # Make it available to this step
+      #     run: |
+      #       echo "ANDROID_NDK_HOME is $ANDROID_NDK_HOME" # Verify it's set
+      #       echo "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
+
+      #       # Create .cargo/config.toml
+      #       mkdir -p .cargo
+      #       cat << EOF > .cargo/config.toml
+      #       [target.aarch64-linux-android]
+      #       ar = "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android-ar"
+      #       # Use API level 21 or your project's minSdk
+      #       linker = "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang"
+      #       EOF
+      #       echo "Created .cargo/config.toml:"
+      #       cat .cargo/config.toml
+      - name: setup Android signing
+        run: |
+          cd src-tauri/gen/android
+          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" > keystore.properties
+          echo "password=${{ secrets.ANDROID_KEY_PASSWORD }}" >> keystore.properties
+          base64 -d <<< "${{ secrets.ANDROID_KEY_BASE64 }}" > $RUNNER_TEMP/keystore.jks
+          echo "storeFile=$RUNNER_TEMP/keystore.jks" >> keystore.properties
+          echo "Keystore properties created."
+          cd ../../.. # Go back to root
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build app bundle
+        run: bun tauri android build -v
+        env:
+          NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/27.0.11902837
+
+      - name: Get Node project version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@v1.3.1
+
+      - name: Rename APK file
+        run: |
+          mv ./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release.apk ./src-tauri/gen/android/app/build/outputs/apk/universal/release/${{env.APP_NAME}}-${{ steps.package-version.outputs.current-version}}.apk
+
+      - name: Publish
+        uses: softprops/action-gh-release@v1
+        with:
+          name: App v${{ steps.package-version.outputs.current-version}}
+          tag_name: v${{ steps.package-version.outputs.current-version}}
+          generate_release_notes: true
+          files: |
+            ./src-tauri/gen/android/app/build/outputs/apk/universal/release/${{env.APP_NAME}}-${{ steps.package-version.outputs.current-version}}.apk
