@@ -24,7 +24,7 @@ const squareStyle = {
   height: '100%',
 };
 
-export const BoardSquare = ({
+export const BoardSquare: React.FC<BoardSquareProps> = ({
   col,
   row,
   orientation = 'white',
@@ -35,7 +35,7 @@ export const BoardSquare = ({
   onMouseOutSquare = () => null,
   onSquareClick = () => null,
   children,
-}: BoardSquareProps): JSX.Element => {
+}) => {
   const square = coordToSquare(col, row);
   /** Handles right and left clicks on a board square */
   const handleClick = (event: React.MouseEvent) => {

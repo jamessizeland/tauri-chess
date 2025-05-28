@@ -22,7 +22,7 @@ const Context = createContext<ContextProps>({
 
 function LayoutProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState<boolean>(false);
-  const ref = useRef<HTMLElement>();
+  const ref = useRef<HTMLElement | null>(null);
   // const router = useRouter();
 
   const toggle = useCallback(() => {

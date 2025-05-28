@@ -63,7 +63,7 @@ function HamburgerMenuToggler({ toggle }: HamburgerTogglerProps) {
 }
 
 function HamburgerMenuCollapse({ open, children }: HamburgerCollapseProps) {
-  const ref = React.useRef<HTMLDivElement>(null);
+  const ref = React.useRef<HTMLDivElement | null>(null);
 
   const inlineStyle: React.CSSProperties = open
     ? { height: ref.current?.scrollHeight }

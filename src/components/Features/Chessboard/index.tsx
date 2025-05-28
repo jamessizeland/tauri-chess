@@ -4,7 +4,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import Board from './Board';
 
-const ChessBoard = ({
+const ChessBoard: React.FC<ChessboardProps> = ({
   className = '',
   // id = 0,
   position = {},
@@ -33,7 +33,7 @@ const ChessBoard = ({
   onSquareRightClick,
   // roughSquare,
   squareStyles,
-}: ChessboardProps): JSX.Element => {
+}) => {
   const [screenWidth, setScreenWidth] = useState(width);
   // const [screenHeight, setScreenHeight] = useState(width);
 

@@ -1,9 +1,9 @@
 [package]
 name = "tauri-chess"
-version = "2.1.0"
+version = "2.2.0"
 description = "A Tauri App for playing chess"
 authors = ["James Sizeland"]
-edition = "2021"
+edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -21,7 +21,7 @@ tauri-build = { version = "^2.0.0", features = [] }
 tauri = { version = "^2.0.0", features = [] }
 serde = { version = "^1", features = ["derive"] }
 serde_json = "^1"
-rand = { version = "0.8.5" }
+rand = { version = "0.9.1" }
 anyhow = "^1.0.80"
 
 # Tauri Plugins

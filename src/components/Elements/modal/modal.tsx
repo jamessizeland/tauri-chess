@@ -30,8 +30,7 @@ const ngClass = {
       'mt-5 mx-8 pb-0 md:m-auto md:w-6/12 lg:w-4/12 md:pt-0 focus:outline-none rounded-lg',
     large:
       'mt-5 mx-8 pb-0 md:m-auto md:w-8/12 lg:w-8/12 md:pt-0 focus:outline-none rounded-lg',
-    extraLarge:
-      'mt-5 mx-8 pb-0 md:w-12/12 md:pt-0 focus:outline-none rounded-lg',
+    extraLarge: 'mt-5 mx-8 pb-0 focus:outline-none rounded-lg',
   },
 };
 
@@ -43,7 +42,7 @@ function Modal({
   closeOnClickOutside = false,
   position = 'default',
 }: ModalProps) {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement | null>(null);
 
   // close modal when you click outside the modal dialogue
   useEffect(() => {

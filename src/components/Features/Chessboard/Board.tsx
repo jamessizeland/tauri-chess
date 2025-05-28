@@ -17,7 +17,7 @@ const basicBoardStyle: CSSProperties = {
 /** Styling properties applied to each square element */
 const squareStyle: CSSProperties = { width: '12.5%', height: '12.5%' };
 
-const Board = ({
+const Board: React.FC<ChessboardProps> = ({
   orientation,
   showNotation,
   position,
@@ -33,7 +33,7 @@ const Board = ({
   onMouseOverSquare,
   onSquareClick,
   squareStyles,
-}: ChessboardProps): JSX.Element => {
+}) => {
   const squares = [];
 
   const hasPiece = (currentPosition: Position, square: Square): boolean =>

@@ -4,7 +4,7 @@ import AppRoutes from 'routes';
 import { BrowserRouter } from 'react-router-dom';
 import { Layout } from 'components';
 
-import './style/global.scss';
+import './style/global.css';
 import './style/tailwind.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
