@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 const Alert = () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const timeOut = useRef<any>(null);
+  const timeOut = useRef<NodeJS.Timeout | null>(null);
   const [seen, setSeen] = useState(
     localStorage.getItem('info_seen') || 'false',
   );
@@ -16,8 +15,7 @@ const Alert = () => {
     timeOut.current = setTimeout(() => onClose(), 12000);
 
     return () => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      clearTimeout(timeOut.current);
+      if (timeOut.current) clearTimeout(timeOut.current);
     };
   }, []);
 

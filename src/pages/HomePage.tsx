@@ -22,8 +22,8 @@ import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 
 const HomePage: React.FC = () => {
-  const [newGameisOpen, newGametoggle] = useToggle(true);
-  const [promoterisOpen, promotertoggle] = useToggle(false);
+  const [newGameIsOpen, newGameToggle] = useToggle(true);
+  const [promoterIsOpen, promoterToggle] = useToggle(false);
   const [position, setPosition] = useState<Position>({});
   const [gameMeta, setGameMeta] = useState<MetaGame>({
     score: 0,
@@ -57,7 +57,7 @@ const HomePage: React.FC = () => {
     );
     invoke<MetaGame>('get_score').then((meta) => setGameMeta(meta));
     // listen for promotion requests
-    const promRef = listen<string>('promotion', () => promotertoggle());
+    const promRef = listen<string>('promotion', () => promoterToggle());
     // listen for unexpected board state updates
     const boardRef = listen<BoardStateArray>('board', (event) => {
       console.log('Rust requests a boardstate update');
@@ -76,10 +76,10 @@ const HomePage: React.FC = () => {
         <AskNewGame
           setGameMeta={setGameMeta}
           setPosition={setPosition}
-          isOpen={newGameisOpen}
-          toggle={newGametoggle}
+          isOpen={newGameIsOpen}
+          toggle={newGameToggle}
         />
-        <Promotions isOpen={promoterisOpen} toggle={promotertoggle} />
+        <Promotions isOpen={promoterIsOpen} toggle={promoterToggle} />
         <Chessboard
           orientation={whiteTurn ? 'white' : 'black'}
           draggable={false}
@@ -115,7 +115,7 @@ const HomePage: React.FC = () => {
                     ? setWhiteTurn(true)
                     : setWhiteTurn(false);
                 }
-                if (gameMeta.game_over) newGametoggle(); // ask if we want to start a new game
+                if (gameMeta.game_over) newGameToggle(); // ask if we want to start a new game
               });
             }
           }}

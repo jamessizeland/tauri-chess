@@ -39,7 +39,7 @@ function Sidenav({
   children,
   closeOnClickOutside,
 }: SidenavProps) {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement | null>(null);
 
   //close on click outside
   useEffect(() => {

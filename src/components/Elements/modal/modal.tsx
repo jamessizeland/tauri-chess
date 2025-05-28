@@ -42,7 +42,7 @@ function Modal({
   closeOnClickOutside = false,
   position = 'default',
 }: ModalProps) {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement | null>(null);
 
   // close modal when you click outside the modal dialogue
   useEffect(() => {

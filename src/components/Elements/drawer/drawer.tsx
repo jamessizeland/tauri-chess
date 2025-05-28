@@ -37,7 +37,7 @@ const ngClass = {
 /** Logic */
 
 function Drawer({ children, isOpen, toggle, position = 'left' }: DrawerProps) {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const handleOutsideClick = (event: globalThis.MouseEvent) => {

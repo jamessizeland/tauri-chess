@@ -12,7 +12,7 @@ function useEventListener<T extends HTMLElement = HTMLDivElement>(
   element?: RefObject<T>,
 ) {
   // Create a ref that stores handler
-  const savedHandler = useRef<(event: Event) => void>(null);
+  const savedHandler = useRef<(event: Event) => void | null>(null);
 
   useEffect(() => {
     // Define the listening target
