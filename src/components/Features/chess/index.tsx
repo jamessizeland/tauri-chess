@@ -110,17 +110,12 @@ const highlightSquares = (
   return props;
 };
 
-const AskNewGame = ({
-  setPosition,
-  setGameMeta,
-  isOpen,
-  toggle,
-}: {
+const AskNewGame: React.FC<{
   setPosition: (position: Position) => void;
   setGameMeta: (meta: MetaGame) => void;
   isOpen: boolean;
   toggle: () => void;
-}) => {
+}> = ({ setPosition, setGameMeta, isOpen, toggle }) => {
   return (
     <Modal toggle={toggle} isOpen={isOpen} animate position="extraLarge">
       <ModalHeader>Welcome to Tauri Chess</ModalHeader>

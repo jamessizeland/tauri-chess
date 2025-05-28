@@ -13,7 +13,7 @@ const Logo: React.FC<Props> = ({
   height = 30,
   width = 30,
   altText = 'logo',
-}: Props) => {
+}) => {
   return (
     <img
       className={cn(
