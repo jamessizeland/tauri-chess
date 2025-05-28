@@ -1,33 +1,24 @@
-import { cn } from 'utils';
+import { IoLogoGithub } from 'react-icons/io';
+import pjson from '../../../../package.json';
+import { useEffect, useState } from 'react';
+import { getVersion } from '@tauri-apps/api/app';
 
-interface User {
-  name: string;
-  email?: string;
-  url?: string;
-}
-
-interface CopywriteProps {
-  className?: string;
-  version?: string;
-  author?: User;
-  owner?: string;
-  repo?: string;
-}
-
-export default function Copywrite({
-  className,
-  version,
-  author,
-  owner,
-  repo = '/',
-}: CopywriteProps) {
+export default function Copywrite() {
+  const [version, setVersion] = useState<string>('');
+  useEffect(() => {
+    getVersion().then((version) => setVersion(version));
+  }, []);
   return (
-    <div className={cn('p-6 bg-gray-200 flex justify-between', className)}>
-      <span>2024, {owner ? owner : author?.name}</span>
-      <a className="text-gray-600 font-semibold" href={repo} target="_blank">
-        Sourcecode
+    <div className="w-full flex justify-center p-2 items-center">
+      <a
+        target="_blank"
+        href={pjson.repository}
+        className="flex items-center border border-gray-200 rounded-lg p-2 shadow-md hover:bg-gray-100 active:bg-gray-200 transition-colors duration-200 ease-in-out space-x-3"
+      >
+        <p>v{version}</p>
+        <IoLogoGithub className="h-7 w-auto" />
+        <p>2025</p>
       </a>
-      <span>version: {version}</span>
     </div>
   );
 }

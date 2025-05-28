@@ -8,12 +8,12 @@ interface Props {
   altText?: string;
 }
 
-const Logo = ({
+const Logo: React.FC<Props> = ({
   className = '',
   height = 30,
   width = 30,
   altText = 'logo',
-}: Props): JSX.Element => {
+}: Props) => {
   return (
     <img
       className={cn(

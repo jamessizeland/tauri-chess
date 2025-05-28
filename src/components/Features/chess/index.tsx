@@ -120,7 +120,7 @@ const AskNewGame = ({
   setGameMeta: (meta: MetaGame) => void;
   isOpen: boolean;
   toggle: () => void;
-}): JSX.Element => {
+}) => {
   return (
     <Modal toggle={toggle} isOpen={isOpen} animate position="extraLarge">
       <ModalHeader>Welcome to Tauri Chess</ModalHeader>

@@ -1,4 +1,4 @@
-const AboutPage = (): JSX.Element => (
+const AboutPage: React.FC = () => (
   <div className="animate-backInRight animate-fast">
     <h1 className="text-3xl font-bold underline text-center">About Page</h1>
     <div className="text-center mt-5">

@@ -9,10 +9,10 @@ import { useEffect, useState } from 'react';
 import { getVersion } from '@tauri-apps/api/app';
 
 type LayoutProps = {
-  children: JSX.Element;
+  children: React.ReactNode;
 };
 
-export function Layout({ children }: LayoutProps): JSX.Element {
+export const Layout: React.FC<LayoutProps> = ({ children }) => {
   useEffect(() => {
     getVersion().then((version) => setVersion(version));
   }, []);
@@ -27,9 +27,9 @@ export function Layout({ children }: LayoutProps): JSX.Element {
         <SideNav version={version} />
         <div className="flex flex-col pl-0 w-full h-screen justify-between">
           <main className="pt-24 pb-1 md:px-4 lg:px-6 lg:pl-2">{children}</main>
-          <Footer version={version} />
+          <Footer />
         </div>
       </div>
     </LayoutProvider>
   );
-}
+};

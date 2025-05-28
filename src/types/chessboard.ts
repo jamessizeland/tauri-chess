@@ -29,7 +29,7 @@ export type CustomPieces = {
     droppedPiece: Piece;
     targetSquare: Square;
     sourceSquare: Square;
-  }) => JSX.Element;
+  }) => React.ReactNode;
 };
 
 export interface ChessboardProps {

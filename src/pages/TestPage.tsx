@@ -10,7 +10,7 @@ import { useToggle } from 'hooks';
 import { listen } from '@tauri-apps/api/event';
 import { invoke } from '@tauri-apps/api/core';
 
-const TestPage = (): JSX.Element => {
+const TestPage: React.FC = () => {
   useEffect(() => {
     const unlisten = listen<string>('test', (event) => {
       console.log(event);

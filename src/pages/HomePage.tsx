@@ -21,7 +21,7 @@ import Promotions from 'components/Features/chess/promotions';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 
-const HomePage = (): JSX.Element => {
+const HomePage: React.FC = () => {
   const [newGameisOpen, newGametoggle] = useToggle(true);
   const [promoterisOpen, promotertoggle] = useToggle(false);
   const [position, setPosition] = useState<Position>({});

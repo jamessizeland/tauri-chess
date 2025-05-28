@@ -5,7 +5,7 @@ import { checkEnv } from 'utils';
 type RouteType = {
   title: string;
   path: string;
-  element: JSX.Element;
+  element: React.ReactNode;
 };
 
 const publicRoutes: RouteType[] = [
@@ -21,7 +21,7 @@ export const routes: RouteType[] = checkEnv('development')
   ? publicRoutes.concat(...devRoutes)
   : publicRoutes;
 
-export default function AppRoutes(): JSX.Element {
+export default function AppRoutes() {
   return (
     <Routes>
       {routes.map(({ path, element, title }) => (

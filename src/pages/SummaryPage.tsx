@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const SummaryPage = (): JSX.Element => {
+const SummaryPage: React.FC = () => {
   const [score] = useState(0);
   return (
     <div className="animate-backInRight animate-fast">
