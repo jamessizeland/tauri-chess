@@ -11,12 +11,12 @@ Experiment with tauri passing data from rust to javascript, by creating a chess 
 Check prerequisites:
 
 - <https://v2.tauri.app/start/prerequisites/>
-- <https://bun.sh/docs/installation>
+- <https://nodejs.org/en/download>
 
 1. `git clone https://github.com/jamessizeland/tauri-chess.git`
 2. `cd tauri-chess`
-3. `bun install`
-4. `bun run tauri dev`
+3. `npm install`
+4. `npm run tauri dev`
 
 ## UI Basics
 
@@ -46,6 +46,6 @@ Check prerequisites:
 
 Set up to run on Android too.
 
-`bun run tauri android dev`
+`npm run tauri android dev`
 
 ![android](./img/tauri-chess-android.gif)
