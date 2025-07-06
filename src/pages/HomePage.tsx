@@ -121,34 +121,8 @@ const HomePage: React.FC = () => {
         />
       </div>
       {/* Game State Row */}
-      <div className="pt-5 w-full flex">
-        <p
-          className={cn(
-            'inline border border-black rounded-sm px-6 py-3 text-sm mr-1',
-            gameMeta.white_king.piece.King[2] ? 'bg-yellow-500' : '',
-            gameMeta.white_king.piece.King[3] ? 'bg-red-800' : '',
-          )}
-        >
-          white king:{' '}
-          {coordToSquare(
-            gameMeta.white_king.square[0],
-            gameMeta.white_king.square[1],
-          )}
-        </p>
-        <p
-          className={cn(
-            'inline border border-black rounded-sm px-6 py-3 text-sm mr-1',
-            gameMeta.black_king.piece.King[2] ? 'bg-yellow-500' : '',
-            gameMeta.black_king.piece.King[3] ? 'bg-red-800' : '',
-          )}
-        >
-          black king:{' '}
-          {coordToSquare(
-            gameMeta.black_king.square[0],
-            gameMeta.black_king.square[1],
-          )}
-        </p>
-        <p className="inline border border-black rounded-sm px-6 py-3 text-sm mr-2">
+      <div className="pt-5 w-full flex justify-center">
+        <p className="border border-black rounded-sm px-6 py-3 text-sm mr-2">
           score: {gameMeta.score}, turn: {gameMeta.turn} (
           {gameMeta.turn % 2 == 0 ? 'White' : 'Black'})
         </p>

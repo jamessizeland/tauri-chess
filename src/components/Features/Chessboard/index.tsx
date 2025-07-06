@@ -48,15 +48,9 @@ const ChessBoard: React.FC<ChessboardProps> = ({
     };
   }, []);
 
-  const containerStyle: CSSProperties = {
-    width: 500,
-    height: 500,
-    // border: '1px solid gray',
-  };
-
   return (
     <DndProvider backend={HTML5Backend}>
-      <div style={containerStyle}>
+      <div className="size-[380px] md:size-[500px] mx-2">
         <Board
           width={screenWidth}
           className={className}

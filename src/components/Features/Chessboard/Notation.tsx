@@ -49,10 +49,11 @@ const renderBottomLeft = ({
       </div>
       <div
         data-testid={`bottom-left-${getColumn(orientation, col)}`}
+        className="bottom-1 right-1"
         style={{
           ...notationStyle,
           ...{ fontSize: width / 48, color: whiteColor },
-          ...alphaStyle(width),
+          // ...alphaStyle(width),
         }}
       >
         {getColumn(orientation, col)}
@@ -71,10 +72,11 @@ const renderLetters = ({
   return (
     <div
       data-testid={`column-${getColumn(orientation, col)}`}
+      className="bottom-1 right-1"
       style={{
         ...notationStyle,
         ...columnStyle({ col, width, blackColor, whiteColor, orientation }),
-        ...alphaStyle(width),
+        // ...alphaStyle(width),
       }}
     >
       {getColumn(orientation, col)}
@@ -157,12 +159,6 @@ const rowStyle = ({
           : whiteColor,
   };
 };
-
-const alphaStyle = (width: number): CSSProperties => ({
-  alignSelf: 'flex-end',
-  paddingTop: width / 8 - width / 48 - 14,
-  paddingLeft: width / 8 - width / 48 - 5,
-});
 
 const numericStyle = (width: number): CSSProperties => ({
   alignSelf: 'flex-start',

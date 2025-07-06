@@ -12,7 +12,7 @@ export default function Promotions({ toggle, isOpen }: PromotionProps) {
     <Modal toggle={toggle} isOpen={isOpen} position="extraLarge">
       <ModalHeader>Pick Promotion</ModalHeader>
       <ModalBody>
-        <div className="flex justify-evenly">
+        <div className="flex justify-evenly flex-col gap-2 md:flex-row items-center">
           {promotions.map((promotion, index) => (
             <div className="hover:animate-heartBeat" key={promotion + index}>
               <Button
