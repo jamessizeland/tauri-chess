@@ -12,8 +12,8 @@
     "windows": [
       {
         "title": "tauri-chess",
-        "width": 800,
-        "height": 800,
+        "width": 412,
+        "height": 915,
         "resizable": true,
         "center": true,
         "fullscreen": false
@@ -28,10 +28,40 @@
     "targets": "all",
     "icon": [
       "icons/32x32.png",
+      "icons/64x64.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
       "icons/icon.icns",
-      "icons/icon.ico"
+      "icons/icon.ico",
+      "icons/icon.png",
+      "icons/Square30x30Logo.png",
+      "icons/Square44x44Logo.png",
+      "icons/Square71x71Logo.png",
+      "icons/Square89x89Logo.png",
+      "icons/Square107x107Logo.png",
+      "icons/Square142x142Logo.png",
+      "icons/Square150x150Logo.png",
+      "icons/Square284x284Logo.png",
+      "icons/Square310x310Logo.png",
+      "icons/StoreLogo.png",
+      "icons/ios/AppIcon-20x20@1x.png",
+      "icons/ios/AppIcon-20x20@2x-1.png",
+      "icons/ios/AppIcon-20x20@2x.png",
+      "icons/ios/AppIcon-20x20@3x.png",
+      "icons/ios/AppIcon-29x29@1x.png",
+      "icons/ios/AppIcon-29x29@2x-1.png",
+      "icons/ios/AppIcon-29x29@2x.png",
+      "icons/ios/AppIcon-29x29@3x.png",
+      "icons/ios/AppIcon-40x40@1x.png",
+      "icons/ios/AppIcon-40x40@2x-1.png",
+      "icons/ios/AppIcon-40x40@2x.png",
+      "icons/ios/AppIcon-40x40@3x.png",
+      "icons/ios/AppIcon-60x60@2x.png",
+      "icons/ios/AppIcon-60x60@3x.png",
+      "icons/ios/AppIcon-76x76@1x.png",
+      "icons/ios/AppIcon-76x76@2x.png",
+      "icons/ios/AppIcon-83.5x83.5@2x.png",
+      "icons/ios/AppIcon-512@2x.png"
     ]
   }
 }

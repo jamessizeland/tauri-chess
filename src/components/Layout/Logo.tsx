@@ -16,11 +16,7 @@ const Logo: React.FC<Props> = ({
 }) => {
   return (
     <img
-      className={cn(
-        'hover:animate-twSpin hover:animate-infinite hover:animate-slow',
-        'mx-2',
-        className,
-      )}
+      className={cn('mx-2', className)}
       src={logo}
       height={height}
       width={width}
