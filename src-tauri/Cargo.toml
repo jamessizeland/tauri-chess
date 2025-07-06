@@ -1,6 +1,6 @@
 [package]
 name = "tauri-chess"
-version = "2.2.0"
+version = "2.3.0"
 description = "A Tauri App for playing chess"
 authors = ["James Sizeland"]
 edition = "2024"
@@ -27,6 +27,7 @@ anyhow = "^1.0.80"
 # Tauri Plugins
 ############################################
 tauri-plugin-shell = "^2.0.0"
+timecat = "1.45.5"
 
 [profile.release]
 panic = "abort"   # Strip expensive panic clean-up logic

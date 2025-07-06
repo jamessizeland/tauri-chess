@@ -2,39 +2,35 @@
 
 use super::{
     board::BoardState,
-    data::{GameMetaData, HistoryData, Message, PieceLocation, QueueHandler, SelectedSquare},
+    data::AppContext,
     moves::check_castling_moves,
     types::{Color, GameMeta, MoveList, MoveType, Piece, Square},
     utils::{check_enemy, remove_invalid_moves, square_to_coord, turn_into_colour, valid_move},
 };
-use anyhow::{anyhow, Context};
-use tauri::Result;
+use anyhow::anyhow;
+use tauri::{Emitter, Result};
 
 #[tauri::command]
 /// Get the location of all pieces from global memory
-pub fn get_state(state: tauri::State<PieceLocation>) -> BoardState {
-    let board = state.lock().expect("board state access");
+pub fn get_state(state: tauri::State<AppContext>) -> BoardState {
+    let board = state.board.lock().expect("board state access");
     board.clone()
 }
 
 #[tauri::command]
 /// Get the game score from global memory
-pub fn get_score(state: tauri::State<GameMetaData>) -> GameMeta {
-    let meta_game = state.lock().expect("game state access");
+pub fn get_score(state: tauri::State<AppContext>) -> GameMeta {
+    let meta_game = state.meta_data.lock().expect("game state access");
     *meta_game
 }
 
 #[tauri::command]
 /// Initialize a new game by sending a starting set of coords
-pub fn new_game(
-    state: tauri::State<PieceLocation>,
-    meta: tauri::State<GameMetaData>,
-    history_data: tauri::State<HistoryData>,
-) -> BoardState {
+pub fn new_game(state: tauri::State<AppContext>) -> BoardState {
     // Lock the counter(Mutex) to get the current value
-    let mut board = state.lock().expect("board state access");
-    let mut game_meta = meta.lock().expect("game state access");
-    let mut history = history_data.lock().expect("game history access");
+    let mut board = state.board.lock().expect("board state access");
+    let mut game_meta = state.meta_data.lock().expect("game state access");
+    let mut history = state.history.lock().expect("game history access");
     *history = Default::default();
     // reset game meta data
     game_meta.new_game();
@@ -46,15 +42,10 @@ pub fn new_game(
 
 #[tauri::command]
 /// Highlight available moves for the piece occupying this square
-pub fn hover_square(
-    square: &str,
-    state: tauri::State<PieceLocation>,
-    clicked: tauri::State<SelectedSquare>,
-    meta: tauri::State<GameMetaData>,
-) -> Result<MoveList> {
-    let board = state.lock().expect("board state access");
-    let game_meta = meta.lock().expect("game state access");
-    let selected = *clicked.lock().expect("selected square access");
+pub fn hover_square(square: &str, state: tauri::State<AppContext>) -> Result<MoveList> {
+    let board = state.board.lock().expect("board state access");
+    let game_meta = state.meta_data.lock().expect("game state access");
+    let selected = *state.selected.lock().expect("selected square access");
     let mut coord: Square = square_to_coord(square)?;
     println!("hovering over square {:?}", coord);
     let turn = turn_into_colour(game_meta.turn);
@@ -98,16 +89,13 @@ pub fn drop_square(source_square: &str, target_square: &str, piece: &str) {
 /// If a square is a valid move of the selected piece, move that piece.
 pub fn click_square(
     square: &str,
-    state: tauri::State<PieceLocation>,
-    clicked: tauri::State<SelectedSquare>,
-    meta: tauri::State<GameMetaData>,
-    history_data: tauri::State<HistoryData>,
-    queue: tauri::State<QueueHandler>,
+    state: tauri::State<AppContext>,
+    app: tauri::AppHandle,
 ) -> Result<(MoveList, BoardState, GameMeta)> {
     // acquire control of global data
-    let mut board = state.lock().expect("board state access");
-    let mut game_meta = meta.lock().expect("game state access");
-    let mut selected = *clicked.lock().expect("selected square access");
+    let mut board = state.board.lock().expect("board state access");
+    let mut game_meta = state.meta_data.lock().expect("game state access");
+    let mut selected = *state.selected.lock().expect("selected square access");
 
     let mut move_list = MoveList::new();
     if game_meta.game_over {
@@ -178,11 +166,7 @@ pub fn click_square(
                         // normal move or capture
                         if mover.is_promotable_pawn(coord) {
                             game_meta.promotable_pawn = Some(coord);
-                            queue
-                                .lock()
-                                .expect("queue access")
-                                .blocking_send(Message::new("promotion", &coord)?)
-                                .context("failed to send promotion event")?;
+                            app.emit("promotion", &coord)?;
                         }
                     }
                 }
@@ -200,7 +184,7 @@ pub fn click_square(
                 }
                 selected = None;
                 // 5. update the meta only if something has changed
-                let mut history = history_data.lock().expect("game history access");
+                let mut history = state.history.lock().expect("game history access");
                 game_meta.new_turn(&mut board, &mut history);
                 println!("score history: {:?}", history.score);
             }
@@ -215,23 +199,17 @@ pub fn click_square(
             }
         }
     }
-    *clicked.lock().expect("clicked square access") = selected;
+    *state.selected.lock().expect("clicked square access") = selected;
     Ok((move_list, board.to_owned(), game_meta.to_owned()))
 }
 
 #[tauri::command]
 /// User has selected a piece type for the promotion of a valid pawn
-pub fn promote(
-    choice: char,
-    state: tauri::State<PieceLocation>,
-    meta: tauri::State<GameMetaData>,
-    queue: tauri::State<QueueHandler>,
-) -> Result<()> {
-    let mut game_meta = meta.lock().expect("game state access");
+pub fn promote(choice: char, state: tauri::State<AppContext>, app: tauri::AppHandle) -> Result<()> {
+    let mut game_meta = state.meta_data.lock().expect("game state access");
     let colour = turn_into_colour(game_meta.turn + 1);
     if let Some(coord) = game_meta.promotable_pawn {
-        let mut board = state.lock().expect("board state access");
-        let rx = queue.lock().expect("queue access");
+        let mut board = state.board.lock().expect("board state access");
         game_meta.promotable_pawn = None;
         let promotion = match choice {
             'Q' => Piece::Queen(colour, false),
@@ -241,8 +219,7 @@ pub fn promote(
             _ => return Err(anyhow!("invalid promotion choice"))?,
         };
         board.set(coord, promotion);
-        rx.blocking_send(Message::new("board", &*board)?)
-            .context("failed to send board state")?;
+        app.emit("board", &*board)?;
     };
     Ok(())
 }
