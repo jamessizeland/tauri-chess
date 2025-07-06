@@ -2,22 +2,18 @@
   "javascript.validate.enable": false,
   "javascript.format.enable": false,
   "typescript.format.enable": false,
-
-  "search.exclude": {
-    ".git": true,
-    ".eslintcache": true,
-    "src/build": true,
-    "bower_components": true,
-    "dll": true,
-    "release": true,
-    "node_modules": true,
-    "npm-debug.log.*": true,
-    "test/**/__snapshots__": true,
-    "*.lock": true,
-    "*.lockb":true,
-    "*.{css,sass,scss}.d.ts": true
-  },
   // force format on save to be enabled for this project
   "editor.formatOnSave": true,
-  "editor.formatOnSaveMode": "file"
+  "editor.formatOnSaveMode": "file",
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "editor.quickSuggestions": {
+    "strings": "on"
+  },
+  "typescript.inlayHints.parameterNames.enabled": "all",
+  "typescript.inlayHints.variableTypes.enabled": true,
+  "typescript.inlayHints.propertyDeclarationTypes.enabled": true,
+  "typescript.inlayHints.functionLikeReturnTypes.enabled": true,
+  "typescript.inlayHints.enumMemberValues.enabled": true,
 }
