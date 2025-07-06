@@ -1,2 +1,176 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @plugin "daisyui";
+@plugin "tailwindcss-animated";
+
+/*
+ * Define custom animations using standard CSS @keyframes.
+ * These are defined at the root of your CSS file.
+*/
+@keyframes modal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes drawer-right {
+  from {
+    right: -500px;
+  }
+  to {
+    right: 0;
+  }
+}
+
+@keyframes drawer-left {
+  from {
+    left: -500px;
+  }
+  to {
+    left: 0;
+  }
+}
+
+@keyframes drawer-top {
+  from {
+    top: -500px;
+  }
+  to {
+    top: 0;
+  }
+}
+
+@keyframes drawer-bottom {
+  from {
+    bottom: -500px;
+  }
+  to {
+    bottom: 0;
+  }
+}
+
+@theme {
+  /*
+   * Custom Colors
+  */
+  --colors-primary: #0694a2;
+  --colors-secondary: #9fa6b2;
+
+  --colors-gray-50: #f9fafb;
+  --colors-gray-100: #f4f5f7;
+  --colors-gray-200: #e5e7eb;
+  --colors-gray-300: #d2d6dc;
+  --colors-gray-400: #9fa6b2;
+  --colors-gray-500: #6b7280;
+  --colors-gray-600: #4b5563;
+  --colors-gray-700: #374151;
+  --colors-gray-800: #252f3f;
+  --colors-gray-900: #161e2e;
+
+  --colors-coral-50: #fdf2f2;
+  --colors-coral-100: #fde8e8;
+  --colors-coral-200: #fbd5d5;
+  --colors-coral-300: #f8b4b4;
+  --colors-coral-400: #f98080;
+  --colors-coral-500: #f05252;
+  --colors-coral-600: #e02424;
+  --colors-coral-700: #c81e1e;
+  --colors-coral-800: #9b1c1c;
+  --colors-coral-900: #771d1d;
+
+  --colors-pumpkin-50: #fff8f1;
+  --colors-pumpkin-100: #feecdc;
+  --colors-pumpkin-200: #fcd9bd;
+  --colors-pumpkin-300: #fdba8c;
+  --colors-pumpkin-400: #ff8a4c;
+  --colors-pumpkin-500: #ff5a1f;
+  --colors-pumpkin-600: #d03801;
+  --colors-pumpkin-700: #b43403;
+  --colors-pumpkin-800: #8a2c0d;
+  --colors-pumpkin-900: #73230d;
+
+  --colors-orange-50: #fdfdea;
+  --colors-orange-100: #fdf6b2;
+  --colors-orange-200: #fce96a;
+  --colors-orange-300: #faca15;
+  --colors-orange-400: #e3a008;
+  --colors-orange-500: #c27803;
+  --colors-orange-600: #9f580a;
+  --colors-orange-700: #8e4b10;
+  --colors-orange-800: #723b13;
+  --colors-orange-900: #633112;
+
+  --colors-turquoise-50: #f3faf7;
+  --colors-turquoise-100: #def7ec;
+  --colors-turquoise-200: #bcf0da;
+  --colors-turquoise-300: #84e1bc;
+  --colors-turquoise-400: #31c48d;
+  --colors-turquoise-500: #0e9f6e;
+  --colors-turquoise-600: #057a55;
+  --colors-turquoise-700: #046c4e;
+  --colors-turquoise-800: #03543f;
+  --colors-turquoise-900: #014737;
+
+  --colors-beach-50: #edfafa;
+  --colors-beach-100: #d5f5f6;
+  --colors-beach-200: #afecef;
+  --colors-beach-300: #7edce2;
+  --colors-beach-400: #16bdca;
+  --colors-beach-500: #0694a2;
+  --colors-beach-600: #047481;
+  --colors-beach-700: #036672;
+  --colors-beach-800: #05505c;
+  --colors-beach-900: #014451;
+
+  --colors-azure-50: #ebf5ff;
+  --colors-azure-100: #e1effe;
+  --colors-azure-200: #c3ddfd;
+  --colors-azure-300: #a4cafe;
+  --colors-azure-400: #76a9fa;
+  --colors-azure-500: #3f83f8;
+  --colors-azure-600: #1c64f2;
+  --colors-azure-700: #1a56db;
+  --colors-azure-800: #1e429f;
+  --colors-azure-900: #233876;
+
+  --colors-blue-50: #f0f5ff;
+  --colors-blue-100: #e5edff;
+  --colors-blue-200: #cddbfe;
+  --colors-blue-300: #b4c6fc;
+  --colors-blue-400: #8da2fb;
+  --colors-blue-500: #6875f5;
+  --colors-blue-600: #5850ec;
+  --colors-blue-700: #5145cd;
+  --colors-blue-800: #42389d;
+  --colors-blue-900: #362f78;
+
+  --colors-indigo-50: #f6f5ff;
+  --colors-indigo-100: #edebfe;
+  --colors-indigo-200: #dcd7fe;
+  --colors-indigo-300: #cabffd;
+  --colors-indigo-400: #ac94fa;
+  --colors-indigo-500: #9061f9;
+  --colors-indigo-600: #7e3af2;
+  --colors-indigo-700: #6c2bd9;
+  --colors-indigo-800: #5521b5;
+  --colors-indigo-900: #4a1d96;
+
+  --colors-cerise-50: #fdf2f8;
+  --colors-cerise-100: #fce8f3;
+  --colors-cerise-200: #fad1e8;
+  --colors-cerise-300: #f8b4d9;
+  --colors-cerise-400: #f17eb8;
+  --colors-cerise-500: #e74694;
+  --colors-cerise-600: #d61f69;
+  --colors-cerise-700: #bf125d;
+  --colors-cerise-800: #99154b;
+  --colors-cerise-900: #751a3d;
+
+  --animate-modal: modal 0.5s;
+  --animate-drawer-right: drawer-right 0.3s;
+  --animate-drawer-left: drawer-left 0.3s;
+  --animate-drawer-top: drawer-top 0.3s;
+  --animate-drawer-bottom: drawer-bottom 0.3s;
+}
