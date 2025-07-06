@@ -127,7 +127,6 @@ const AskNewGame: React.FC<{
         <Button
           onClick={() => {
             invoke<BoardStateArray>('new_game').then((board) => {
-              notify('starting new game', 'new_game');
               setPosition(parseBoardState(board));
               console.log(board);
             });

@@ -24,7 +24,7 @@ const TestPage: React.FC = () => {
   const [isOpen1, toggle1] = useToggle(false);
   const [isOpen2, toggle2] = useToggle(false);
   return (
-    <div className="animate-backInRight animate-fast">
+    <div className="animate-backInRight">
       <h1 className="text-3xl font-bold underline text-center">Test Page</h1>
       <div>
         <Modal toggle={toggle1} isOpen={isOpen1} animate position="extraLarge">

@@ -70,8 +70,7 @@ const HomePage: React.FC = () => {
   }, []);
 
   return (
-    <div className="animate-backInRight animate-fast">
-      <h1 className="text-3xl font-bold underline text-center">Game</h1>
+    <div className="animate-backInRight">
       <div className="flex justify-around items-center flex-wrap pt-5">
         <AskNewGame
           setGameMeta={setGameMeta}

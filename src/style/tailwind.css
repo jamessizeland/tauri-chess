@@ -2,16 +2,47 @@
 @plugin "daisyui";
 @plugin "tailwindcss-animated";
 
-/*
- * Define custom animations using standard CSS @keyframes.
- * These are defined at the root of your CSS file.
-*/
-@keyframes modal {
+@keyframes backInDown {
   from {
-    opacity: 0;
+    transform: translate3d(0, calc(-1 * var(--animate-distance, 1000px)), 0)
+      scale3d(0, 0, 1);
   }
-  to {
-    opacity: 1;
+  80% {
+    opacity: 0.7;
+    transform: translate3d(0, 0, 0) scale3d(0.7, 0.7, 1);
+  }
+}
+
+@keyframes backInLeft {
+  from {
+    transform: translate3d(calc(-1 * var(--animate-distance, 2000px)), 0, 0)
+      scale3d(0, 0, 1);
+  }
+  80% {
+    opacity: 0.7;
+    transform: translate3d(0, 0, 0) scale3d(0.7, 0.7, 1);
+  }
+}
+
+@keyframes backInRight {
+  from {
+    transform: translate3d(var(--animate-distance, 2000px), 0, 0)
+      scale3d(0, 0, 1);
+  }
+  80% {
+    opacity: 0.7;
+    transform: translate3d(0, 0, 0) scale3d(0.7, 0.7, 1);
+  }
+}
+
+@keyframes backInUp {
+  from {
+    transform: translate3d(0, var(--animate-distance, 1000px), 0)
+      scale3d(0, 0, 1);
+  }
+  80% {
+    opacity: 0.7;
+    transform: translate3d(0, 0, 0) scale3d(0.7, 0.7, 1);
   }
 }
 
@@ -173,4 +204,8 @@
   --animate-drawer-left: drawer-left 0.3s;
   --animate-drawer-top: drawer-top 0.3s;
   --animate-drawer-bottom: drawer-bottom 0.3s;
+  --animate-backInDown: backInDown 0.3s;
+  --animate-backInLeft: backInLeft 0.3s;
+  --animate-backInRight: backInRight 0.3s;
+  --animate-backInUp: backInUp 0.3s;
 }

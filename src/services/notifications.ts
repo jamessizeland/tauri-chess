@@ -19,6 +19,6 @@ export const notify = (
 ): string => {
   toastConfig.autoClose = timeout;
   toastConfig.toastId = id ? id : Date.now().toString(16);
-  toast.info(message, toastConfig);
+  toast(message, toastConfig);
   return toastConfig.toastId;
 };
