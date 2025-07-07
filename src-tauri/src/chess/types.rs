@@ -20,6 +20,11 @@ pub struct GameMeta {
     pub white_king: KingMeta,
     /// Register if the game is active or ended
     pub game_over: bool,
+    /// Half-move counter, used for the fifty-move rule
+    /// This is incremented every turn, and reset to 0 when a pawn is moved
+    /// or a piece is captured.
+    /// This is used to determine if the game can be drawn by the fifty-move rule
+    pub half_move_count: usize,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, Default)]
@@ -65,6 +70,7 @@ impl GameMeta {
     /// Increment the turn to the next player, check state of both players and return if game end has occurred
     pub fn update_turn(&mut self) {
         self.turn += 1;
+        self.half_move_count += 1;
         println!("turn {}", self.turn)
     }
     /// Set up new game
@@ -118,6 +124,7 @@ impl Default for GameMeta {
                 piece: Piece::King(Color::Black, true, false, false),
                 square: (4, 7),
             },
+            half_move_count: 0,
         }
     }
 }
@@ -162,6 +169,26 @@ pub enum Piece {
     Bishop(Color, FirstMove),
     Knight(Color, FirstMove),
     Rook(Color, FirstMove),
+}
+
+impl Piece {
+    pub fn to_fen_char(&self) -> Option<char> {
+        match *self {
+            Piece::None => None,
+            Piece::Pawn(Color::White, _) => Some('P'),
+            Piece::Pawn(Color::Black, _) => Some('p'),
+            Piece::King(Color::White, _, _, _) => Some('K'),
+            Piece::King(Color::Black, _, _, _) => Some('k'),
+            Piece::Queen(Color::White, _) => Some('Q'),
+            Piece::Queen(Color::Black, _) => Some('q'),
+            Piece::Bishop(Color::White, _) => Some('B'),
+            Piece::Bishop(Color::Black, _) => Some('b'),
+            Piece::Knight(Color::White, _) => Some('N'),
+            Piece::Knight(Color::Black, _) => Some('n'),
+            Piece::Rook(Color::White, _) => Some('R'),
+            Piece::Rook(Color::Black, _) => Some('r'),
+        }
+    }
 }
 
 impl Display for Piece {

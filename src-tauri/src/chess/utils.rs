@@ -3,7 +3,7 @@
 use super::board::BoardState;
 use super::moves::check_castling_moves;
 use super::types::{Color, GameMeta, MoveList, MoveType, Piece, Square};
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 
 /// Convert letters a-h to a row index from a standard chessboard
 pub fn letter_to_row(letter: char) -> Result<usize> {
@@ -18,6 +18,22 @@ pub fn letter_to_row(letter: char) -> Result<usize> {
         'h' => 7,
         _ => return Err(anyhow!("invalid letter")),
     })
+}
+
+/// convert a coord (col, row) to a square i.e. b3
+pub fn coord_to_square(coord: (usize, usize)) -> Result<String> {
+    let letter = match coord.0 {
+        0 => 'a',
+        1 => 'b',
+        2 => 'c',
+        3 => 'd',
+        4 => 'e',
+        5 => 'f',
+        6 => 'g',
+        7 => 'h',
+        _ => return Err(anyhow!("invalid coordinate")),
+    };
+    Ok(format!("{}{}", letter, coord.1 + 1))
 }
 
 /// check if the piece we are looking is of the opposite colour to us

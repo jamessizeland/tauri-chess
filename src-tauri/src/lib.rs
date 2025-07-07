@@ -2,13 +2,18 @@
 
 mod chess;
 
-use crate::chess::data::AppContext;
+use chess::data::AppContext;
+use tauri::Manager as _;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
-        .manage(AppContext::default())
+        .setup(|app| {
+            let state = AppContext::new(app.handle().clone());
+            app.handle().manage(state);
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             chess::api::new_game,
             chess::api::get_state,

@@ -15,12 +15,12 @@ impl BoardState {
         let mut board = [[Piece::None; 8]; 8];
         // set up white pieces
         board[0][0] = Piece::Rook(white, true);
-        board[1][0] = Piece::Bishop(white, true);
-        board[2][0] = Piece::Knight(white, true);
+        board[1][0] = Piece::Knight(white, true);
+        board[2][0] = Piece::Bishop(white, true);
         board[3][0] = Piece::Queen(white, true);
         board[4][0] = Piece::King(white, true, false, false);
-        board[5][0] = Piece::Knight(white, true);
-        board[6][0] = Piece::Bishop(white, true);
+        board[5][0] = Piece::Bishop(white, true);
+        board[6][0] = Piece::Knight(white, true);
         board[7][0] = Piece::Rook(white, true);
         // set up black pieces
         board[0][7] = Piece::Rook(black, true);
@@ -49,10 +49,48 @@ impl BoardState {
     pub fn iter(&self) -> std::slice::Iter<[Piece; 8]> {
         self.0.iter()
     }
+    /// Construct the board section of a fen string
+    pub fn to_fen_string(&self) -> String {
+        let mut fen = String::new();
+        let mut empty_count = 0;
+        for row in (0..8).rev() {
+            for col in 0..8 {
+                let piece = self.0[col][row];
+                if let Some(piece) = piece.to_fen_char() {
+                    if empty_count > 0 {
+                        fen.push_str(&empty_count.to_string());
+                        empty_count = 0;
+                    }
+                    fen.push(piece);
+                } else {
+                    empty_count += 1;
+                }
+            }
+            if empty_count > 0 {
+                fen.push_str(&empty_count.to_string());
+                empty_count = 0;
+            }
+            fen.push('/');
+        }
+        fen.pop();
+        fen
+    }
 }
 
 impl Default for BoardState {
     fn default() -> Self {
         BoardState([[Piece::None; 8]; 8])
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::chess::board::BoardState;
+
+    #[test]
+    fn test_generate_fen() {
+        let board = BoardState::new();
+        let fen = board.to_fen_string();
+        assert_eq!(fen, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
     }
 }
