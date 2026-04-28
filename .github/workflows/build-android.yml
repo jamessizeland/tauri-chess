@@ -13,18 +13,16 @@ env:
 
 jobs:
   publish-android:
-    if: ${{ github.event.pull_request.merged }} && github.repository_owner == 'jamessizeland' # This is to ensure that only the owner can publish the app.
+    if: ${{ github.event.pull_request.merged && github.repository_owner == 'jamessizeland' }} # This is to ensure that only the owner can publish the app.
     permissions:
       contents: write
-    strategy:
-      fail-fast: true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: setup bun
-        uses: oven-sh/setup-bun@v2
+      - name: setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          bun-version: latest
+          version: latest
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -67,10 +65,10 @@ jobs:
           cd ../../.. # Go back to root
 
       - name: Install dependencies
-        run: bun install
+        run: pnpm install
 
       - name: Build app bundle
-        run: bun tauri android build -v
+        run: pnpm tauri android build -v
         env:
           NDK_HOME: /usr/local/lib/android/sdk/ndk/27.0.11902837
 
