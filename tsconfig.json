@@ -13,13 +13,29 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "types": ["node"],
 
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "baseUrl": "src"
+    "paths": {
+      "assets/*": ["./src/assets/*"],
+      "components": ["./src/components/index.ts"],
+      "components/*": ["./src/components/*"],
+      "hooks": ["./src/hooks/index.ts"],
+      "hooks/*": ["./src/hooks/*"],
+      "pages": ["./src/pages/index.ts"],
+      "pages/*": ["./src/pages/*"],
+      "routes": ["./src/routes/index.tsx"],
+      "routes/*": ["./src/routes/*"],
+      "services/*": ["./src/services/*"],
+      "types": ["./src/types/index.ts"],
+      "types/*": ["./src/types/*"],
+      "utils": ["./src/utils/index.ts"],
+      "utils/*": ["./src/utils/*"]
+    }
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
