@@ -38,7 +38,7 @@ function Header({}: HeaderProps) {
         'shadow-sm shadow-slate-500',
       )}
     >
-      <Navbar className={cn('bg-linear-to-r from-blue-500 to-primary pr-2')}>
+      <Navbar className={cn('bg-gradient-to-r from-blue-500 to-primary pr-2')}>
         <NavbarBrand href="/">
           <Logo />
         </NavbarBrand>

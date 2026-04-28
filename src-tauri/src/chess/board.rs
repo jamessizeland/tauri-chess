@@ -15,8 +15,8 @@ impl BoardState {
         let mut board = [[Piece::None; 8]; 8];
         // set up white pieces
         board[0][0] = Piece::Rook(white, true);
-        board[1][0] = Piece::Knight(white, true);
-        board[2][0] = Piece::Bishop(white, true);
+        board[1][0] = Piece::Bishop(white, true);
+        board[2][0] = Piece::Knight(white, true);
         board[3][0] = Piece::Queen(white, true);
         board[4][0] = Piece::King(white, true, false, false);
         board[5][0] = Piece::Knight(white, true);
@@ -46,7 +46,7 @@ impl BoardState {
     pub fn get(&self, square: Square) -> Piece {
         self.0[square.0][square.1]
     }
-    pub fn iter(&self) -> std::slice::Iter<'_, [Piece; 8]> {
+    pub fn iter(&self) -> std::slice::Iter<[Piece; 8]> {
         self.0.iter()
     }
 }
