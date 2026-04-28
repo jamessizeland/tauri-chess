@@ -13,7 +13,7 @@ interface DrawerProps extends Props {
 }
 
 const ngClass = {
-  body: `flex-shrink flex-grow p-4`,
+  body: `shrink grow p-4`,
   headerTitle: `text-2xl md:text-3xl font-light`,
   content: `relative flex flex-col bg-white pointer-events-auto w-full`,
   header: `items-start justify-between p-4 border-b border-gray-300`,
