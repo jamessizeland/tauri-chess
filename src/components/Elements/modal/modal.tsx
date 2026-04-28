@@ -16,7 +16,7 @@ interface ModalProps extends Props {
 
 const ngClass = {
   animate: 'animate-backInDown',
-  body: `flex-shrink flex-grow p-4`,
+  body: `shrink grow p-4`,
   headerTitle: `text-2xl md:text-3xl font-light`,
   header: `items-start justify-between p-4 border-b border-gray-300`,
   container: `fixed top-0 left-0 z-40 w-full h-full m-0 overflow-y-auto`,

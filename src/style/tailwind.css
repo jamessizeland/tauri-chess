@@ -1,2 +1,173 @@
-@import "tailwindcss";
-@plugin "daisyui";
+@import 'tailwindcss';
+
+@plugin "daisyui/index.js" {
+  themes:
+    light --default,
+    dark --prefersdark;
+}
+
+@theme {
+  --color-primary: #0694a2;
+  --color-secondary: #9fa6b2;
+
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f4f5f7;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d2d6dc;
+  --color-gray-400: #9fa6b2;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #252f3f;
+  --color-gray-900: #161e2e;
+
+  --color-coral-50: #fdf2f2;
+  --color-coral-100: #fde8e8;
+  --color-coral-200: #fbd5d5;
+  --color-coral-300: #f8b4b4;
+  --color-coral-400: #f98080;
+  --color-coral-500: #f05252;
+  --color-coral-600: #e02424;
+  --color-coral-700: #c81e1e;
+  --color-coral-800: #9b1c1c;
+  --color-coral-900: #771d1d;
+
+  --color-pumpkin-50: #fff8f1;
+  --color-pumpkin-100: #feecdc;
+  --color-pumpkin-200: #fcd9bd;
+  --color-pumpkin-300: #fdba8c;
+  --color-pumpkin-400: #ff8a4c;
+  --color-pumpkin-500: #ff5a1f;
+  --color-pumpkin-600: #d03801;
+  --color-pumpkin-700: #b43403;
+  --color-pumpkin-800: #8a2c0d;
+  --color-pumpkin-900: #73230d;
+
+  --color-orange-50: #fdfdea;
+  --color-orange-100: #fdf6b2;
+  --color-orange-200: #fce96a;
+  --color-orange-300: #faca15;
+  --color-orange-400: #e3a008;
+  --color-orange-500: #c27803;
+  --color-orange-600: #9f580a;
+  --color-orange-700: #8e4b10;
+  --color-orange-800: #723b13;
+  --color-orange-900: #633112;
+
+  --color-turquoise-50: #f3faf7;
+  --color-turquoise-100: #def7ec;
+  --color-turquoise-200: #bcf0da;
+  --color-turquoise-300: #84e1bc;
+  --color-turquoise-400: #31c48d;
+  --color-turquoise-500: #0e9f6e;
+  --color-turquoise-600: #057a55;
+  --color-turquoise-700: #046c4e;
+  --color-turquoise-800: #03543f;
+  --color-turquoise-900: #014737;
+
+  --color-beach-50: #edfafa;
+  --color-beach-100: #d5f5f6;
+  --color-beach-200: #afecef;
+  --color-beach-300: #7edce2;
+  --color-beach-400: #16bdca;
+  --color-beach-500: #0694a2;
+  --color-beach-600: #047481;
+  --color-beach-700: #036672;
+  --color-beach-800: #05505c;
+  --color-beach-900: #014451;
+
+  --color-azure-50: #ebf5ff;
+  --color-azure-100: #e1effe;
+  --color-azure-200: #c3ddfd;
+  --color-azure-300: #a4cafe;
+  --color-azure-400: #76a9fa;
+  --color-azure-500: #3f83f8;
+  --color-azure-600: #1c64f2;
+  --color-azure-700: #1a56db;
+  --color-azure-800: #1e429f;
+  --color-azure-900: #233876;
+
+  --color-blue-50: #f0f5ff;
+  --color-blue-100: #e5edff;
+  --color-blue-200: #cddbfe;
+  --color-blue-300: #b4c6fc;
+  --color-blue-400: #8da2fb;
+  --color-blue-500: #6875f5;
+  --color-blue-600: #5850ec;
+  --color-blue-700: #5145cd;
+  --color-blue-800: #42389d;
+  --color-blue-900: #362f78;
+
+  --color-indigo-50: #f6f5ff;
+  --color-indigo-100: #edebfe;
+  --color-indigo-200: #dcd7fe;
+  --color-indigo-300: #cabffd;
+  --color-indigo-400: #ac94fa;
+  --color-indigo-500: #9061f9;
+  --color-indigo-600: #7e3af2;
+  --color-indigo-700: #6c2bd9;
+  --color-indigo-800: #5521b5;
+  --color-indigo-900: #4a1d96;
+
+  --color-cerise-50: #fdf2f8;
+  --color-cerise-100: #fce8f3;
+  --color-cerise-200: #fad1e8;
+  --color-cerise-300: #f8b4d9;
+  --color-cerise-400: #f17eb8;
+  --color-cerise-500: #e74694;
+  --color-cerise-600: #d61f69;
+  --color-cerise-700: #bf125d;
+  --color-cerise-800: #99154b;
+  --color-cerise-900: #751a3d;
+
+  --animate-modal: modal 0.5s;
+  --animate-drawer-right: drawer-right 0.3s;
+  --animate-drawer-left: drawer-left 0.3s;
+  --animate-drawer-top: drawer-top 0.3s;
+  --animate-drawer-bottom: drawer-bottom 0.3s;
+
+  @keyframes modal {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes drawer-right {
+    0% {
+      right: -500px;
+    }
+    100% {
+      right: 0;
+    }
+  }
+
+  @keyframes drawer-left {
+    0% {
+      left: -500px;
+    }
+    100% {
+      left: 0;
+    }
+  }
+
+  @keyframes drawer-top {
+    0% {
+      top: -500px;
+    }
+    100% {
+      top: 0;
+    }
+  }
+
+  @keyframes drawer-bottom {
+    0% {
+      bottom: -500px;
+    }
+    100% {
+      bottom: 0;
+    }
+  }
+}
